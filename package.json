@@ -28,17 +28,18 @@
   "scripts": {
     "clean": "rm -rf ./dist",
     "build": "tsc",
-    "build:core-backend": "tsc",
-    "build:watch": "tsc -w --preserveWatchOutput",
-    "test": "jest --watchAll"
+    "test": "jest --watchAll",
+    "bump:major": "npm run build & node node_modules/bump-simple/bump-simple.js --major",
+    "bump:minor": "npm run build & node node_modules/bump-simple/bump-simple.js --minor",
+    "bump:patch": "npm run build & node node_modules/bump-simple/bump-simple.js --patch"
   },
   "dependencies": {
     "@types/jest": "^29.5.4",
     "@types/mongoose": "^5.11.97",
-    "bump-simple": "^1.0.24",
     "topkat-utils": "latest"
   },
   "devDependencies": {
+    "bump-simple": "^1.0.24",
     "jest": "^29.6.2",
     "ts-jest": "^29.1.1"
   }
