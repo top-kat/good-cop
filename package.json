@@ -8,7 +8,6 @@
     "./backend": "./dist/index-backend.js",
     "./frontend": "./dist/index-frontend.js"
   },
-  "types": "src/index.ts",
   "description": "",
   "license": "ISC",
   "author": "topkat",
