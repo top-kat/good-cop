@@ -6,7 +6,11 @@ import { ErrorOptions, parseRegexp } from 'topkat-utils'
 //----------------------------------------
 // SHARED/ALIASED DEFINITIONS
 //----------------------------------------
-export function matchRegexp<This extends Definition>(this: This, regexpOrStr: string | RegExp, regexpOptions: Parameters<typeof parseRegexp>[1]) {
+export function matchRegexp<This extends Definition>(
+    this: This,
+    regexpOrStr: string | RegExp,
+    regexpOptions?: Parameters<typeof parseRegexp>[1]
+) {
     const regexp = typeof regexpOrStr === 'string' ? new RegExp(parseRegexp(regexpOrStr, regexpOptions)) : regexpOrStr
     return this.newDef({
         errorMsg: ctx => `Entry ${ctx.value} do not match ${regexp}`,
