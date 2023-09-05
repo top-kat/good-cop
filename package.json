@@ -11,10 +11,10 @@
   "typesVersions": {
     "*": {
       "backend": [
-        "./dist/index-backend.js"
+        "./src/index-backend.ts"
       ],
       "frontend": [
-        "./dist/index-frontend.js"
+        "./src/index-frontend.ts"
       ]
     }
   },
