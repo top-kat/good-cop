@@ -1,5 +1,5 @@
 
-import {CtxUser} from '../core-types'
+import { User } from '../core-types'
 import { DefinitionPartial, DefCtxWithoutValueAndAddr, DefCtx, DaoGenericMethods } from '../definitionTypes'
 import { DefinitionBase } from '../DefinitionBaseClass'
 
@@ -20,7 +20,7 @@ export async function formatAndValidate<This extends DefinitionBase<any, any>>(
         disableValidation?: boolean
         /** may provide a little perf boost for validation on read operation (that where already formatted on write) */
         disableFormatting?: boolean
-        user?: CtxUser
+        user?: User
     } = {}
 ) {
     const definitions = this._definitions.map(d => typeof d === 'function' ? d() : d)

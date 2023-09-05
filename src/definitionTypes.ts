@@ -1,4 +1,4 @@
-import { CtxUser, NoExtraProperties, MaybePromise, ObjectWithNoFn } from './core-types'
+import { User, NoExtraProperties, MaybePromise, ObjectWithNoFn } from './core-types'
 import { Definition } from './DefinitionClass'
 
 import { ErrorOptions } from 'topkat-utils'
@@ -61,7 +61,7 @@ export interface DefCtx {
     fields: ObjectWithNoFn
     fieldAddr: string
     map?: ObjectWithNoFn
-    user: CtxUser
+    user: User
 }
 
 export type DefCtxWithoutValueAndAddr = Omit<DefCtx, 'value' | 'fieldAddr'>

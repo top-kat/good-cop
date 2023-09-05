@@ -13,23 +13,6 @@
     "plugins": [
         "@typescript-eslint"
     ],
-    "globals": {
-        "Ctx": "readonly",
-        "RecursiveObjValueType": "readonly",
-        "Roles": "readonly",
-        "FunctionalRoles": "readonly",
-        "CtxUser": "readonly",
-        "Env": "readonly",
-        "ObjectGeneric": "readonly",
-        "Mask": "readonly",
-        "ObjectWithNoFn": "readonly",
-        "CtxMinimal": "readonly",
-        "Override": "readonly",
-        "DistributeurAdminRoles": "readonly",
-        "MaybeArray": "readonly",
-        "MaybePromise": "readonly",
-        "ObjectId": "readonly"
-    },
     "parserOptions": {
         "ecmaVersion": 2018,
         "sourceType": "module",
