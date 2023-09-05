@@ -1,0 +1,36 @@
+{
+    //----------------------------------------
+    // GENERAL
+    //----------------------------------------
+    "Commentaire": {
+        "scope": "javascript,typescript,md,markdown",
+        "prefix": "com",
+        "body": [
+            "//----------------------------------------",
+            "// $1",
+            "//----------------------------------------"
+        ],
+        "description": "Commentaire"
+    },
+    "import": {
+        "scope": "javascript,typescript",
+        "prefix": "import",
+        "body": [
+            "import $1 from '${2:$1}'$3"
+        ]
+    },
+    "importutils": {
+        "scope": "javascript,typescript",
+        "prefix": "importutils",
+        "body": [
+            "import {$1} from 'topkat-utils'$2"
+        ]
+    },
+    "importtypes": {
+        "scope": "javascript,typescript",
+        "prefix": "importtypes",
+        "body": [
+            "import * as t from 'shared/types'"
+        ]
+    },
+}

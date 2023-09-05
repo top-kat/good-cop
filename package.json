@@ -1,0 +1,35 @@
+{
+  "name": "good-cop",
+  "version": "1.0.0",
+  "type": "commonjs",
+  "main": "./dist/index-frontend.js",
+  "exports": {
+    ".": "./dist/index-frontend.js",
+    "./backend": "./dist/index-backend.js",
+    "./frontend": "./dist/index-frontend.js"
+  },
+  "types": "src/index.ts",
+  "description": "",
+  "license": "ISC",
+  "author": "topkat",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/top-kat/good-cop"
+  },
+  "scripts": {
+    "clean": "rm -rf ./dist",
+    "build": "tsc",
+    "build:core-backend": "tsc",
+    "build:watch": "tsc -w --preserveWatchOutput",
+    "test": "jest --watchAll"
+  },
+  "dependencies": {
+    "@types/jest": "^29.5.4",
+    "@types/mongoose": "^5.11.97",
+    "topkat-utils": "latest"
+  },
+  "devDependencies": {
+    "jest": "^29.6.2",
+    "ts-jest": "^29.1.1"
+  }
+}

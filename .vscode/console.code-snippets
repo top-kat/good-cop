@@ -1,0 +1,63 @@
+{
+    //----------------------------------------
+    // CONSOLE
+    //----------------------------------------
+    "Print var to console": {
+        "prefix": [
+            "csl",
+            "csl:log"
+        ],
+        "body": [
+            "console.log(`$1`, ${2:$1} )$3"
+        ],
+        "description": "Print a var to console"
+    },
+    "Console.error": {
+        "prefix": [
+            "cse",
+            "csl:error"
+        ],
+        "body": [
+            "console.error($2)"
+        ],
+        "description": "Log ERROR to console"
+    },
+    "Console.time": {
+        "prefix": [
+            "cst",
+            "csl:timeStart"
+        ],
+        "body": [
+            "console.time('$1')"
+        ],
+        "description": "Log time to console: usefull for performance testing"
+    },
+    "Console.timeEnd": {
+        "prefix": [
+            "cste",
+            "csl:timeEnd"
+        ],
+        "body": [
+            "console.timeEnd('$1')"
+        ],
+        "description": "Log timeEnd to console"
+    },
+    "Console.jsonStringify": {
+        "prefix": [
+            "cstr",
+            "csl:jsonstr"
+        ],
+        "body": [
+            "console.log('$1', JSON.stringify(${2:$1}, null, 2))"
+        ],
+    },
+    "jsonStringify": {
+        "prefix": [
+            "jstr",
+            "jsonstringify"
+        ],
+        "body": [
+            "JSON.stringify($1, null, 2)$2"
+        ],
+    },
+}
