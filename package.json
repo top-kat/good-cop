@@ -8,7 +8,17 @@
     "./backend": "./dist/index-backend.js",
     "./frontend": "./dist/index-frontend.js"
   },
-  "description": "",
+  "typesVersions": {
+    "*": {
+      "backend": [
+        "./dist/index-backend.js"
+      ],
+      "frontend": [
+        "./dist/index-frontend.js"
+      ]
+    }
+  },
+  "description": "EXTENDABLE VALIDATION LIBRARY (zod like syntax, can generate mongo models and infer types)",
   "license": "ISC",
   "author": "topkat",
   "repository": {
@@ -25,6 +35,7 @@
   "dependencies": {
     "@types/jest": "^29.5.4",
     "@types/mongoose": "^5.11.97",
+    "bump-simple": "^1.0.24",
     "topkat-utils": "latest"
   },
   "devDependencies": {

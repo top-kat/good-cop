@@ -1,8 +1,5 @@
 # See http://help.github.com/ignore-files/ for more about ignoring files.
 
-#logs
-*.log
-
 # compiled output
 /dist
 tmp/
@@ -26,6 +23,8 @@ node_modules
 npm-debug.log
 testem.log
 /typings
+tests/env.json
+env.json
 
 # e2e
 /e2e/*.js
@@ -37,4 +36,3 @@ Thumbs.db
 
 #visual studio history
 /.history
-/.nyc_output
