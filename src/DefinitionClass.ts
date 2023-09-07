@@ -89,12 +89,14 @@ export class Definition<
             tsTypeStr: 'boolean',
         })
     }
-    enum<This extends Definition, T extends readonly string[]>(this: This, possibleValues: [...T]) {
-        return this.newDef<T[number]>({
+    enum<
+        T extends string[]
+    >(possibleValues: [...T] | readonly [...T]) {
+        return this.newDef<T[any]>({
             errorMsg: ctx => `Value "${ctx.value}" do not match allowed values ${possibleValues.join(',')}`,
             validate: ctx => possibleValues.includes(ctx.value),
             tsTypeStr: possibleValues.length ? `'${possibleValues.join(`' | '`)}'` : 'never',
-            inheritFrom: possibleValues.every(v => typeof v === 'number') ? this.float() : this.string(),
+            inheritFrom: (possibleValues.every(v => typeof v === 'number') ? this.float() : this.string()) as any, // loose ref because if not it return any type for enum ?!? Maybe circular type ref
         })
     }
     date() {

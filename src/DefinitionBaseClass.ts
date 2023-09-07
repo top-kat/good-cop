@@ -16,9 +16,9 @@ export class DefinitionBase<
     isRequired?: boolean | undefined
     refValue?: string | undefined
     /** used to store models for model() and ref() definitions */
-    _models? = {} as ProvidedModels
-    _definitions = [] as (DefinitionPartial | DefinitionPartialFn)[]
-    _flatObjectCacheWithoutArraySyntax: Record<string, Definition> | undefined
+    _definitions = [] as (DefinitionPartial | DefinitionPartialFn)[] // may be used somewhere outside the class
+    protected _models? = {} as ProvidedModels
+    // protected _flatObjectCacheWithoutArraySyntax: Record<string, Definition> | undefined
     constructor(definitions?: DefinitionPartial | DefinitionPartial[], previousThis?: DefinitionBase<any, any>) {
         if (previousThis) {
             // this._arrOrObjCache = previousThis._arrOrObjCache
