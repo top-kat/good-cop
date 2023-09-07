@@ -1,5 +1,5 @@
 
-import { MaybeArray , TranslationObj} from './core-types'
+import { MaybeArray, TranslationObj } from './core-types'
 import { defaultTypeError } from './helpers/definitionGenericHelpers'
 import { object, array, genericObject } from './definitions/arraysObjectsDefinitionHandlers'
 import { formatAndValidateDefinitionPartials } from './helpers/formatAndValidateForDefinition'
@@ -54,11 +54,11 @@ export class Definition<
     /** NAME => Alias to write paramName in extraInfos */
     n = name
     getMongoType() {/**/} // To be overrided
-    string() {
+    string(allowEmpty = false) {
         return this.newDef<string>({
             errorMsg: defaultTypeError('string'),
             format: ctx => typeof ctx.value === 'number' ? ctx.value.toString() : ctx.value,
-            validate: ctx => typeof ctx.value === 'string',
+            validate: ctx => typeof ctx.value === 'string' && (allowEmpty || ctx.value.trim().length > 0),
             mongoType: 'string',
             tsTypeStr: 'string',
         })
@@ -322,11 +322,11 @@ export class Definition<
                 const output = [] as any[]
                 for (const [i, def] of Object.entries(array)) {
                     output.push(await formatAndValidateDefinitionPartials(
-                        def._definitions, 
-                        ctx, 
-                        true, 
-                        false, 
-                        ctx.value[i], 
+                        def._definitions,
+                        ctx,
+                        true,
+                        false,
+                        ctx.value[i],
                         ctx.fieldAddr + `[${i}]`
                     ))
                 }
