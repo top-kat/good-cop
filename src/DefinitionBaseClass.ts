@@ -3,7 +3,7 @@ import { formatAndValidate } from './helpers/formatAndValidateForDefinition'
 import { triggerOnObjectType } from './helpers/triggerOnObjectType'
 import { Definition } from './DefinitionClass'
 
-import { DefinitionPartial, DefinitionObjChild, DefinitionPartialFn } from './definitionTypes'
+import { DefinitionPartial, DefinitionObjChild, DefinitionPartialFn, ProvidedModels } from './definitionTypes'
 
 import { asArray } from 'topkat-utils'
 
@@ -16,7 +16,7 @@ export class DefinitionBase<
     isRequired?: boolean | undefined
     refValue?: string | undefined
     /** used to store models for model() and ref() definitions */
-    _models? = {} as Record<string, Record<string, any>>
+    _models? = {} as ProvidedModels
     _definitions = [] as (DefinitionPartial | DefinitionPartialFn)[]
     _flatObjectCacheWithoutArraySyntax: Record<string, Definition> | undefined
     constructor(definitions?: DefinitionPartial | DefinitionPartial[], previousThis?: DefinitionBase<any, any>) {

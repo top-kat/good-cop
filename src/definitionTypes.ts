@@ -1,5 +1,5 @@
 import { User, NoExtraProperties, MaybePromise, ObjectWithNoFn } from './core-types'
-import { Definition } from './DefinitionClass'
+import type { Definition } from './DefinitionClass'
 
 import { ErrorOptions } from 'topkat-utils'
 
@@ -121,4 +121,10 @@ export type ModelReadWrite = { // duplicated in core, but may aboid lot of depen
     Read: Record<string, any>
     // WithoutGenerics?: Record<string, any>
     // WithoutGenericsWrite?: Record<string, any>
+}
+
+export type ProvidedModels = {
+    [databaseName: string]: () => ({
+        [modelName: string]: Definition
+    })
 }

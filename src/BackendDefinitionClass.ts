@@ -1,5 +1,5 @@
 import mongoose from 'mongoose'
-import {MaybeArray} from './core-types'
+import { MaybeArray } from './core-types'
 import { Definition as BaseDefClass } from './DefinitionClass'
 import { getArrObjDef, objDefPartials } from './definitions/arraysObjectsDefinitionHandlers'
 
@@ -17,7 +17,11 @@ export class Definition<
     OverridedTypeRead,
     OverridedTypeWrite
     > {
-    constructor(models?, definition?: MaybeArray<DefinitionPartial>, previousThis?: any) {
+    constructor(
+        models?: any, // any is for removing type reference and avoid circular type definition
+        definition?: MaybeArray<DefinitionPartial>,
+        previousThis?: any
+    ) {
         super(definition, previousThis)
         this._models = models
     }
@@ -49,7 +53,8 @@ export class Definition<
             dbName: dbId as string,
             model: modelName as string,
         }, () => {
-            const model = this._models?.[dbId as any]?.[modelName as any]
+            const models = this._models?.[dbId as any]()
+            const model = models?.[modelName as any]
             if (!model) throw new DescriptiveError('Model not set in model validation', { dbId, modelName })
             return { ...model._definitions[0], tsTypeStr: undefined }
         }])
@@ -97,7 +102,7 @@ export class Definition<
     forceUserId() {
         return this.newDef({
             format: ctx => {
-                const {  method, fields, fieldAddr, user } = ctx
+                const { method, fields, fieldAddr, user } = ctx
                 const isSystem = getId(user) === systemUserId
                 if (method === 'update') delete fields[fieldAddr] // only on CREATE
                 else if (!(isSystem && isset(ctx.fields[fieldAddr]))) ctx.fields[fieldAddr] = getId(user) // ALLOW system to update this field if set

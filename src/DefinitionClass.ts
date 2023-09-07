@@ -54,11 +54,11 @@ export class Definition<
     /** NAME => Alias to write paramName in extraInfos */
     n = name
     getMongoType() {/**/} // To be overrided
-    string(allowEmpty = false) {
+    string() {
         return this.newDef<string>({
             errorMsg: defaultTypeError('string'),
             format: ctx => typeof ctx.value === 'number' ? ctx.value.toString() : ctx.value,
-            validate: ctx => typeof ctx.value === 'string' && (allowEmpty || ctx.value.trim().length > 0),
+            validate: ctx => typeof ctx.value === 'string',
             mongoType: 'string',
             tsTypeStr: 'string',
         })
