@@ -1,3 +1,6 @@
+### v1.0.5
+* Improve enum typings
+
 ### v1.0.4
 * Fix circular dependency when providing models as input params of Definition class
 * String do not allow by default empty strings (only spaces...etc) with param to allow empty strings
