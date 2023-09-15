@@ -230,9 +230,20 @@ export class Definition<
     }
     length(length: number, comparisonOperator: '<' | '>' | '===' = '===') {
         return this.newDef({
-            doc: `Eg: 'length:2', 'length:>2', 'length:<2'`,
             errorMsg: ctx => `Wrong length for value at ${ctx.fieldAddr}. Expected length (${comparisonOperator} ${length}) but got length ${ctx.value && ctx.value.length}`,
-            validate: ctx=> isset(ctx.value) ? comparisonOperator === '>' ? ctx.value.length > length : comparisonOperator === '<' ? ctx.value.length < length : ctx.value.length === length : true,
+            validate: ctx=> isset(ctx.value) ? comparisonOperator === '>' ? ctx.value?.length > length : comparisonOperator === '<' ? ctx.value?.length < length : ctx.value?.length === length : true,
+        })
+    }
+    minLength(minLength: number) {
+        return this.newDef({
+            errorMsg: ctx => `Wrong length for value at ${ctx.fieldAddr}. Expected minLength (${minLength}) but got length ${ctx.value && ctx.value.length}`,
+            validate: ctx=> typeof ctx.value === 'undefined' ? true : ctx.value?.length >= minLength,
+        })
+    }
+    maxLength(maxLength: number) {
+        return this.newDef({
+            errorMsg: ctx => `Wrong length for value at ${ctx.fieldAddr}. Expected minLength (${maxLength}) but got length ${ctx.value && ctx.value.length}`,
+            validate: ctx=> typeof ctx.value === 'undefined' ? true : ctx.value?.length <= maxLength,
         })
     }
     ts<TsTypeRead, TsTypeWrite>(tsString: string, tsTypeWrite: string = tsString) {
