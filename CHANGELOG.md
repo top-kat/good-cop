@@ -1,3 +1,7 @@
+### v1.0.7
+* FIX autowrite fields type mongo
+* NEW minLength and maxLength
+
 ### v1.0.5
 * Improve enum typings
 
