@@ -90,9 +90,9 @@ export class Definition<
         const untyped = object as Record<string, any>
         untyped._id = _.string().alwaysDefinedInRead()
         if (autoWriteFields.includes('creationDate')) untyped.creationDate = _.date().default(() => new Date())
-        if (autoWriteFields.includes('creator')) untyped.creator = _.date().default(ctx => getId(ctx.user))
+        if (autoWriteFields.includes('creator')) untyped.creator = _.ref('user').default(ctx => getId(ctx.user))
         if (autoWriteFields.includes('lastUpdateDate')) untyped.lastUpdateDate = _.date().transform(() => new Date())
-        if (autoWriteFields.includes('lastUpdater')) untyped.lastUpdater = _.date().transform(ctx => isAnonymousUser(ctx.user._id) ? undefined : getId(ctx.user))
+        if (autoWriteFields.includes('lastUpdater')) untyped.lastUpdater = _.ref('user').default(ctx => getId(ctx.user)).transform(ctx => isAnonymousUser(ctx.user._id) ? undefined : getId(ctx.user))
 
         return this.newDef<InferTypeRead<T> & MongoFieldsRead<U[number]>, InferTypeWrite<T> & MongoFieldsWrite>(getArrObjDef(object || {}, objDefPartials))
     }
