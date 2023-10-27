@@ -53,6 +53,13 @@ export class Definition<
     name = name
     /** NAME => Alias to write paramName in extraInfos */
     n = name
+    /** Number should be between min and max inclusive (min and max are allowed values) */
+    between<This extends Definition>(this: This, min: number, max: number) {
+        return this.newDef({
+            errorMsg: ctx => `Value ${ctx.value} should be between ${min} and ${max} (inclusive)`,
+            validate: ctx => ctx.value >= min && ctx.value <= max,
+        })
+    }
     getMongoType() {/**/} // To be overrided
     string() {
         return this.newDef<string>({
