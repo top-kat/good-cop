@@ -38,15 +38,16 @@
     "topkat-utils": "latest"
   },
   "devDependencies": {
+    "ts-node": "^10.9.1",
     "@types/jest": "^29.5.4",
-    "bump-simple": "^1.0.24",
-    "jest": "^29.6.2",
-    "ts-jest": "^29.1.1",
-    "eslint-config-next": "latest",
-    "eslint-config-turbo": "latest",
     "@typescript-eslint/eslint-plugin": "latest",
     "@typescript-eslint/parser": "latest",
+    "bump-simple": "^1.0.24",
     "eslint": "latest",
+    "eslint-config-next": "latest",
+    "eslint-config-turbo": "latest",
+    "jest": "^29.6.2",
+    "ts-jest": "^29.1.1",
     "typescript": "^5.0.3"
   }
 }

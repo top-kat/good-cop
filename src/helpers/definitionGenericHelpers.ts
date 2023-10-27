@@ -1,5 +1,5 @@
 
-import { DefinitionPartial, DefCtx } from '../definitionTypes'
+import { DefinitionPartial, DefinitionPartialFn, DefCtx } from '../definitionTypes'
 import { Definition } from '../DefinitionClass'
 
 export const defaultTypeError = (type, displayCompareWithTypeofValue = true) => ({ value, errorExtraInfos }: DefCtx) => {
@@ -9,7 +9,7 @@ export const defaultTypeError = (type, displayCompareWithTypeofValue = true) => 
 }
 
 export function mergeDefinitionInherits(def: DefinitionPartial, inheritFrom: Definition) {
-    const defFromInherit = inheritFrom._definitions[0]
+    const defFromInherit = inheritFrom._definitions.pop() as DefinitionPartial | DefinitionPartialFn
     if ('inheritFrom' in defFromInherit) mergeDefinitionInherits(defFromInherit, defFromInherit.inheritFrom as Definition)
     for (const [k, v] of Object.entries(defFromInherit)) {
         if (typeof def[k] === 'undefined') {

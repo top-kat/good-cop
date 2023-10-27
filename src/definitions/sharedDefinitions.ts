@@ -50,5 +50,8 @@ export function errorExtraInfos<This extends Definition>(this: This, errorExtraI
 }
 
 export function name<This extends Definition>(this: This, name: string, paramNumber?: number) {
-    return this.newDef({ errorExtraInfos: { paramName: name, paramNumber }, paramName: name })
+    return this.newDef({
+        errorExtraInfos: { paramName: name, paramNumber },
+        paramName: name
+    })
 }

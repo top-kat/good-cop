@@ -10,17 +10,17 @@ describe('Definition', () => {
 
     describe(`String def single`, () => {
 
-        const stringDef = _.string()
+        const stringDef = _.n('myString').string()
 
         it('stringDef', () => {
             expect(stringDef.getTsTypeAsString()).toEqual({ 'read': 'string', 'write': 'string' })
         })
 
-        it('stringDef2', async () => {
+        it('check formatting', async () => {
             expect(await stringDef.formatAndValidate('rere')).toEqual('rere')
         })
 
-        it('stringDef3', async () => {
+        it('number is converted to string', async () => {
             expect(await stringDef.formatAndValidate(1)).toEqual('1')
         })
 
@@ -28,6 +28,15 @@ describe('Definition', () => {
             expect(async () => await stringDef.formatAndValidate(['r', true])).rejects.toThrow()
         })
 
+    })
+
+    describe(`Number def`, () => {
+
+        const numberDef = _.n('myNumber').number() // check inherit working correctly
+
+        it('numberDef', () => {
+            expect(numberDef.getTsTypeAsString()).toEqual({ 'read': 'number', 'write': 'number' })
+        })
     })
 
     describe(`ARRAY single`, () => {
@@ -71,7 +80,7 @@ describe('Definition', () => {
         })
 
         it('objDef3 throw', async () => {
-            expect(async () => await objDef.formatAndValidate( 22)).rejects.toThrow()
+            expect(async () => await objDef.formatAndValidate(22)).rejects.toThrow()
         })
 
 
