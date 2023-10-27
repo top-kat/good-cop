@@ -53,6 +53,12 @@ export class Definition<
     name = name
     /** NAME => Alias to write paramName in extraInfos */
     n = name
+    positive<This extends Definition>(this: This) {
+        return this.newDef({
+            errorMsg: ctx => `Value ${ctx.value} should be positive`,
+            validate: ctx => ctx.value >= 0,
+        })
+    }
     /** Number should be between min and max inclusive (min and max are allowed values) */
     between<This extends Definition>(this: This, min: number, max: number) {
         return this.newDef({
