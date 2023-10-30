@@ -124,7 +124,7 @@ export type ModelReadWrite = { // duplicated in core, but may aboid lot of depen
 }
 
 export type ProvidedModels = {
-    [databaseName: string]: () => ({
+    [databaseName: string]: {
         [modelName: string]: Definition
-    })
+    }
 }

@@ -53,9 +53,8 @@ export class Definition<
             dbName: dbId as string,
             model: modelName as string,
         }, () => {
-            const models = this._models?.[dbId as any]()
-            const model = models?.[modelName as any]
-            if (!model) throw new DescriptiveError('Model not set in model validation', { dbId, modelName })
+            const model = this._models?.[dbId as any]?.[modelName as any]
+            if (!model) throw new DescriptiveError('Model not set in model validation', { dbId, modelName, modelNames: Object.keys(this._models || {}) })
             return { ...model._definitions[0], tsTypeStr: undefined }
         }])
     }
