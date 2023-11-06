@@ -55,3 +55,28 @@ export function name<This extends Definition>(this: This, name: string, paramNum
         paramName: name
     })
 }
+
+export function onValidate<This extends Definition>(this: This, callback: (ctx: DefCtx) => any) {
+    return this.newDef({
+        validate: async ctx => {
+            if (await callback(ctx) === false) return false
+            else return true
+        }
+    })
+}
+
+export function between<This extends Definition>(this: This, min: number, max: number) {
+    return this.newDef({
+        errorMsg: ctx => `Value ${ctx.value} should be between ${min} and ${max} (inclusive)`,
+        validate: ctx => ctx.value >= min && ctx.value <= max,
+    })
+}
+
+
+export function undefinedType<This extends Definition>(this: This) {
+    return this.newDef<undefined>({
+        validate: () => true,
+        format: ctx => typeof ctx.value === 'undefined' ? ctx.value : undefined,
+        tsTypeStr: `undefined`,
+    })
+}

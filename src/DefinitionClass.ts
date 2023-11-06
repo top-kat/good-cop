@@ -3,9 +3,9 @@ import { MaybeArray, TranslationObj } from './core-types'
 import { defaultTypeError } from './helpers/definitionGenericHelpers'
 import { object, array, genericObject } from './definitions/arraysObjectsDefinitionHandlers'
 import { formatAndValidateDefinitionPartials } from './helpers/formatAndValidateForDefinition'
-import { float, round2, matchRegexp, format, max, min, errorExtraInfos, name } from './definitions/sharedDefinitions'
 import { DefinitionBase } from './DefinitionBaseClass'
 
+import { float, round2, matchRegexp, format, max, min, errorExtraInfos, name, onValidate, between, undefinedType } from './definitions/sharedDefinitions'
 import { DefCtx, InferTypeRead, InferTypeWrite, DefinitionObj, DefinitionPartial } from './definitionTypes'
 
 import { isType, isDateIntOrStringValid, isset } from 'topkat-utils'
@@ -32,6 +32,7 @@ export class Definition<
 
     object = object
     array = array
+    /** An object which keys can be anything but the value shall be typed. Eg: { [k: string]: number } */
     genericObject = genericObject
     float = float
     number = float
@@ -39,12 +40,18 @@ export class Definition<
     round2 = round2
     regexp = matchRegexp
     match = matchRegexp
+    /** Format value before validation */
     format = format
+    /** Format value before validation */
     transform = format
     max = max
     min = min
     lte = max
     gte = min
+    /** Number should be between min and max inclusive (min and max are allowed values) */
+    between = between
+    /** Number should be between min and max inclusive (min and max are allowed values) */
+    minMax = between
     /** Append extra infos to any errors that may throw during format and validate */
     errorExtraInfos = errorExtraInfos
     /** Error Extra Infos => append extra infos to any errors that may throw during format and validate */
@@ -53,17 +60,18 @@ export class Definition<
     name = name
     /** NAME => Alias to write paramName in extraInfos */
     n = name
+    /** Make the callback return false to unvalidate this field and trigger an error. Note: validation happens after formating */
+    onValidate = onValidate
+    /** Make the callback return false to unvalidate this field and trigger an error. Note: validation happens after formating */
+    validate = onValidate
+    /** Should be used if the value is expected to be undefined */
+    undefined = undefinedType
+    /** Should be used if the value is expected to be undefined */
+    void = undefinedType
     positive<This extends Definition>(this: This) {
         return this.newDef({
             errorMsg: ctx => `Value ${ctx.value} should be positive`,
             validate: ctx => ctx.value >= 0,
-        })
-    }
-    /** Number should be between min and max inclusive (min and max are allowed values) */
-    between<This extends Definition>(this: This, min: number, max: number) {
-        return this.newDef({
-            errorMsg: ctx => `Value ${ctx.value} should be between ${min} and ${max} (inclusive)`,
-            validate: ctx => ctx.value >= min && ctx.value <= max,
         })
     }
     getMongoType() {/**/} // To be overrided
@@ -120,13 +128,6 @@ export class Definition<
             validate: ctx => ctx.value instanceof Date,
             mongoType: 'date',
             tsTypeStr: 'Date',
-        })
-    }
-    undefined() {
-        return this.newDef<undefined>({
-            validate: () => true,
-            format: ctx => typeof ctx.value === 'undefined' ? ctx.value : undefined,
-            tsTypeStr: `undefined`,
         })
     }
     null() {
@@ -284,15 +285,6 @@ export class Definition<
             format: async ctx => {
                 await callback(ctx)
                 return ctx.value
-            }
-        })
-    }
-    /** Validation happens after formatiing */
-    onValidate(callback: (ctx: DefCtx) => any) {
-        return this.newDef({
-            validate: async ctx => {
-                await callback(ctx)
-                return true
             }
         })
     }
