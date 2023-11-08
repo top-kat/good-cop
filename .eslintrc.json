@@ -20,10 +20,10 @@
     },
     "rules": {
         "indent": "off",
-        "@typescript-eslint/indent": [
-            "warn",
-            4
-        ],
+        // "@typescript-eslint/indent": [
+        //     "warn",
+        //     4
+        // ],
         "no-inner-declarations": "off",
         "no-console": "warn",
         "no-unused-vars": 0,
