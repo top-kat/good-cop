@@ -18,16 +18,12 @@ export class Definition<
     newDef<
         TypeTsRead = 'def',
         TypeTsWrite = TypeTsRead,
-        NewDef extends MaybeArray<DefinitionPartial> = DefinitionPartial,
-        This extends Definition = Definition
+        NewDef extends MaybeArray<DefinitionPartial> = DefinitionPartial
     >(newDef?: NewDef) {
         return new Definition<
-        TypeTsRead extends 'def' ? This['tsTypeRead'] : TypeTsRead,
-        TypeTsWrite extends 'def' ? This['tsTypeWrite'] : TypeTsWrite
-        >(newDef, this) as Omit<(typeof this), 'tsTypeRead' | 'tsTypeWrite'> & {
-            tsTypeRead: TypeTsRead,
-            tsTypeWrite: TypeTsWrite
-        }
+            TypeTsRead extends 'def' ? typeof this['tsTypeRead'] : TypeTsRead,
+            TypeTsWrite extends 'def' ? typeof this['tsTypeWrite'] : TypeTsWrite
+        >(newDef, this)
     }
 
     object = object
@@ -74,7 +70,7 @@ export class Definition<
             validate: ctx => ctx.value >= 0,
         })
     }
-    getMongoType() {/**/} // To be overrided
+    getMongoType() {/**/ } // To be overrided
     string() {
         return this.newDef<string>({
             errorMsg: defaultTypeError('string'),
@@ -197,7 +193,7 @@ export class Definition<
             },
         })
     }
-    default(defaultValue: ((ctx: DefCtx) => any) | (string | any[] | Record<string, any>| Date | boolean | number | null)) {
+    default(defaultValue: ((ctx: DefCtx) => any) | (string | any[] | Record<string, any> | Date | boolean | number | null)) {
         return this.newDef({
             priority: 1,
             format: ctx => {
@@ -245,19 +241,19 @@ export class Definition<
     length(length: number, comparisonOperator: '<' | '>' | '===' = '===') {
         return this.newDef({
             errorMsg: ctx => `Wrong length for value at ${ctx.fieldAddr}. Expected length (${comparisonOperator} ${length}) but got length ${ctx.value && ctx.value.length}`,
-            validate: ctx=> isset(ctx.value) ? comparisonOperator === '>' ? ctx.value?.length > length : comparisonOperator === '<' ? ctx.value?.length < length : ctx.value?.length === length : true,
+            validate: ctx => isset(ctx.value) ? comparisonOperator === '>' ? ctx.value?.length > length : comparisonOperator === '<' ? ctx.value?.length < length : ctx.value?.length === length : true,
         })
     }
     minLength(minLength: number) {
         return this.newDef({
             errorMsg: ctx => `Wrong length for value at ${ctx.fieldAddr}. Expected minLength (${minLength}) but got length ${ctx.value && ctx.value.length}`,
-            validate: ctx=> typeof ctx.value === 'undefined' ? true : ctx.value?.length >= minLength,
+            validate: ctx => typeof ctx.value === 'undefined' ? true : ctx.value?.length >= minLength,
         })
     }
     maxLength(maxLength: number) {
         return this.newDef({
             errorMsg: ctx => `Wrong length for value at ${ctx.fieldAddr}. Expected minLength (${maxLength}) but got length ${ctx.value && ctx.value.length}`,
-            validate: ctx=> typeof ctx.value === 'undefined' ? true : ctx.value?.length <= maxLength,
+            validate: ctx => typeof ctx.value === 'undefined' ? true : ctx.value?.length <= maxLength,
         })
     }
     ts<TsTypeRead, TsTypeWrite>(tsString: string, tsTypeWrite: string = tsString) {
@@ -300,8 +296,8 @@ export class Definition<
     /** **Note:** formatting will not work for typesOr checks */
     typesOr<T extends Definition[]>(types: [...T]) {
 
-        type InferTypesOrRead<T> = T extends [infer A, ...infer R] ? A extends Definition ? [ A['tsTypeRead'], ...InferTypesOrRead<R> ] : [] : []
-        type InferTypesOrWrite<T> = T extends [infer A, ...infer R] ? A extends Definition ? [ A['tsTypeWrite'], ...InferTypesOrRead<R> ] : [] : []
+        type InferTypesOrRead<T> = T extends [infer A, ...infer R] ? A extends Definition ? [A['tsTypeRead'], ...InferTypesOrRead<R>] : [] : []
+        type InferTypesOrWrite<T> = T extends [infer A, ...infer R] ? A extends Definition ? [A['tsTypeWrite'], ...InferTypesOrRead<R>] : [] : []
 
         return this.newDef<InferTypesOrRead<T>[number], InferTypesOrWrite<T>[number]>({
             errorMsg: ctx => `Value ${ctx.value} should be one of the following types: ${types.join(', ')}`,
@@ -362,7 +358,7 @@ export const _ = new Definition()
 
 // TYPE TESTS
 
-// const str = _.string().tsTypeRead
+// const str = _.string().required().tsTypeRead
 
 // const or = _.typesOr([_.string(), _.number(), _.boolean()]).tsTypeRead
 
