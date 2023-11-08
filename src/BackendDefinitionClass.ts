@@ -16,7 +16,7 @@ export class Definition<
 > extends BaseDefClass<
     OverridedTypeRead,
     OverridedTypeWrite
-    > {
+> {
     constructor(
         models?: any, // any is for removing type reference and avoid circular type definition
         definition?: MaybeArray<DefinitionPartial>,
@@ -29,18 +29,14 @@ export class Definition<
     newDef<
         TypeTsRead = 'def',
         TypeTsWrite = TypeTsRead,
-        NewDef extends MaybeArray<DefinitionPartial> = DefinitionPartial,
-        This extends Definition = Definition
+        NewDef extends MaybeArray<DefinitionPartial> = DefinitionPartial
     >(newDef?: NewDef) {
         return new Definition<
-        ModelsType,
-        DefaultDbId,
-        TypeTsRead extends 'def' ? This['tsTypeRead'] : TypeTsRead,
-        TypeTsWrite extends 'def' ? This['tsTypeWrite'] : TypeTsWrite
-        >(this._models, newDef, this) as Omit<(typeof this), 'tsTypeRead' | 'tsTypeWrite'> & {
-            tsTypeRead: TypeTsRead,
-            tsTypeWrite: TypeTsWrite
-        }
+            ModelsType,
+            DefaultDbId,
+            TypeTsRead extends 'def' ? typeof this['tsTypeRead'] : TypeTsRead,
+            TypeTsWrite extends 'def' ? typeof this['tsTypeWrite'] : TypeTsWrite
+        >(this._models, newDef, this)
     }
     //----------------------------------------
     // MODEL
@@ -135,7 +131,7 @@ export const _ = new Definition()
 // HELPERS
 //----------------------------------------
 
-const mongoTypeMapping: {[k in MongoTypesString]: MongoTypes} = {
+const mongoTypeMapping: { [k in MongoTypesString]: MongoTypes } = {
     boolean: Boolean,
     number: Number,
     string: String,
@@ -147,7 +143,7 @@ const mongoTypeMapping: {[k in MongoTypesString]: MongoTypes} = {
 
 type MongoFieldsRead<T extends string> = { _id: string } & { [K in T]: string }
 
-type MongoFieldsWrite = { _id?: string}
+type MongoFieldsWrite = { _id?: string }
 
 type MongoTypes = Date | Number | Boolean | String | Object | typeof mongoose.Schema.Types.Mixed
 type MongoTypeObj = { type?: MongoTypes, ref?: string, unique?: boolean }
