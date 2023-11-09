@@ -5,7 +5,7 @@ import { ErrorOptions } from 'topkat-utils'
 
 export type DaoGenericMethods = 'create' | 'update' | 'delete' | 'getOne' | 'getAll' // duplicated in core types
 
-export type MongoTypesString = 'date' | 'number' | 'boolean' | 'object' | 'string' | 'mixed'| 'objectId'
+export type MongoTypesString = 'date' | 'number' | 'boolean' | 'object' | 'string' | 'mixed' | 'objectId'
 
 export type DefinitionPartialFn = () => DefinitionPartial & { priority: number } // usually possible in real js
 
@@ -25,7 +25,6 @@ export type DefinitionPartial = NoExtraProperties<{
     /** should return a truthy value if valid and falsey if not */
     validate?: (ctx: DefCtx) => (any | Promise<any>)
     format?: (ctx: DefCtx) => (any | Promise<any>)
-    inheritFrom?: Definition
     /** field is always defined when reading, for example if it has a default value */
     alwaysDefinedInRead?: true
     /** shall the function be triggered on undefined fields */
@@ -72,37 +71,37 @@ export type InferType<T extends DefinitionObjChild> = InferTypeRead<T> // alias
 export type InferTypeRead<T extends DefinitionObjChild> =
     T extends Definition ? T['tsTypeRead'] : {
         [K in keyof T]?: T[K] extends Definition ? T[K]['tsTypeRead'] : // definition
-            T[K] extends any[] ? InferTypeArrRead<T[K]> : // array
-                T[K] extends Record<any, any> ? InferTypeRead<T[K]> : // object
-                    never // unknown
+        T[K] extends any[] ? InferTypeArrRead<T[K]> : // array
+        T[K] extends Record<any, any> ? InferTypeRead<T[K]> : // object
+        never // unknown
     }
 
 
 export type InferTypeArrRead<T extends readonly DefinitionObjChild[]> =
     T extends [] ? [] :
-        T[number] extends (infer U) ?
-            U extends Definition ? U['tsTypeRead'][] : // 1st item is definition
-                U extends Record<any, any> ? InferTypeRead<U>[] : // 1st item is Model
-                    never : // 1st item is unknown
-            never // not an array
+    T[number] extends (infer U) ?
+    U extends Definition ? U['tsTypeRead'][] : // 1st item is definition
+    U extends Record<any, any> ? InferTypeRead<U>[] : // 1st item is Model
+    never : // 1st item is unknown
+    never // not an array
 
 
 /** Infer type for definition or object / array of definitions and all write methods (some requirement may vary between read/write types) */
 export type InferTypeWrite<T extends DefinitionObjChild> =
-T extends Definition ? T['tsTypeWrite'] : {
-    [K in keyof T]?: T[K] extends Definition ? T[K]['tsTypeWrite'] : // definition
+    T extends Definition ? T['tsTypeWrite'] : {
+        [K in keyof T]?: T[K] extends Definition ? T[K]['tsTypeWrite'] : // definition
         T[K] extends any[] ? InferTypeArrWrite<T[K]> : // array
-            T[K] extends Record<any, any> ? InferTypeWrite<T[K]> : // object
-                never // unknown
-}
+        T[K] extends Record<any, any> ? InferTypeWrite<T[K]> : // object
+        never // unknown
+    }
 
 export type InferTypeArrWrite<T extends readonly DefinitionObjChild[]> =
     T extends [] ? [] :
-        T[number] extends (infer U) ?
-            U extends Definition ? U['tsTypeWrite'][] : // 1st item is definition
-                U extends Record<any, any> ? InferTypeWrite<U>[] : // 1st item is Model
-                    never : // 1st item is unknown
-            never // not an array
+    T[number] extends (infer U) ?
+    U extends Definition ? U['tsTypeWrite'][] : // 1st item is definition
+    U extends Record<any, any> ? InferTypeWrite<U>[] : // 1st item is Model
+    never : // 1st item is unknown
+    never // not an array
 
 export type DefinitionObjChild = Definition | DefinitionObj | Definition[] | DefinitionObj[]
 

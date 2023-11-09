@@ -1,4 +1,3 @@
-import { mergeDefinitionInherits } from './helpers/definitionGenericHelpers'
 import { formatAndValidate } from './helpers/formatAndValidateForDefinition'
 import { triggerOnObjectType } from './helpers/triggerOnObjectType'
 import { Definition } from './DefinitionClass'
@@ -7,19 +6,14 @@ import { DefinitionPartial, DefinitionObjChild, DefinitionPartialFn, ProvidedMod
 
 import { asArray } from 'topkat-utils'
 
-export class DefinitionBase<
-    OverridedTypeRead = unknown,
-    OverridedTypeWrite = unknown
-> {
-    tsTypeRead = '' as OverridedTypeRead
-    tsTypeWrite = '' as OverridedTypeWrite
+export class DefinitionBase {
     isRequired?: boolean | undefined
     refValue?: string | undefined
     /** used to store models for model() and ref() definitions */
     _definitions = [] as (DefinitionPartial | DefinitionPartialFn)[] // may be used somewhere outside the class
     protected _models? = {} as ProvidedModels
     // protected _flatObjectCacheWithoutArraySyntax: Record<string, Definition> | undefined
-    constructor(definitions?: DefinitionPartial | DefinitionPartial[], previousThis?: DefinitionBase<any, any>) {
+    constructor(definitions?: DefinitionPartial | DefinitionPartial[], previousThis?: DefinitionBase) {
         if (previousThis) {
             // this._arrOrObjCache = previousThis._arrOrObjCache
             this.refValue = previousThis.refValue as any
@@ -32,7 +26,6 @@ export class DefinitionBase<
 
                 this._definitions.push(definition)
 
-                if (definition.inheritFrom) mergeDefinitionInherits(definition, definition.inheritFrom)
                 if (definition.ref) this.refValue = definition.ref as any
                 if (typeof definition.required === 'boolean') this.isRequired = definition.required
             }

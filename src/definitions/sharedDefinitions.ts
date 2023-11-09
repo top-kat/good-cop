@@ -1,5 +1,6 @@
 import { DefCtx } from '../definitionTypes'
 import { Definition } from '../DefinitionClass'
+import { defaultTypeError } from '../helpers/definitionGenericHelpers'
 
 import { ErrorOptions, parseRegexp } from 'topkat-utils'
 
@@ -31,14 +32,18 @@ export function min<This extends Definition>(this: This, minVal: number) {
 }
 export function round2<This extends Definition>(this: This) {
     return this.newDef({
+        errorMsg: defaultTypeError('number'),
+        validate: ctx => typeof ctx.value === 'number',
+        mongoType: 'number',
         format: ctx => Math.round(ctx.value * 100) / 100,
-        inheritFrom: this.int(),
     })
 }
 export function float<This extends Definition>(this: This) {
     return this.newDef<number>({
+        errorMsg: defaultTypeError('number'),
+        validate: ctx => typeof ctx.value === 'number',
+        mongoType: 'number',
         format: ctx => parseFloat(ctx.value),
-        inheritFrom: this.int(),
     })
 }
 export function format<This extends Definition>(this: This, format: (ctx: DefCtx) => any) {

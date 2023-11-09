@@ -14,7 +14,9 @@ import { isType, isDateIntOrStringValid, isset } from 'topkat-utils'
 export class Definition<
     OverridedTypeRead = any,
     OverridedTypeWrite = any
-> extends DefinitionBase<OverridedTypeRead, OverridedTypeWrite> {
+> extends DefinitionBase {
+    tsTypeRead = '' as OverridedTypeRead
+    tsTypeWrite = '' as OverridedTypeWrite
     newDef<
         TypeTsRead = 'def',
         TypeTsWrite = TypeTsRead,
@@ -71,11 +73,11 @@ export class Definition<
         })
     }
     getMongoType() {/**/ } // To be overrided
-    string() {
+    string(acceptEmpty = false) {
         return this.newDef<string>({
             errorMsg: defaultTypeError('string'),
-            format: ctx => typeof ctx.value === 'number' ? ctx.value.toString() : ctx.value,
-            validate: ctx => typeof ctx.value === 'string',
+            format: ctx => (typeof ctx.value === 'number' ? ctx.value.toString() : ctx.value)?.trim(),
+            validate: ctx => typeof ctx.value === 'string' && (acceptEmpty || ctx.value.length),
             mongoType: 'string',
             tsTypeStr: 'string',
         })
@@ -110,10 +112,10 @@ export class Definition<
         T extends string[]
     >(possibleValues: [...T] | readonly [...T]) {
         return this.newDef<T[any]>({
+            mongoType: 'string',
             errorMsg: ctx => `Value "${ctx.value}" do not match allowed values ${possibleValues.join(',')}`,
             validate: ctx => possibleValues.includes(ctx.value),
-            tsTypeStr: possibleValues.length ? `'${possibleValues.join(`' | '`)}'` : 'never',
-            inheritFrom: (possibleValues.every(v => typeof v === 'number') ? this.float() : this.string()) as any, // loose ref because if not it return any type for enum ?!? Maybe circular type ref
+            tsTypeStr: possibleValues.length ? `'${possibleValues.join(`' | '`)}'` : 'never'
         })
     }
     date() {
@@ -137,7 +139,7 @@ export class Definition<
         return this.newDef<number>({
             errorMsg: defaultTypeError('date8', false),
             validate: ctx => isDateIntOrStringValid(ctx.value, false, 8),
-            format: ctx => typeof ctx.value === 'string' ? parseInt(ctx.value) : ctx.value,
+            format: ctx => (typeof ctx.value === 'string' ? parseInt(ctx.value) : ctx.value)?.trim(),
             mongoType: 'number',
             tsTypeStr: 'number',
         })
@@ -146,28 +148,36 @@ export class Definition<
         return this.newDef<number>({
             errorMsg: defaultTypeError('date12', false),
             validate: ctx => isDateIntOrStringValid(ctx.value, false, 12),
-            inheritFrom: this.date8(),
+            format: ctx => (typeof ctx.value === 'string' ? parseInt(ctx.value) : ctx.value)?.trim(),
+            mongoType: 'number',
+            tsTypeStr: 'number',
         })
     }
     year() {
         return this.newDef<number>({
             errorMsg: defaultTypeError('year', false),
             validate: ctx => isDateIntOrStringValid(ctx.value, false, 4),
-            inheritFrom: this.date8(),
+            format: ctx => (typeof ctx.value === 'string' ? parseInt(ctx.value) : ctx.value)?.trim(),
+            mongoType: 'number',
+            tsTypeStr: 'number',
         })
     }
     email() {
         return this.newDef<string>({
+            format: ctx => ctx.value?.toLowerCase().trim(),
+            mongoType: 'string',
+            tsTypeStr: 'string',
             errorMsg: defaultTypeError('email', false),
             validate: ctx => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(ctx.value),
-            inheritFrom: this.string()
         })
     }
     url() {
         return this.newDef<string>({
+            format: ctx => typeof ctx.value === 'number' ? ctx.value.toString() : ctx.value,
+            mongoType: 'string',
+            tsTypeStr: 'string',
             errorMsg: defaultTypeError('url', false),
-            validate: ctx => /^https?:\/\/.+/.test(ctx.value),
-            inheritFrom: this.string()
+            validate: ctx => /^https?:\/\/.+/.test(ctx.value)
         })
     }
     translation() {
@@ -209,14 +219,16 @@ export class Definition<
     }
     lowerCase() {
         return this.newDef({
+            errorMsg: defaultTypeError('string'),
             format: ctx => typeof ctx.value === 'string' ? ctx.value.toLowerCase() : ctx.value,
-            inheritFrom: this.string()
         })
     }
     trim() {
         return this.newDef({
+            errorMsg: defaultTypeError('string'),
+            mongoType: 'string',
+            tsTypeStr: 'string',
             format: ctx => typeof ctx.value === 'string' ? ctx.value.trim() : ctx.value,
-            inheritFrom: this.string()
         })
     }
     gt(maxVal: number) {
