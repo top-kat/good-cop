@@ -35,6 +35,7 @@ export function round2<This extends Definition>(this: This) {
         errorMsg: defaultTypeError('number'),
         validate: ctx => typeof ctx.value === 'number',
         mongoType: 'number',
+        tsTypeStr: 'number',
         format: ctx => Math.round(ctx.value * 100) / 100,
     })
 }
@@ -43,6 +44,7 @@ export function float<This extends Definition>(this: This) {
         errorMsg: defaultTypeError('number'),
         validate: ctx => typeof ctx.value === 'number',
         mongoType: 'number',
+        tsTypeStr: 'number',
         format: ctx => parseFloat(ctx.value),
     })
 }

@@ -29,9 +29,10 @@
     "clean": "rm -rf ./dist",
     "build": "tsc",
     "test": "jest --watchAll",
-    "bump:major": "npm run build & node node_modules/bump-simple/bump-simple.js --major",
-    "bump:minor": "npm run build & node node_modules/bump-simple/bump-simple.js --minor",
-    "bump:patch": "npm run build & node node_modules/bump-simple/bump-simple.js --patch"
+    "test:ci": "jest --ci",
+    "bump:major": "jest --ci && npm run build & node node_modules/bump-simple/bump-simple.js --major",
+    "bump:minor": "jest --ci && npm run build & node node_modules/bump-simple/bump-simple.js --minor",
+    "bump:patch": "jest --ci && npm run build & node node_modules/bump-simple/bump-simple.js --patch"
   },
   "dependencies": {
     "@types/mongoose": "^5.11.97",
