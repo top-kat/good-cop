@@ -5,7 +5,7 @@ import { DefinitionBase } from '../DefinitionBaseClass'
 
 import { DescriptiveError } from 'topkat-utils'
 
-export async function formatAndValidate<This extends DefinitionBase<any, any>>(
+export async function formatAndValidate<This extends DefinitionBase>(
     this: This,
     value: any,
     options: {
