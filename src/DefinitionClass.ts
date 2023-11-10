@@ -43,8 +43,8 @@ const { required, number, round2, lt, gt, gte, lte, undefType, string, wrapperTy
 export class Definition<
     ModelsType extends DefinitionClassReceivedModelType = any,
     DefaultDbId extends keyof ModelsType = any,
-    OverridedTypeRead = any,
-    OverridedTypeWrite = any,
+    OverridedTypeRead = never,
+    OverridedTypeWrite = never,
     IsRequiredType extends boolean = false
 > extends DefinitionBase {
     tsTypeRead = '' as OverridedTypeRead
@@ -210,12 +210,15 @@ export class Definition<
             fieldName.length === 2 ? { [`__${fieldName[0]}`]: { [`__${fieldName[1]}`]: objectOrDef } } :
                 { [`__${fieldName[0]}`]: { [`__${fieldName[1]}`]: { [`__${fieldName[2]}`]: objectOrDef } } }
 
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
+        const That = this // dunno why I need this sheet on those lines buit linter happy
+
         return this.newDef({
             ...getArrObjDef(realObj || {}, 'object'),
             nbNestedGenericObjects: typeof fieldName === 'string' ? 1 : fieldName.length
         }) as any as
             PickSecondLevelMethods<
-                ReturnType<typeof this.newDef<
+                ReturnType<typeof That.newDef<
                     Read,
                     Write
                 >>,
@@ -244,12 +247,15 @@ export class Definition<
             const realObjDef = typeof objDef === 'function' ? objDef() : objDef
             Object.assign(realObjDef.objectCache as Record<string, any>, object)
         }
+
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
+        const That = this // dunno why I need this sheet on those lines buit linter happy
         // Object.assign(this.object, object)
         return this.newDef() as any as
             PickSecondLevelMethods<
-                ReturnType<typeof this.newDef<
-                    InferTypeRead<T> & typeof this.tsTypeRead,
-                    InferTypeWrite<T> & typeof this.tsTypeWrite
+                ReturnType<typeof That.newDef<
+                    InferTypeRead<T> & typeof That.tsTypeRead,
+                    InferTypeWrite<T> & typeof That.tsTypeWrite
                 >>,
                 'partial' | 'complete'
             >
