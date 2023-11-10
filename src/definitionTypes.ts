@@ -1,6 +1,8 @@
 import { User, NoExtraProperties, MaybePromise, ObjectWithNoFn } from './core-types'
 import type { Definition } from './DefinitionClass'
 
+/** Type that matches all possible definitions */
+export type DefinitionOut = Partial<Omit<Definition, UniversalMethods>> & Required<Pick<Definition, UniversalMethods>>
 
 export type TypedExclude<T extends keyof Definition, K extends keyof Definition> = Exclude<T, K>
 
