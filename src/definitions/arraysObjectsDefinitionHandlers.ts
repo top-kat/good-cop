@@ -1,21 +1,12 @@
+
+
 import { Definition } from '../DefinitionClass'
 import { validateDefinitionPartials } from '../helpers/formatAndValidateForDefinition'
 import { defaultTypeError } from '../helpers/definitionGenericHelpers'
-import { InferTypeRead, InferTypeWrite, InferTypeArrRead, InferTypeArrWrite, DefCtx, DefinitionPartial, DefinitionObjChild, DefinitionObj } from '../definitionTypes'
+import { DefCtx, DefinitionPartial, DefinitionObjChild } from '../definitionTypes'
 import { triggerOnObjectTypeAsync, triggerOnObjectType } from '../helpers/triggerOnObjectType'
 
 import { isObject, C } from 'topkat-utils'
-
-
-//----------------------------------------
-// GENERIC OBJECT
-//----------------------------------------
-
-
-//----------------------------------------
-// ARRAY
-//----------------------------------------
-
 
 //----------------------------------------
 // VALIDATORS
@@ -42,7 +33,7 @@ export const getArrObjDef = (objOrArr, type: 'object' | 'array') => ({
     isParent: true,
 })
 
-async function formatAndValidateRecursive(ctx: DefCtx, obj: DefinitionObjChild<any>, value: any, addr: string) {
+async function formatAndValidateRecursive(ctx: DefCtx, obj: DefinitionObjChild, value: any, addr: string) {
     return await triggerOnObjectTypeAsync(obj, {
         errorExtraInfos: { modelName: ctx.modelName, addressInParent: addr },
         //==============

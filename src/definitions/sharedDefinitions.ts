@@ -55,5 +55,15 @@ export const sharedDefinitions = {
         validate: () => true,
         format: ctx => typeof ctx.value === 'undefined' ? ctx.value : undefined,
         tsTypeStr: `undefined`,
-    }
+    },
+    wrapperTypeStr: (def, wrapperName) => ({
+        tsTypeStr: () => {
+            const typeStr = def.getTsTypeAsString().read
+            return typeStr.startsWith(wrapperName) ? typeStr : `${wrapperName}<${typeStr}>`
+        },
+        tsTypeStrForWrite: () => {
+            const typeStr = def.getTsTypeAsString().write
+            return typeStr.startsWith(wrapperName) ? typeStr : `${wrapperName}<${typeStr}>`
+        },
+    }),
 } satisfies Record<string, DefinitionPartial | (() => DefinitionPartial)>

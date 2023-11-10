@@ -161,8 +161,8 @@ describe('Definition', () => {
 
         it('merge1', () => {
             expect(objDef.getTsTypeAsString()).toEqual({
-                read: '{\n    name?: string\n    number?: number\n    bool?: boolean\n}',
-                write: '{\n    name?: string\n    number?: number\n    bool?: boolean\n}',
+                read: '{\n    name?: string\n    email: string\n}',
+                write: '{\n    name?: string\n    email: string\n}',
             })
         })
 
@@ -171,7 +171,7 @@ describe('Definition', () => {
         })
 
         it('merge3 throw email missing', async () => {
-            expect(await objDef.formatAndValidate({ name: 22 })).toThrow()
+            expect(async () => await objDef.formatAndValidate({ name: 22 })).rejects.toThrow()
         })
         it('merge4 name missing = OK', async () => {
             expect(await objDef.formatAndValidate({ email: 22 })).toEqual({ email: '22' })
@@ -183,7 +183,7 @@ describe('Definition', () => {
         const partial = _.object({ name: _.string() }).mergeWith({ email: _.string().required() }).partial()
 
         it('partial1', () => {
-            expect(partial.getTsTypeAsString()).toContain('Partial<')
+            expect(partial.getTsTypeAsString().read).toContain('Partial<')
         })
 
         it('partial2', async () => {
@@ -193,11 +193,11 @@ describe('Definition', () => {
         const complete = _.object({ name: _.string() }).mergeWith({ email: _.string().required() }).complete()
 
         it('complete1', () => {
-            expect(complete.getTsTypeAsString()).toContain('Required<')
+            expect(complete.getTsTypeAsString().read).toContain('Required<')
         })
 
-        it('complete2 name should be defined now', async () => {
-            expect(await complete.formatAndValidate({ email: 'coucou' })).toThrow()
+        it('complete2 name should be required now', async () => {
+            expect(async () => await complete.formatAndValidate({ email: 'coucou' })).rejects.toThrow('Field name is required')
         })
         it('complete3', async () => {
             expect(await complete.formatAndValidate({ email: 'coucou', name: 'rtr' })).toEqual({ email: 'coucou', name: 'rtr' })

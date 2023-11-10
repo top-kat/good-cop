@@ -180,7 +180,7 @@ export type InferTypeArrWrite<T extends readonly DefinitionObjChild[]> =
     never : // 1st item is unknown
     never // not an array
 
-export type DefinitionObjChild = GenericDef | DefinitionObj | GenericDef | DefinitionObj[]
+export type DefinitionObjChild = GenericDef | DefinitionObj | GenericDef[] | DefinitionObj[]
 
 export type DefinitionObj = { [field: string]: DefinitionObjChild }
 

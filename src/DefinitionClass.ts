@@ -36,7 +36,7 @@ import { DefCtx, InferTypeRead, InferTypeWrite, DefinitionObj, DefinitionPartial
 import { isType, isset, getId, capitalize1st, isObject, DescriptiveError, isDateIntOrStringValid, parseRegexp, ErrorOptions } from 'topkat-utils'
 
 
-const { required, number, round2, lt, gt, gte, lte, undefType, string } = sharedDefinitions
+const { required, number, round2, lt, gt, gte, lte, undefType, string, wrapperTypeStr } = sharedDefinitions
 
 
 
@@ -322,7 +322,7 @@ export class Definition<
                 def._definitions = def._definitions.filter(d => d.name !== 'required')
             }
         }
-        return this as
+        return this.newDef(wrapperTypeStr(this, 'Partial')) as
             PickSecondLevelMethods<
                 ReturnType<typeof this.newDef<
                     Partial<typeof this.tsTypeRead>,
@@ -343,7 +343,7 @@ export class Definition<
                 }
             }
         }
-        return this as
+        return this.newDef(wrapperTypeStr(this, 'Required')) as
             PickSecondLevelMethods<
                 ReturnType<typeof this.newDef<
                     Required<typeof this.tsTypeRead>,
@@ -927,14 +927,7 @@ export class Definition<
             priority: 99, // should pass after Array or any types
             errorMsg: ctx => `Expected: typeof Promise but got ${typeof ctx.value}`,
             validate: ctx => typeof ctx.value?.then === 'function', // /!\ promise type should not concern in app validation so this should never apply
-            tsTypeStr: () => {
-                const typeStr = this.getTsTypeAsString().read
-                return typeStr.startsWith('Promise') ? typeStr : `Promise<${typeStr}>`
-            },
-            tsTypeStrForWrite: () => {
-                const typeStr = this.getTsTypeAsString().write
-                return typeStr.startsWith('Promise') ? typeStr : `Promise<${typeStr}>`
-            },
+            ...wrapperTypeStr(this, 'Promise')
         }) as any as
             PickSecondLevelMethods<
                 ReturnType<typeof this.newDef<
@@ -1040,6 +1033,16 @@ export const _ = new Definition()
 // const obj1 = __.object({ name: __.string() }).mergeWith({ email: __.email().required() }).tsTypeRead
 // const obj2 = __.object({ name: __.string() }).mergeWith({ email: __.email().required() }).partial()
 // const obj3 = __.object({ name: __.string() }).mergeWith({ email: __.email().required() }).complete()
+// const complexOne = __.object({
+//     arr: [__.string()],
+//     arr2: __.array(__.string()),
+//     subObj: {
+//         name: __.enum(['a', 'b']),
+//         tuple: __.tuple([__.string(), __.date()]),
+//         typeOr: __.typesOr([__.number(), __.boolean()]),
+//         subArr: [__.email()]
+//     }
+// }).tsTypeRead
 
 // const or = __.typesOr([__.string(), __.number(), __.boolean()]).tsTypeRead
 
@@ -1048,8 +1051,8 @@ export const _ = new Definition()
 
 
 
-// const rtpoij = __.object({ name: __.string(), arr1: __.array(), arr2: __.array({ subArr: __.array({ name: __.string() }) }) })
-// const rtpoZEZEij = __.array({ name: __.string(), arr1: __.array(), arr2: __.array({ subArr: __.array({ name: __.string() }) }) })
+// const rtpoij = __.object({ name: __.string(), arr1: __.email(), arr2: __.array({ subArr: __.array({ name: __.string() }) }) })
+// const rtpoZEZEij = __.array({ name: __.string(), subObj: { bool: __.boolean() }, arr2: __.array({ subArr: __.array({ name: __.string() }) }) })
 
 // const rtpoZEZEiEEj = __.array({ name: __.string() })
 // const tyeee = rtpoZEZEiEEj.tsTypeRead
@@ -1057,9 +1060,3 @@ export const _ = new Definition()
 // const type = rtpoij.tsTypeRead
 
 // const aa = __.genericObject('objName', __.null()).partial()
-
-
-
-// type AAAA = (typeof type)['arr2'][number]
-
-// type azpodj = (typeof rtpoZEZEij.tsTypeRead)[number]['arr2'][number]['subArr'][number]['name']
