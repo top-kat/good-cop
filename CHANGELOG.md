@@ -1,3 +1,6 @@
+### v1.1.1
+* add type DefinitionOut, which matches all possible definitions
+
 ### v1.0.7
 * FIX autowrite fields type mongo
 * NEW minLength and maxLength
