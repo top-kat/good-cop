@@ -8,7 +8,7 @@ import { asArray } from 'topkat-utils'
 
 export class DefinitionBase {
     isRequired?: boolean | undefined
-    refValue?: string | undefined
+    _refValue?: string | undefined
     /** used to store models for model() and ref() definitions */
     _definitions = [] as (DefinitionPartial | DefinitionPartialFn)[] // may be used somewhere outside the class
     protected _models? = {} as ProvidedModels
@@ -16,25 +16,30 @@ export class DefinitionBase {
     constructor(definitions?: DefinitionPartial | DefinitionPartial[], previousThis?: DefinitionBase) {
         if (previousThis) {
             // this._arrOrObjCache = previousThis._arrOrObjCache
-            this.refValue = previousThis.refValue as any
+            this._refValue = previousThis._refValue as any
             this._definitions = [...previousThis._definitions]
         }
         if (definitions) {
             for (const definition of asArray(definitions)) {
-                // default values
-                if (typeof definition.priority !== 'number') definition.priority = 50
-
-                this._definitions.push(definition)
-
-                if (definition.ref) this.refValue = definition.ref as any
-                if (typeof definition.required === 'boolean') this.isRequired = definition.required
+                this._pushNewDef(definition, false)
             }
             this._definitions.sort((a, b) => (a as any).priority - (b as any).priority)
         }
     }
+    _pushNewDef(definition: DefinitionPartial, doSort = true) {
+        // default values
+        if (typeof definition.priority !== 'number') definition.priority = 50
+
+        this._definitions.push(definition)
+
+        if (definition.ref) this._refValue = definition.ref as any
+        if (typeof definition.required === 'boolean') this.isRequired = definition.required
+
+        if (doSort) this._definitions.sort((a, b) => (a as any).priority - (b as any).priority)
+    }
     /** @returns formatted result */
     formatAndValidate = formatAndValidate
-    getObjectCache(): DefinitionObjChild | undefined {
+    _getObjectCache(): DefinitionObjChild | undefined {
         const definitions = this._definitions
 
         for (const def of definitions) {
@@ -43,7 +48,7 @@ export class DefinitionBase {
         }
     }
 
-    /** for all definitions of the object (eg [string, required]) it will find a value */
+    /** for all definitions of the object (eg [string, required]) it will find a defined value and return when the value is met the first time. Eg: for a value of 'isRequired', it will check all definitions for the first containing that field and return it's value */
     getDefinitionValue<K extends keyof DefinitionPartial>(name: K): (DefinitionPartial[K] | void) {
         for (const defRaw of this._definitions) {
             const def = typeof defRaw === 'function' ? defRaw() : defRaw
@@ -77,18 +82,18 @@ export class DefinitionBase {
 
         return output
     }
-    flatten(
+    _getDefinitionObjFlat(
         removeArrayBracketsNotation = false,
         onDefinition: (def: Definition) => any = (def: Definition) => def,
         addr = '',
         objFlat = {}
     ) {
-        const obj = this.getObjectCache()
-        return obj ? flatten(removeArrayBracketsNotation, onDefinition, obj, addr, objFlat) : {}
+        const obj = this._getObjectCache()
+        return obj ? _getDefinitionObjFlat(removeArrayBracketsNotation, onDefinition, obj, addr, objFlat) : {}
     }
 }
 
-function flatten(
+function _getDefinitionObjFlat(
     this: Definition | any,
     removeArrayBracketsNotation = false,
     /** Returning falsey value will write nothing in flat model */
@@ -102,15 +107,15 @@ function flatten(
     // if (removeArrayBracketsNotation && this?._flatObjectCacheWithoutArraySyntax) return this?._flatObjectCacheWithoutArraySyntax
     triggerOnObjectType(parentValue, {
         onArrayItem(item, i) {
-            flatten(removeArrayBracketsNotation, onDefinition, item, addr + (removeArrayBracketsNotation ? '' : `[${i}]`), flatObj)
+            _getDefinitionObjFlat(removeArrayBracketsNotation, onDefinition, item, addr + (removeArrayBracketsNotation ? '' : `[${i}]`), flatObj)
         },
         onObjectItem(value, key) {
-            flatten(removeArrayBracketsNotation, onDefinition, value, addr ? addr + `.${key}` : key, flatObj)
+            _getDefinitionObjFlat(removeArrayBracketsNotation, onDefinition, value, addr ? addr + `.${key}` : key, flatObj)
         },
         onDefinition(definition) {
             const returnValue = onDefinition(definition)
             if (returnValue) flatObj[addr] = returnValue
-            definition.flatten(removeArrayBracketsNotation, onDefinition, addr, flatObj)
+            definition._getDefinitionObjFlat(removeArrayBracketsNotation, onDefinition, addr, flatObj)
         },
     })
     return flatObj

@@ -6,79 +6,34 @@ import { triggerOnObjectTypeAsync, triggerOnObjectType } from '../helpers/trigge
 
 import { isObject, C } from 'topkat-utils'
 
-//----------------------------------------
-// OBJECT
-//----------------------------------------
-export function object<
-    This extends Definition,
-    T extends DefinitionObj
->(
-    this: This, object?: T
-) {
-    return this.newDef<InferTypeRead<T>, InferTypeWrite<T>>(getArrObjDef(object || {}, objDefPartials))
-}
 
 //----------------------------------------
 // GENERIC OBJECT
 //----------------------------------------
-/** this allow to set type as { [k: string]: InferredType } thus allowing any key to be present in the object */
-export function genericObject<
-    This extends Definition,
-    T extends DefinitionObj | Definition,
-    FieldName extends string | [string, string] | [string, string, string]
->(
-    this: This, fieldName: FieldName, objectOrDef?: T
-) {
-    type Read = FieldName extends string ? {[k: string]: InferTypeRead<T>} :
-        FieldName extends [string, string] ? {[k: string]: {[k: string]: InferTypeRead<T>}} :
-            {[k: string]: {[k: string]: {[k: string]: InferTypeRead<T>}}}
-
-    type Write = FieldName extends string ? {[k: string]: InferTypeRead<T>} :
-        FieldName extends [string, string] ? {[k: string]: {[k: string]: InferTypeRead<T>}} :
-            {[k: string]: {[k: string]: {[k: string]: InferTypeWrite<T>}}}
-
-    const realObj = typeof fieldName === 'string' ? { [`__${fieldName}`]: objectOrDef } :
-        fieldName.length === 2 ? { [`__${fieldName[0]}`]: { [`__${fieldName[1]}`]: objectOrDef } } :
-            { [`__${fieldName[0]}`]: { [`__${fieldName[1]}`]: { [`__${fieldName[2]}`]: objectOrDef } } }
-
-    return this.newDef<Read, Write>({
-        ...getArrObjDef(realObj || {}, objDefPartials),
-        nbNestedGenericObjects: typeof fieldName === 'string' ? 1 : fieldName.length
-    })
-}
 
 
 //----------------------------------------
 // ARRAY
 //----------------------------------------
-export function array<
-    This extends Definition,
-    R extends Definition | DefinitionObj,
->(
-    this: This,
-    array?: R,
-) {
-    return this.newDef<InferTypeArrRead<Array<R>>, InferTypeArrWrite<Array<R>>>(getArrObjDef([array] || [], arrDefPartials))
-}
 
 
 //----------------------------------------
 // VALIDATORS
 //----------------------------------------
-export const arrDefPartials: DefinitionPartial = {
+const arrDefPartials: DefinitionPartial = {
     name: 'array',
     errorMsg: defaultTypeError('array'),
     validate: ctx => Array.isArray(ctx.value),
 }
 
-export const objDefPartials: DefinitionPartial = {
+const objDefPartials: DefinitionPartial = {
     name: 'object',
     errorMsg: defaultTypeError('object'),
     validate: ctx => isObject(ctx.value),
 }
 
-export const getArrObjDef = (objOrArr, defPartial: DefinitionPartial) => ({
-    ...defPartial,
+export const getArrObjDef = (objOrArr, type: 'object' | 'array') => ({
+    ...(type === 'object' ? objDefPartials : arrDefPartials),
     format: async ctx => await formatAndValidateRecursive(ctx, objOrArr, ctx.value, ctx.fieldAddr),
     mongoType: () => mongoTypeRecursive(objOrArr),
     tsTypeStr: () => tsTypeRecursive('tsTypeStr', objOrArr),
@@ -87,7 +42,7 @@ export const getArrObjDef = (objOrArr, defPartial: DefinitionPartial) => ({
     isParent: true,
 })
 
-async function formatAndValidateRecursive(ctx: DefCtx, obj: DefinitionObjChild, value: any, addr: string) {
+async function formatAndValidateRecursive(ctx: DefCtx, obj: DefinitionObjChild<any>, value: any, addr: string) {
     return await triggerOnObjectTypeAsync(obj, {
         errorExtraInfos: { modelName: ctx.modelName, addressInParent: addr },
         //==============
@@ -176,7 +131,7 @@ function tsTypeRecursive(fnName: 'tsTypeStr' | 'tsTypeStrForWrite', definitionCh
                 if (!isDynamicKey) {
                     // OPTIONAL OR REQUIRED BEHAVIOR
                     if (v && typeof v === 'object' && '_definitions' in v) { // TODO fix find why instanceof Definition doesn't work in certain cases
-                        const alwaysDefinedInRead = v._definitions.some(d =>(typeof d === 'function' ? d() : d).alwaysDefinedInRead)
+                        const alwaysDefinedInRead = v._definitions.some(d => (typeof d === 'function' ? d() : d).alwaysDefinedInRead)
                         const required = (alwaysDefinedInRead && fnName === 'tsTypeStr') || v.isRequired === true
                         if (!required) newKey = k + `?` // optional by default
                     } else if ((Array.isArray(v) || isObject(v))) {
