@@ -301,7 +301,7 @@ export class Definition<
     object<
         T extends DefinitionObj
     >(
-        object: T
+        object: T = {} as T
     ) {
         return this.newDef(getArrObjDef(object || {}, 'object')) as any as
             PickSecondLevelMethods<
