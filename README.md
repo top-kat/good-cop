@@ -11,14 +11,16 @@
 
 > This library is a personal work, actually used in production apps feel free to contact me via github to collaborate or for feature request
 
-# EXTENDABLE VALIDATION LIBRARY (zod like syntax)
+# VALIDATION LIBRARY (zod like syntax)
 
-* can be extended to add any type definitions
 * Infer typescript types
-* Generate type as string for file generation
-* Generate any types (mongo schema types...etc)
+* **Generate type as string** for file generation
+* **Generate mongo schemas** from types
 * format and validation
-* Can return a different type (ts and validation) depending of a method (create, update, delete...). Eg: When using `.required()`, you usually want to throw an error on `create` but not on other methods (`update`...). Eg2: in a mongo model, you usually want _id field to be mandatory in an object type on read but not on write
+* Can return a different type (ts and validation) depending of a method (create, update, delete...). 
+  * Eg: When using `.required()`, you usually want to throw an error on `create` but not on `update`
+  * Also, when required, the typescript prop type in an object will be required (`myProp: val` instead of `myProp: val`) so you wont have to check for undefined before accessing the value
+  * Eg2: in a mongo model, you usually want _id field to be mandatory in an object type on read but not on write
 
 # Examples
 
@@ -35,7 +37,7 @@ const objDef = _.object({
     _.boolean()
   ),
   arr: [_.email()],
-  otherArr: _.array(_.url())
+  otherArr: _.array(_.url()).maxLength(3).required(),
   subObj: {
     subField: _.genericObject('fieldName', { date: _.date() }), // tsType: { [fieldName: string]: { date: Date } }
     regexp: _.string().regexp(/my\sregexp/),
@@ -46,12 +48,12 @@ type Obj = InferType<typeof objDef>
 /*
 {
   string: string
-  enum: [ number, boolean ]
-  arr: string[]
+  enum?: [ number, boolean ]
+  arr?: string[]
   otherArr: string[]
-  subObj: {
-    subField: { [fieldName: string]: { date: Date } }
-    regexp: string
+  subObj?: {
+    subField?: { [fieldName: string]: { date: Date } }
+    regexp?: string
   }
 }
 */
@@ -73,7 +75,7 @@ const _ = new Definition<{
     user,
     organization
   } 
-})
+}).init() // the .init is necessary for the types suggestions to work best
 
 const user = _.mongoModel(
   ['creationDate'], // those fields will be autoCreated and will appear as always defined on read method but not required in write

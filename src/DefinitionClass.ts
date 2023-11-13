@@ -1015,7 +1015,7 @@ export class Definition<
     }
 }
 
-export const _ = new Definition()
+export const _ = new Definition().init()
 
 
 
