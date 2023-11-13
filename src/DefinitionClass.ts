@@ -5,7 +5,7 @@
  * ------------------------------------------
  *
  * Here are some technical choices that have been taken and may not be intuitive:
- * * Everything is in this file, since it's impossible to keep the exact this type
+ * * Everything is in this file, since it's impossible to keep the exact `this` type
  * when putting methods in another file (tryed a lot)
  * * types and functional code are "separated" with returning `as PickSecondLevelMethods`
  * this seems like the best way to choose what to display in the autocomplete suggestion,
