@@ -871,8 +871,8 @@ export class Definition<
         return this.newDef(required) as any as
             PickSecondLevelMethods<
                 ReturnType<typeof this.newDef<
-                    string,
-                    string,
+                    typeof this.tsTypeRead,
+                    typeof this.tsTypeWrite,
                     true
                 >>,
                 (typeof this)['tsTypeRead'] extends string ? StringMethods : (typeof this)['tsTypeRead'] extends number ? NumberMethods : never
@@ -911,7 +911,13 @@ export class Definition<
         }) as Pick<typeof this, FirstLevelTypes>
     }
     /** NAME => Alias to write paramName in extraInfos */
-    n(...params: [Parameters<typeof this['name']>[0], Parameters<typeof this['name']>[1]?]) { return this.name(...params) as Pick<typeof this, FirstLevelTypes> }
+    n(name: string, paramNumber?: number) {
+        // /!\ DUPLICATE OF NAME
+        return this.newDef({
+            errorExtraInfos: { paramName: name, paramNumber },
+            paramName: name
+        }) as Pick<typeof this, FirstLevelTypes>
+    }
     /** Make the callback return false to unvalidate this field and trigger an error. Note: validation happens after formating */
     onValidate(callback: (ctx: DefCtx) => any) {
         return this.newDef({
@@ -1066,3 +1072,15 @@ export const _ = new Definition()
 // const type = rtpoij.tsTypeRead
 
 // const aa = __.genericObject('objName', __.null()).partial()
+
+
+// const aa = __.n('userFields').object({
+//     screenSize: __.string().required(),
+//     deviceId: __.string().required(),
+//     phonePrefix: __.regexp(/^\+\d+$/).required(),
+//     phoneNumber: __.string().minLength(7).maxLength(17).required(),
+//     lang: __.enum(['en', 'fr']).required(),
+//     currency: __.enum(['eur', 'usd']).required(),
+// }).required()
+
+// type BPo = typeof aa.tsTypeRead
