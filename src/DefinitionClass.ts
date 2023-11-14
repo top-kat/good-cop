@@ -95,7 +95,7 @@ export class Definition<
         }]) as any as
             PickSecondLevelMethods<
                 ReturnType<typeof this.newDef<
-                    ModelsType[A][B]
+                    ModelsType[A][B][C]
                 >>,
                 'partial' | 'complete'
             >
