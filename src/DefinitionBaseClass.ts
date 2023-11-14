@@ -2,7 +2,7 @@ import { formatAndValidate } from './helpers/formatAndValidateForDefinition'
 import { triggerOnObjectType } from './helpers/triggerOnObjectType'
 import { Definition } from './DefinitionClass'
 
-import { DefinitionPartial, DefinitionObjChild, DefinitionPartialFn, ProvidedModels } from './definitionTypes'
+import { DefinitionPartial, DefinitionObjChild, DefinitionPartialFn, ProvidedModels, MainTypes } from './definitionTypes'
 
 import { asArray } from 'topkat-utils'
 
@@ -60,6 +60,16 @@ export class DefinitionBase {
             const { paramName } = typeof def === 'function' ? def() : def
             if (paramName) return paramName
         }
+    }
+    getMainType() {
+        return this.getDefinitionValue('mainType')
+    }
+    isType(type: MainTypes) {
+        for (const def of this._definitions) {
+            const { mainType } = typeof def === 'function' ? def() : def
+            if (mainType === type) return true
+        }
+        return false
     }
     getTsTypeAsString() {
         const definitions = this._definitions

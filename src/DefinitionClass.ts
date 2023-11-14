@@ -85,6 +85,7 @@ export class Definition<
         dbId: A, modelName: B, modelType: C = 'Read' as C
     ) {
         return this.newDef([{
+            mainType: 'object',
             tsTypeStr: `t.${capitalize1st(dbId.toString())}Models.${capitalize1st(modelName.toString())}Models['${modelType.toString()}']`,
             dbName: dbId as string,
             model: modelName as string,
@@ -102,6 +103,7 @@ export class Definition<
     }
     ref(modelName: keyof ModelsType[DefaultDbId]) {
         return this.newDef({
+            mainType: 'string',
             errorMsg: `Only ObjectIds are accepted on referenced fields`,
             format: ctx => getId(ctx.value),
             validate: ctx => isType(ctx.value, 'objectId'),
@@ -227,6 +229,7 @@ export class Definition<
     }
     translation() {
         return this.newDef({
+            mainType: 'object',
             errorMsg: defaultTypeError('{ [countryCodeIso]: translationString }', false),
             validate: ctx => isType(ctx.value, 'object') && Object.entries(ctx.value).every(([countryCode, translationStr]) => typeof translationStr === 'string' && /[a-z][a-z]/.test(countryCode)),
             mongoType: 'object',
@@ -271,6 +274,7 @@ export class Definition<
 
         return this.newDef({
             name: 'tuple',
+            mainType: 'array',
             validate: async (ctx) => {
                 if (!Array.isArray(ctx.value)) return false
                 for (const [i, def] of Object.entries(array)) {
@@ -363,6 +367,7 @@ export class Definition<
     //----------------------------------------
     any() {
         return this.newDef({
+            mainType: 'any',
             validate: () => true,
             mongoType: 'mixed',
             tsTypeStr: 'any',
@@ -376,6 +381,7 @@ export class Definition<
     }
     boolean() {
         return this.newDef({
+            mainType: 'boolean',
             errorMsg: defaultTypeError('boolean'),
             // format: ctx => !!ctx.value, commented because we want "strict mode"
             validate: ctx => typeof ctx.value === 'boolean',
@@ -432,7 +438,7 @@ export class Definition<
     }
     enum<T extends string[]>(possibleValues: [...T] | readonly [...T]) {
         return this.newDef({
-            mongoType: 'string',
+            ...string(),
             tsTypeStr: possibleValues.length ? `'${possibleValues.join(`' | '`)}'` : 'never',
             errorMsg: ctx => `Value "${ctx.value}" do not match allowed values ${possibleValues.join(',')}`,
             validate: ctx => possibleValues.includes(ctx.value),
@@ -686,6 +692,7 @@ export class Definition<
     //----------------------------------------
     date() {
         return this.newDef({
+            mainType: 'date',
             errorMsg: defaultTypeError('date', false),
             // May be 01 Jan 1901 00:00:00 GMT || 2012-01-01T12:12:01.595Z
             format: ctx => typeof ctx.value === 'string' && (/\d{4}-\d{1,2}-\d{1,2}T\d+:\d+:\d+.*/.test(ctx.value) || /\d+ [A-Za-z]+ \d+/.test(ctx.value)) ? new Date(ctx.value) : ctx.value,

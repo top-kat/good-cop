@@ -13,7 +13,7 @@ export type EnsureIsDefMethod<T extends keyof Definition> = T
 export type FirstLevelTypes = EnsureIsDefMethod<'any' | 'array' | 'boolean' | 'date' | 'date12' | 'date8' | 'email' | 'enum' | 'float' | 'genericObject' | 'model' | 'year' | 'url' | 'tuple' | 'typesOr' | 'undefined' | 'string' | 'regexp' | 'percentage' | 'object' | 'translation' | 'number' | 'mongoModel' | 'n' | 'name' | 'ref' | 'void' | 'null' | 'integer'>
 
 
-export type UniversalMethods = EnsureIsDefMethod<'alwaysDefinedInRead' | '_definitions' | 'tsTypeRead' | 'tsTypeWrite' | 'default' | 'errorExtraInfos' | 'formatAndValidate' | 'onFormat' | 'onValidate' | '_pushNewDef' | 'getDefinitionValue' | 'getTsTypeAsString' | '_getObjectCache' | '_getDefinitionObjFlat' | '_refValue' | 'getMongoType' | 'isRequired' | 'isRequiredType' | 'getName' | 'ts' | 'required' | 'unique' | 'optional' | 'promise'>
+export type UniversalMethods = EnsureIsDefMethod<'alwaysDefinedInRead' | '_definitions' | 'tsTypeRead' | 'tsTypeWrite' | 'default' | 'errorExtraInfos' | 'formatAndValidate' | 'onFormat' | 'onValidate' | '_pushNewDef' | 'getDefinitionValue' | 'getTsTypeAsString' | '_getObjectCache' | '_getDefinitionObjFlat' | '_refValue' | 'getMongoType' | 'isRequired' | 'isRequiredType' | 'getName' | 'isType' | 'getMainType' | 'ts' | 'required' | 'unique' | 'optional' | 'promise'>
 
 export type LengthMethods = EnsureIsDefMethod<'length' | 'maxLength' | 'minLength'>
 
@@ -39,9 +39,12 @@ export type DaoGenericMethods = 'create' | 'update' | 'delete' | 'getOne' | 'get
 
 export type MongoTypesString = 'date' | 'number' | 'boolean' | 'object' | 'string' | 'mixed' | 'objectId'
 
+export type MainTypes = Exclude<MongoTypesString, 'objectId' | 'mixed'> | 'array' | 'any' | 'undefined'
+
 export type DefinitionPartialFn = () => DefinitionPartial & { priority: number } // usually possible in real js
 
 export type DefinitionPartial = NoExtraProperties<{
+    mainType?: MainTypes
     name?: string
     /** The lower, the more precedence it will take */
     priority?: number

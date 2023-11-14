@@ -13,12 +13,14 @@ import { isObject, C } from 'topkat-utils'
 //----------------------------------------
 const arrDefPartials: DefinitionPartial = {
     name: 'array',
+    mainType: 'array',
     errorMsg: defaultTypeError('array'),
     validate: ctx => Array.isArray(ctx.value),
 }
 
 const objDefPartials: DefinitionPartial = {
     name: 'object',
+    mainType: 'object',
     errorMsg: defaultTypeError('object'),
     validate: ctx => isObject(ctx.value),
 }

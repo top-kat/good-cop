@@ -6,6 +6,7 @@ import { isset } from 'topkat-utils'
 
 export const sharedDefinitions = {
     string: (acceptEmpty = false) => ({
+        mainType: 'string',
         errorMsg: defaultTypeError('string'),
         format: ctx => (typeof ctx.value === 'number' ? ctx.value.toString() : ctx.value)?.trim(),
         validate: ctx => typeof ctx.value === 'string' && (acceptEmpty || ctx.value.length),
@@ -22,6 +23,7 @@ export const sharedDefinitions = {
         triggerOnUndefineds: true,
     },
     number: {
+        mainType: 'number',
         errorMsg: defaultTypeError('number'),
         validate: ctx => typeof ctx.value === 'number',
         mongoType: 'number',
@@ -52,6 +54,7 @@ export const sharedDefinitions = {
         validate: ctx => ctx.value >= minVal,
     }),
     undefType: {
+        mainType: 'undefined',
         validate: () => true,
         format: ctx => typeof ctx.value === 'undefined' ? ctx.value : undefined,
         tsTypeStr: `undefined`,
