@@ -345,11 +345,17 @@ export class Definition<
         const objDef = this._definitions.find(d => d.name === 'object')
         if (objDef) {
             const realObjDef = typeof objDef === 'function' ? objDef() : objDef
-            const obj = realObjDef.objectCache as any as Record<string, Definition>
-            for (const def of Object.values(obj)) {
-                const requiredDefFound = def._definitions.find(d => d.name === 'required')
-                if (!requiredDefFound) {
-                    def._pushNewDef(required)
+            const obj = realObjDef.objectCache as any as Record<string, Definition | Definition[]>
+            for (const [name, def] of Object.entries(obj)) {
+                if (Array.isArray(def)) {
+                    // put it as a definition array, but only in js, we doesn't
+                    // care about ts since it's already typed
+                    obj[name] = _.array(def as any).required() as any
+                } else {
+                    const requiredDefFound = def._definitions.find(d => d.name === 'required')
+                    if (!requiredDefFound) {
+                        def._pushNewDef(required)
+                    }
                 }
             }
         }

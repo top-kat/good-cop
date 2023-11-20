@@ -4374,10 +4374,10 @@ to-regex-range@^5.0.1:
   dependencies:
     is-number "^7.0.0"
 
-topkat-utils@latest:
-  version "1.2.53"
-  resolved "https://registry.yarnpkg.com/topkat-utils/-/topkat-utils-1.2.53.tgz#df443d87a09b565822ffccb10859aeebe5205931"
-  integrity sha512-mHawR6t7g/KGP1HIWtFt/SdSWbWCTk3PX/jLSbjQKm/nY0iiIiQQvRM7/3hShV47wHx3l7DXwbEgE4bCG9kKjQ==
+topkat-utils@^1.2.61:
+  version "1.2.61"
+  resolved "https://registry.yarnpkg.com/topkat-utils/-/topkat-utils-1.2.61.tgz#a3c4d0fb746ee043ab9b1294cfe2f3ae38086aee"
+  integrity sha512-ZSphkAq35NRaCTlWXzjguIAU7ujeSMYDCsDIR9VbFTzmlovYgFsREqe1bbgVKTSDMB8HJlxj0ExuBHKb/iuB1Q==
 
 tough-cookie@^2.3.3, tough-cookie@~2.5.0:
   version "2.5.0"
