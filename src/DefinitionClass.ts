@@ -921,7 +921,7 @@ export class Definition<
         return this.newDef({
             errorExtraInfos: { paramName: name, paramNumber },
             paramName: name
-        }) as Pick<typeof this, FirstLevelTypes>
+        }) as any as Pick<typeof this, FirstLevelTypes>
     }
     /** NAME => Alias to write paramName in extraInfos */
     n(name: string, paramNumber?: number) {
@@ -929,7 +929,7 @@ export class Definition<
         return this.newDef({
             errorExtraInfos: { paramName: name, paramNumber },
             paramName: name
-        }) as Pick<typeof this, FirstLevelTypes>
+        }) as any as Pick<typeof this, FirstLevelTypes>
     }
     /** Make the callback return false to unvalidate this field and trigger an error. Note: validation happens after formating */
     onValidate(callback: (ctx: DefCtx) => any) {
