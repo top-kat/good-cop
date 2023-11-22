@@ -169,7 +169,7 @@ export class Definition<
             const { mongoType } = typeof def === 'function' ? def() : def
             if (typeof mongoType === 'function') {
                 const result = mongoType(mongoTypeOutput)
-                if (isObject(result)) mongoTypeOutput = result
+                if (isObject(result) || Array.isArray(result)) mongoTypeOutput = result
             } else if (typeof mongoType === 'string') mongoTypeOutput.type = mongoTypeMapping[mongoType] // mongo type string
             else if (isObject(mongoType)) mongoTypeOutput = mongoType as Record<string, any> // Model
         }
@@ -185,7 +185,7 @@ export class Definition<
     >(
         array?: R,
     ) {
-        return this.newDef(getArrObjDef([array] || [], 'array')) as any as
+        return this.newDef(getArrObjDef(array ? [array] : [], 'array')) as any as
             PickSecondLevelMethods<
                 ReturnType<typeof this.newDef<
                     InferTypeArrRead<Array<R>>,
