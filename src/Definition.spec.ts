@@ -68,8 +68,8 @@ describe('Definition', () => {
 
         it('objDef', () => {
             expect(objDef.getTsTypeAsString()).toEqual({
-                read: '{\n    name?: string\n    number?: number\n    bool?: boolean\n}',
-                write: '{\n    name?: string\n    number?: number\n    bool?: boolean\n}',
+                read: `{\n    'name'?: string\n    'number'?: number\n    'bool'?: boolean\n}`,
+                write: `{\n    'name'?: string\n    'number'?: number\n    'bool'?: boolean\n}`,
             })
         })
 
@@ -104,8 +104,8 @@ describe('Definition', () => {
 
         it('objDef', () => {
             expect(objDef.getTsTypeAsString()).toEqual({
-                read: '{\n    arr?: Array<string>\n    arr2?: Array<string>\n    subObj?: {\n        name?: \'a\' | \'b\'\n        tuple?: [string, Date]\n        typeOr?: number | boolean\n        subArr?: Array<string>\n    }\n}',
-                write: '{\n    arr?: Array<string>\n    arr2?: Array<string>\n    subObj?: {\n        name?: \'a\' | \'b\'\n        tuple?: [string, Date]\n        typeOr?: number | boolean\n        subArr?: Array<string>\n    }\n}',
+                read: `{\n    'arr'?: Array<string>\n    'arr2'?: Array<string>\n    'subObj'?: {\n        'name'?: 'a' | 'b'\n        'tuple'?: [string, Date]\n        'typeOr'?: number | boolean\n        'subArr'?: Array<string>\n    }\n}`,
+                write: `{\n    'arr'?: Array<string>\n    'arr2'?: Array<string>\n    'subObj'?: {\n        'name'?: 'a' | 'b'\n        'tuple'?: [string, Date]\n        'typeOr'?: number | boolean\n        'subArr'?: Array<string>\n    }\n}`,
             })
         })
 
@@ -161,8 +161,8 @@ describe('Definition', () => {
 
         it('merge1', () => {
             expect(objDef.getTsTypeAsString()).toEqual({
-                read: '{\n    name?: string\n    email: string\n}',
-                write: '{\n    name?: string\n    email: string\n}',
+                read: `{\n    'name'?: string\n    'email': string\n}`,
+                write: `{\n    'name'?: string\n    'email': string\n}`,
             })
         })
 
