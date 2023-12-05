@@ -379,10 +379,7 @@ export class Definition<
             tsTypeStr: 'any',
         }) as any as
             PickSecondLevelMethods<
-                ReturnType<typeof this.newDef<
-                    any,
-                    any
-                >>
+                ReturnType<typeof this.newDef< any, any >>
             >
     }
     boolean() {
@@ -395,10 +392,7 @@ export class Definition<
             tsTypeStr: 'boolean',
         }) as any as
             PickSecondLevelMethods<
-                ReturnType<typeof this.newDef<
-                    boolean,
-                    boolean
-                >>,
+                ReturnType<typeof this.newDef< boolean, boolean >>,
                 'mergeWith'
             >
     }
@@ -408,11 +402,13 @@ export class Definition<
     string(acceptEmpty = false) {
         return this.newDef(string(acceptEmpty)) as any as
             PickSecondLevelMethods<
-                ReturnType<typeof this.newDef<
-                    string
-                >>,
+                ReturnType<typeof this.newDef<string>>,
                 StringMethods
             >
+    }
+    /** String alias for readability */
+    objectId(acceptEmpty = false) {
+        return this.newDef(string(acceptEmpty)) as any as PickSecondLevelMethods<ReturnType<typeof this.newDef<string>>, StringMethods>
     }
     email() {
         return this.newDef({
@@ -422,9 +418,7 @@ export class Definition<
             validate: ctx => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(ctx.value),
         }) as any as
             PickSecondLevelMethods<
-                ReturnType<typeof this.newDef<
-                    string
-                >>,
+                ReturnType<typeof this.newDef< string >>,
                 StringMethods
             >
     }
@@ -436,9 +430,7 @@ export class Definition<
             validate: ctx => /^https?:\/\/.+/.test(ctx.value)
         }) as any as
             PickSecondLevelMethods<
-                ReturnType<typeof this.newDef<
-                    string
-                >>,
+                ReturnType<typeof this.newDef< string >>,
                 StringMethods
             >
     }
@@ -450,9 +442,7 @@ export class Definition<
             validate: ctx => possibleValues.includes(ctx.value),
         }) as any as
             PickSecondLevelMethods<
-                ReturnType<typeof this.newDef<
-                    T[number]
-                >>,
+                ReturnType<typeof this.newDef< T[number]>>,
                 TypedExclude<StringMethods, 'match'>
             >
     }
