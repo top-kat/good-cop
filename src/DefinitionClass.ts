@@ -413,7 +413,7 @@ export class Definition<
     email() {
         return this.newDef({
             ...string(),
-            format: ctx => ctx.value?.toLowerCase().trim(),
+            format: ctx => ctx.value?.toLowerCase?.()?.trim(),
             errorMsg: defaultTypeError('email', false),
             validate: ctx => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(ctx.value),
         }) as any as
@@ -707,7 +707,7 @@ export class Definition<
             ...number,
             errorMsg: defaultTypeError('date8', false),
             validate: ctx => isDateIntOrStringValid(ctx.value, false, 8),
-            format: ctx => (typeof ctx.value === 'string' ? parseInt(ctx.value) : ctx.value)?.trim(),
+            format: ctx => (typeof ctx.value === 'string' ? parseInt(ctx.value) : ctx.value),
         }) as any as
             PickSecondLevelMethods<
                 ReturnType<typeof this.newDef<
@@ -720,7 +720,7 @@ export class Definition<
             ...number,
             errorMsg: defaultTypeError('date12', false),
             validate: ctx => isDateIntOrStringValid(ctx.value, false, 12),
-            format: ctx => (typeof ctx.value === 'string' ? parseInt(ctx.value) : ctx.value)?.trim(),
+            format: ctx => (typeof ctx.value === 'string' ? parseInt(ctx.value) : ctx.value),
         }) as any as
             PickSecondLevelMethods<
                 ReturnType<typeof this.newDef<
@@ -733,7 +733,7 @@ export class Definition<
             ...number,
             errorMsg: defaultTypeError('year', false),
             validate: ctx => isDateIntOrStringValid(ctx.value, false, 4),
-            format: ctx => (typeof ctx.value === 'string' ? parseInt(ctx.value) : ctx.value)?.trim(),
+            format: ctx => (typeof ctx.value === 'string' ? parseInt(ctx.value) : ctx.value),
         }) as any as
             PickSecondLevelMethods<
                 ReturnType<typeof this.newDef<

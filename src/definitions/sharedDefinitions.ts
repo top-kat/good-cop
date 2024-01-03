@@ -8,7 +8,7 @@ export const sharedDefinitions = {
     string: (acceptEmpty = false) => ({
         mainType: 'string',
         errorMsg: defaultTypeError('string'),
-        format: ctx => (typeof ctx.value === 'number' ? ctx.value.toString() : ctx.value)?.trim(),
+        format: ctx => (typeof ctx.value === 'number' ? ctx.value.toString() : typeof ctx.value === 'string' ? ctx.value?.trim() : ctx.value),
         validate: ctx => typeof ctx.value === 'string' && (acceptEmpty || ctx.value.length),
         mongoType: 'string',
         tsTypeStr: 'string',
