@@ -407,8 +407,12 @@ export class Definition<
             >
     }
     /** String alias for readability */
-    objectId(acceptEmpty = false) {
-        return this.newDef(string(acceptEmpty)) as any as PickSecondLevelMethods<ReturnType<typeof this.newDef<string>>, StringMethods>
+    objectId() {
+        return this.newDef({
+            ...string(),
+            format: ctx => ctx.value.toString(),
+            validate: ctx => ctx.value?.length?.() === 24,
+        }) as any as PickSecondLevelMethods<ReturnType<typeof this.newDef<string>>, StringMethods>
     }
     email() {
         return this.newDef({
