@@ -1,24 +1,24 @@
 /**------------------------------------------
- *
- *               GOOD - COP
- *
- * ------------------------------------------
- *
- * Here are some technical choices that have been taken and may not be intuitive:
- * * Everything is in this file, since it's impossible to keep the exact `this` type
- * when putting methods in another file (tryed a lot)
- * * types and functional code are "separated" with returning `as PickSecondLevelMethods`
- * this seems like the best way to choose what to display in the autocomplete suggestion,
- * Eg: when typing `_.object().`, `partial` and `complete` are suggested but `greaterThan`
- * is not
- * For this to work, any new function added may be added to:
- *   => FirstLevelTypes: the types displayed on first autocomplete suggestion
- *   => UniversalMethods: the types displayed everywhere else
- *   => Then you may select additional methods to suggest via `PickSecondLevelMethods`
- * * There is a lot of code duplication, for example in types, but written like this,
- * this improved how type was rendered
- * * I could not always use default values so we need to always pass every important type when
- * returning a new `newDef()`
+ *                                          *
+ *               GOOD - COP                 *
+ *                                          *
+---------------------------------------------
+
+Here are some technical choices that have been taken and may not be intuitive:
+* Everything is in this file, since it's impossible to keep the exact `this` type
+when putting methods in another file (tryed a lot)
+* types and functional code are "separated" with returning `as PickSecondLevelMethods`
+this seems like the best way to choose what to display in the autocomplete suggestion,
+Eg: when typing `_.object().`, `partial` and `complete` are suggested but `greaterThan`
+is not. Unlike to zod implementation where every type and subtype is defined in oit's
+own class, this avoid creating different classes for each type and
+subtypes and avoid a lot of extra code files and spaghetti
+
+For this to work, any new function added may be added to:
+=> FirstLevelTypes: the types displayed on first autocomplete suggestion
+=> UniversalMethods: the types displayed everywhere else
+=> Then you may select additional methods to suggest via `PickSecondLevelMethods`
+
  */
 
 import mongoose from 'mongoose' // only used for typings, may not be compatible if used in frontend
