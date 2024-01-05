@@ -130,7 +130,7 @@ export class Definition<
     ) {
         const _ = new Definition()
         const untyped = object as Record<string, any>
-        untyped._id = _.string().alwaysDefinedInRead()
+        untyped._id = _.objectId().alwaysDefinedInRead()
         if (autoWriteFields.includes('creationDate')) untyped.creationDate = _.date().default(() => new Date())
         if (autoWriteFields.includes('creator')) untyped.creator = _.ref('user').default(ctx => getId(ctx.user))
         if (autoWriteFields.includes('lastUpdateDate')) untyped.lastUpdateDate = _.date().onFormat(() => new Date())
