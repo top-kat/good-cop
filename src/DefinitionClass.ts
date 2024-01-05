@@ -411,7 +411,7 @@ export class Definition<
         return this.newDef({
             ...string(),
             format: ctx => ctx.value.toString(),
-            validate: ctx => ctx.value?.length?.() === 24,
+            validate: ctx => ctx.value?.length === 24,
         }) as any as PickSecondLevelMethods<ReturnType<typeof this.newDef<string>>, StringMethods>
     }
     email() {
