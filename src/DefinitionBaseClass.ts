@@ -1,6 +1,9 @@
+
+
 import { formatAndValidate } from './helpers/formatAndValidateForDefinition'
 import { triggerOnObjectType } from './helpers/triggerOnObjectType'
 import { Definition } from './DefinitionClass'
+import { findTypeInDefinitions, getFieldValueForDefinitions } from './helpers/findInDefinitions'
 
 import { DefinitionPartial, DefinitionObjChild, DefinitionPartialFn, ProvidedModels, MainTypes } from './definitionTypes'
 
@@ -50,26 +53,16 @@ export class DefinitionBase {
 
     /** for all definitions of the object (eg [string, required]) it will find a defined value and return when the value is met the first time. Eg: for a value of 'isRequired', it will check all definitions for the first containing that field and return it's value */
     getDefinitionValue<K extends keyof DefinitionPartial>(name: K): (DefinitionPartial[K] | void) {
-        for (const defRaw of this._definitions) {
-            const def = typeof defRaw === 'function' ? defRaw() : defRaw
-            if (typeof def?.[name] !== 'undefined') return def?.[name]
-        }
+        return getFieldValueForDefinitions(this._definitions, name)
     }
     getName() {
-        for (const def of this._definitions) {
-            const { paramName } = typeof def === 'function' ? def() : def
-            if (paramName) return paramName
-        }
+        return getFieldValueForDefinitions(this._definitions, 'paramName')
     }
     getMainType() {
         return this.getDefinitionValue('mainType')
     }
     isType(type: MainTypes) {
-        for (const def of this._definitions) {
-            const { mainType } = typeof def === 'function' ? def() : def
-            if (mainType === type) return true
-        }
-        return false
+        return findTypeInDefinitions(this._definitions, type)
     }
     getTsTypeAsString() {
         const definitions = this._definitions

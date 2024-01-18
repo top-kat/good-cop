@@ -30,6 +30,7 @@ import { defaultTypeError } from './helpers/definitionGenericHelpers'
 import { TranslationObj } from './core-types'
 import { formatAndValidateDefinitionPartials } from './helpers/formatAndValidateForDefinition'
 import { MongoFieldsRead, MongoFieldsWrite, MongoTypeObj, isAnonymousUser, mongoTypeMapping, systemUserId } from './helpers/backendDefinitionsHelpers'
+import { getFieldValueForDefinitions } from './helpers/findInDefinitions'
 
 import { DefCtx, InferTypeRead, InferTypeWrite, DefinitionObj, DefinitionPartial, AutoWritedFieldNames, DefinitionClassReceivedModelType, InferTypeArrRead, InferTypeArrWrite, FirstLevelTypes, TypedExclude, NumberMethods, StringMethods, GenericDef, PickSecondLevelMethods, LengthMethods } from './definitionTypes'
 
@@ -168,7 +169,7 @@ export class Definition<
         for (const def of definitions) {
             const { mongoType } = typeof def === 'function' ? def() : def
             if (typeof mongoType === 'function') {
-                const result = mongoType(mongoTypeOutput)
+                const result = mongoType(mongoTypeOutput, definitions)
                 if (isObject(result) || Array.isArray(result)) mongoTypeOutput = result
             } else if (typeof mongoType === 'string') mongoTypeOutput.type = mongoTypeMapping[mongoType] // mongo type string
             else if (isObject(mongoType)) mongoTypeOutput = mongoType as Record<string, any> // Model
@@ -994,7 +995,13 @@ export class Definition<
         return this.newDef({
             errorMsg: ctx => `Item should be unique. Another item with value: "${ctx.value}" for field "${ctx.fieldAddr}" has been found`,
             // TODO ?? add validator
-            mongoType: obj => obj.unique = true,
+            mongoType: (obj, definitions) => {
+                const required = getFieldValueForDefinitions(definitions, 'required')
+                // ref: https://masteringjs.io/tutorials/mongoose/unique
+                // ref: https://codehunter.cc/a/mongodb/mongodb-mongoose-unique-if-not-null
+                if (required) obj.unique = true
+                else obj.index = { unique: true, sparse: true }
+            },
         }) as any as
             PickSecondLevelMethods<
                 ReturnType<typeof this.newDef<

@@ -56,7 +56,7 @@ export type DefinitionPartial = NoExtraProperties<{
     tsTypeStr?: ((previousType: string) => string) | string
     tsTypeStrForWrite?: (() => string) | string
     /** Use function to modify mongoType object directly, use object to pass a full or a string to define which type to use for mongo for that field */
-    mongoType?: ((mongoTypeObj: Record<string, any>) => any) | MongoTypesString | Record<string, any>
+    mongoType?: ((mongoTypeObj: Record<string, any>, definitions: (DefinitionPartial | DefinitionPartialFn)[]) => any) | MongoTypesString | Record<string, any>
     /** should return a truthy value if valid and falsey if not */
     validate?: (ctx: DefCtx) => (any | Promise<any>)
     format?: (ctx: DefCtx) => (any | Promise<any>)
