@@ -228,6 +228,7 @@ export class Definition<
                 'partial' | 'complete'
             >
     }
+    /** an object who's keys are locale and values are translation string. Eg: `{ fr: 'Salut', en: 'Hi' }` */
     translation() {
         return this.newDef({
             mainType: 'object',
@@ -323,6 +324,7 @@ export class Definition<
                 'complete' | 'partial' | 'mergeWith'
             >
     }
+    /** For all props of an object type to be OPTIONAL */
     partial() {
         const objDef = this._definitions.find(d => d.name === 'object')
         if (objDef) {
@@ -342,6 +344,7 @@ export class Definition<
                 'mergeWith'
             >
     }
+    /** For all props of an object type to be REQUIRED */
     complete() {
         const objDef = this._definitions.find(d => d.name === 'object')
         if (objDef) {
@@ -825,7 +828,7 @@ export class Definition<
     // TRANSFORM
     //----------------------------------------
     /** Formatting happens first, before every validations */
-    onFormat(callback: (ctx: DefCtx) => any) {
+    onFormat(callback: ((ctx: DefCtx) => any) | ((ctx: DefCtx) => Promise<any>)) {
         return this.newDef({
             format: async ctx => {
                 await callback(ctx)
@@ -1044,7 +1047,7 @@ export const _ = new Definition().init()
 // const __ = new Definition<Modelssss, 'aa'>().init()
 
 
-// // BASE TYPES
+// BASE TYPES
 // const str = __.string().required().lowerCase().isRequiredType
 // const strAZ = __.string().lowerCase().isRequiredType
 // const strWZ = __.string().lowerCase().tsTypeWrite
@@ -1085,7 +1088,6 @@ export const _ = new Definition().init()
 // const apoapo = __.string().tsTypeRead
 // const type = rtpoij.tsTypeRead
 
-// const aa = __.genericObject('objName', __.null()).partial()
 
 
 // const aa = __.n('userFields').object({
