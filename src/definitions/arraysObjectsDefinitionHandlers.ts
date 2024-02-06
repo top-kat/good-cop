@@ -100,7 +100,7 @@ async function formatAndValidateRecursive(ctx: DefCtx, obj: DefinitionObjChild, 
 function mongoTypeRecursive(obj: DefinitionObjChild) {
     return triggerOnObjectType(obj, {
         errorExtraInfos: { msg: 'mongoTypeNotDefinedForModel' },
-        onDefinition: definition => definition.getMongoType(),
+        onDefinition: definition => definition._getMongoType(),
     })
 }
 

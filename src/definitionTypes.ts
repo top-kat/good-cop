@@ -13,7 +13,7 @@ export type EnsureIsDefMethod<T extends keyof Definition> = T
 export type FirstLevelTypes = EnsureIsDefMethod<'any' | 'array' | 'boolean' | 'date' | 'date12' | 'date8' | 'email' | 'enum' | 'float' | 'genericObject' | 'model' | 'year' | 'url' | 'tuple' | 'typesOr' | 'undefined' | 'string' | 'regexp' | 'percentage' | 'object' | 'translation' | 'number' | 'mongoModel' | 'n' | 'name' | 'ref' | 'void' | 'null' | 'integer' | 'objectId'>
 
 
-export type UniversalMethods = EnsureIsDefMethod<'alwaysDefinedInRead' | '_definitions' | 'tsTypeRead' | 'tsTypeWrite' | 'default' | 'errorExtraInfos' | 'formatAndValidate' | 'onFormat' | 'onValidate' | '_pushNewDef' | 'getDefinitionValue' | 'getTsTypeAsString' | '_getObjectCache' | '_getDefinitionObjFlat' | '_refValue' | 'getMongoType' | 'isRequired' | 'isRequiredType' | 'getName' | 'isType' | 'getMainType' | 'ts' | 'required' | 'unique' | 'optional' | 'promise'>
+export type UniversalMethods = EnsureIsDefMethod<'alwaysDefinedInRead' | '_definitions' | 'tsTypeRead' | 'tsTypeWrite' | 'default' | 'errorExtraInfos' | 'formatAndValidate' | 'onFormat' | 'onValidate' | '_pushNewDef' | 'getDefinitionValue' | 'getTsTypeAsString' | '_getObjectCache' | '_getDefinitionObjFlat' | '_refValue' | '_getMongoType' | 'isRequired' | 'isRequiredType' | 'getName' | 'isType' | 'getMainType' | 'ts' | 'required' | 'unique' | 'optional' | 'promise'>
 
 export type LengthMethods = EnsureIsDefMethod<'length' | 'maxLength' | 'minLength'>
 
@@ -22,9 +22,12 @@ export type NumberMethods = EnsureIsDefMethod<'between' | 'greaterThan' | 'gt' |
 export type StringMethods = 'lowerCase' | 'upperCase' | 'trim' | 'match' | LengthMethods
 
 
+export type DateMethods = 'isFuture'
+
+
 export type SecondLevelMethods = Exclude<keyof Definition, FirstLevelTypes | UniversalMethods>
 
-export type PickSecondLevelMethods<
+export type NextAutocompletionChoices<
     Def extends Definition<any, any, any, any, any>,
     Keys extends SecondLevelMethods = never
 > = Pick<Def, Keys | UniversalMethods>
