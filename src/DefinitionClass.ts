@@ -94,7 +94,7 @@ export class Definition<
             model: modelName as string,
         }, () => {
             const model = this._models?.[dbId as any]?.[modelName as any]
-            if (!model) throw new DescriptiveError('Model not set in model validation', { dbId, modelName, modelNames: Object.keys(this._models || {}) })
+            if (!model) throw new DescriptiveError(`Model not found. Please make you provided a model with the name "${modelName.toString()}" when initiating good-cop`, { dbId, modelName, modelNames: Object.keys(this._models || {}) })
             return { ...model._definitions[0], tsTypeStr: undefined }
         }]) as any as
             NextAutocompletionChoices<
