@@ -104,7 +104,7 @@ export class Definition<
                 'partial' | 'complete'
             >
     }
-    ref(modelName: keyof ModelsType[DefaultDbId], alwaysPopulated?: boolean) {
+    ref<AlwaysPopulated extends boolean>(modelName: keyof ModelsType[DefaultDbId], alwaysPopulated?: AlwaysPopulated) {
         return this._newDef({
             mainType: 'string',
             errorMsg: `Only ObjectIds are accepted on referenced fields`,
@@ -120,7 +120,9 @@ export class Definition<
         }) as any as
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef<
-                    ModelsType[DefaultDbId][typeof modelName] | string,
+                    AlwaysPopulated extends true
+                    ? ModelsType[DefaultDbId][typeof modelName]
+                    : ModelsType[DefaultDbId][typeof modelName] | string,
                     string
                 >>
             >
@@ -1065,11 +1067,14 @@ export const _ = new Definition().init()
 
 // type Modelssss = {
 //     aa: {
-//         bb: { Read: any, Write: any }
+//         bb: { Read: { a: number }, Write: { a: number } }
 //     }
 // }
 
 // const __ = new Definition<Modelssss, 'aa'>().init()
+
+// const populated = __.ref('bb', true).tsTypeRead
+// const notPop = __.ref('bb').tsTypeRead
 
 
 // BASE TYPES
