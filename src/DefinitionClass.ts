@@ -104,7 +104,7 @@ export class Definition<
                 'partial' | 'complete'
             >
     }
-    ref(modelName: keyof ModelsType[DefaultDbId]) {
+    ref(modelName: keyof ModelsType[DefaultDbId], alwaysPopulated?: boolean) {
         return this._newDef({
             mainType: 'string',
             errorMsg: `Only ObjectIds are accepted on referenced fields`,
@@ -114,7 +114,7 @@ export class Definition<
                 typeObj.type = mongoose.Schema.Types.ObjectId
                 typeObj.ref = modelName
             },
-            tsTypeStr: `string | ${capitalize1st(modelName as string)}`,
+            tsTypeStr: (alwaysPopulated ? '' : `string | `) + `${capitalize1st(modelName as string)}`,
             tsTypeStrForWrite: `string`,
             ref: modelName as string,
         }) as any as
