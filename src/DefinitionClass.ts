@@ -461,12 +461,12 @@ export class Definition<
         regexp?: RegExp
         minLength?: number
         maxLength?: number
-        encrypt(value: string): string
+        encrypt(value: string): string | Promise<string>
     }) {
         return this._newDef({
             ...string(),
             errorMsg: `Password doesn't match regexp ${regexp.toString()} or do not match the condition minLength:${minLength} and maxLength:${maxLength}`,
-            format: ctx => encrypt(ctx.value),
+            format: async ctx => await encrypt(ctx.value),
             validate: ctx => regexp.test(ctx.value) && ctx.value >= minLength && ctx.value <= maxLength
         }) as any as
             NextAutocompletionChoices<
