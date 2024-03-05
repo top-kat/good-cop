@@ -7,16 +7,16 @@
 Here are some technical choices that have been taken and may not be intuitive:
 * Everything is in this file, since it's impossible to keep the exact `this` type
 when putting methods in another file (tryed a lot)
-* types and functional code are "separated" with returning `as PickSecondLevelMethods`
+* types and functional code are "separated" with returning `as NextAutocompletionChoices`
 this seems like the best way to choose what to display in the autocomplete suggestion
 while avoiding a class extension nighmare like in zod
 Eg: when typing `_.object().`, `partial` and `complete` are suggested but `greaterThan`
 is not
 
-For this to work, any new function added may be added to:
+/!\ For this to work, any new function added may be added to /!\:
 => FirstLevelTypes: the types displayed on first autocomplete suggestion
 => UniversalMethods: the types displayed everywhere else
-=> Then you may select additional methods to suggest via `PickSecondLevelMethods`
+=> Then you may select additional methods to suggest via `NextAutocompletionChoices` in the definition
 
  */
 
