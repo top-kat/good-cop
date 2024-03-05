@@ -452,6 +452,28 @@ export class Definition<
                 StringMethods
             >
     }
+    password({
+        regexp = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).*$/, // at least one upperCase, one lowerCase and a digit
+        minLength = 8,
+        maxLength = 30,
+        encrypt
+    }: {
+        regexp?: RegExp
+        minLength?: number
+        maxLength?: number
+        encrypt(value: string): string
+    }) {
+        return this._newDef({
+            ...string(),
+            errorMsg: `Password doesn't match regexp ${regexp.toString()} or do not match the condition minLength:${minLength} and maxLength:${maxLength}`,
+            format: ctx => encrypt(ctx.value),
+            validate: ctx => regexp.test(ctx.value) && ctx.value >= minLength && ctx.value <= maxLength
+        }) as any as
+            NextAutocompletionChoices<
+                ReturnType<typeof this._newDef< string >>,
+                StringMethods
+            >
+    }
     /** Predefined list of values. Eg: status: _.enum(['success', 'error', 'pending']) */
     enum<T extends string[]>(possibleValues: [...T] | readonly [...T]) {
         return this._newDef({
