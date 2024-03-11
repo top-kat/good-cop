@@ -67,29 +67,40 @@ export async function formatAndValidateDefinitionPartials(
 
         const { errorMsg, methods = ['create', 'update'], triggerOnUndefineds } = def
 
+        const validationErr = async () => {
+            const errMsg = typeof errorMsg === 'string' ? errorMsg : typeof errorMsg === 'function' ? await errorMsg(defCtx) : 'fieldValidationError'
+            const { dbName, modelName, dbId, method, fields } = defCtx
+            throw new DescriptiveError(errMsg, { code: 422, ...defCtx.errorExtraInfos, dbName, modelName, dbId, method, value, fieldAddr, fields }) // TODO for unit tests we should put models.mongo[dbName][modelName] to fix
+        }
+
         defCtx.definition = def
         if (def.name) defCtx.errorExtraInfos.definition = def.name
 
         if ((value !== undefined || triggerOnUndefineds) && methods.includes(method)) {
-            if (disableValidation !== true && def.validateBeforeFormatting) {
-                // TODO
-            }
-            if (disableFormatting !== true && def.format) {
+            if (
+                disableValidation !== true
+                && def.validateBeforeFormatting
+                && !await def.validateBeforeFormatting(defCtx)
+            ) await validationErr()
+            if (
+                disableFormatting !== true
+                && def.format
+            ) {
                 const formattedValue = await def.format(defCtx)
                 if (typeof formattedValue !== 'undefined') defCtx.value = formattedValue
             }
-            if (disableValidation !== true && def.validate) {
-                if (!await def.validate(defCtx)) {
-                    const errMsg = typeof errorMsg === 'string' ? errorMsg : typeof errorMsg === 'function' ? await errorMsg(defCtx) : 'fieldValidationError'
-                    const { dbName, modelName, dbId, method, fields } = defCtx
-                    throw new DescriptiveError(errMsg, { code: 422, ...defCtx.errorExtraInfos, dbName, modelName, dbId, method, value, fieldAddr, fields }) // TODO for unit tests we should put models.mongo[dbName][modelName] to fix
-                }
-            }
+            if (
+                disableValidation !== true
+                && def.validate
+                && !await def.validate(defCtx)
+            ) await validationErr()
         }
     }
 
     return defCtx.value
 }
+
+
 
 /* alias */
 export async function validateDefinitionPartials(
