@@ -430,6 +430,7 @@ export class Definition<
     email() {
         return this._newDef({
             ...string(),
+            name: 'email',
             format: ctx => ctx.value?.toLowerCase?.()?.trim(),
             errorMsg: defaultTypeError('email', false),
             validate: ctx => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(ctx.value),
@@ -465,9 +466,10 @@ export class Definition<
     }) {
         return this._newDef({
             ...string(),
+            name: 'password',
             errorMsg: `Password doesn't match regexp ${regexp.toString()} or do not match the condition minLength:${minLength} and maxLength:${maxLength}`,
+            validateBeforeFormatting: ctx => regexp.test(ctx.value) && ctx.value.length >= minLength && ctx.value.length <= maxLength,
             format: async ctx => await encrypt(ctx.value),
-            validate: ctx => regexp.test(ctx.value) && ctx.value.length >= minLength && ctx.value.length <= maxLength
         }) as any as
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef< string >>,

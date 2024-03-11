@@ -71,6 +71,9 @@ export async function formatAndValidateDefinitionPartials(
         if (def.name) defCtx.errorExtraInfos.definition = def.name
 
         if ((value !== undefined || triggerOnUndefineds) && methods.includes(method)) {
+            if (disableValidation !== true && def.validateBeforeFormatting) {
+                // TODO
+            }
             if (disableFormatting !== true && def.format) {
                 const formattedValue = await def.format(defCtx)
                 if (typeof formattedValue !== 'undefined') defCtx.value = formattedValue

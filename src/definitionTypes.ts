@@ -60,8 +60,10 @@ export type DefinitionPartial = NoExtraProperties<{
     tsTypeStrForWrite?: (() => string) | string
     /** Use function to modify mongoType object directly, use object to pass a full or a string to define which type to use for mongo for that field */
     mongoType?: ((mongoTypeObj: Record<string, any>, definitions: (DefinitionPartial | DefinitionPartialFn)[]) => any) | MongoTypesString | Record<string, any>
-    /** should return a truthy value if valid and falsey if not */
+    /** should return a truthy value if valid and falsey if not. Actually validation is done AFTER formatting. If you want it differently please use validateBeforeFormatting() */
     validate?: (ctx: DefCtx) => (any | Promise<any>)
+    /** This happen BEFORE formatting, unless classic validation should return a truthy value if valid and falsey if not */
+    validateBeforeFormatting?: (ctx: DefCtx) => (any | Promise<any>)
     format?: (ctx: DefCtx) => (any | Promise<any>)
     /** field is always defined when reading, for example if it has a default value */
     alwaysDefinedInRead?: true
