@@ -48,15 +48,19 @@ export type DefinitionPartialFn = () => DefinitionPartial & { priority: number }
 
 export type DefinitionPartial = NoExtraProperties<{
     mainType?: MainTypes
+    /** Name of the definition for used for debugging purpose */
     name?: string
     /** The lower, the more precedence it will take */
     priority?: number
+    /** Documentation, not used actually */
     doc?: string
     /** Error message displayed when the validate function return falsey value */
     errorMsg?: string | ((ctx: DefCtx) => MaybePromise<string>)
     /** Shall represent the ts type, the value should never be evaluated in code, only the inferred type, so we can type as `{ tsType: '' as any as anyTypeYouWant }` */
     tsType?: ((previousType: string) => string) | any
+    /** string representation of the typescript type */
     tsTypeStr?: ((previousType: string) => string) | string
+    /** string representation of the typescript type for write methods (update, create) */
     tsTypeStrForWrite?: (() => string) | string
     /** Use function to modify mongoType object directly, use object to pass a full or a string to define which type to use for mongo for that field */
     mongoType?: ((mongoTypeObj: Record<string, any>, definitions: (DefinitionPartial | DefinitionPartialFn)[]) => any) | MongoTypesString | Record<string, any>
