@@ -468,7 +468,10 @@ export class Definition<
             ...string(),
             name: 'password',
             errorMsg: `Password doesn't match regexp ${regexp.toString()} or do not match the condition minLength:${minLength} and maxLength:${maxLength}`,
-            validateBeforeFormatting: ctx => regexp.test(ctx.value) && ctx.value.length >= minLength && ctx.value.length <= maxLength,
+            validateBeforeFormatting: ctx =>
+                regexp.test(ctx.value)
+                && ctx.value.length >= minLength
+                && ctx.value.length <= maxLength,
             format: async ctx => await encrypt(ctx.value),
         }) as any as
             NextAutocompletionChoices<
