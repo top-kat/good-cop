@@ -835,7 +835,7 @@ export class Definition<
         return this._newDef(undefType) as any as
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef<
-                    undefined
+                    void
                 >>
             >
     }
@@ -844,7 +844,7 @@ export class Definition<
         return this._newDef(undefType) as any as
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef<
-                    undefined
+                    void
                 >>
             >
     }
