@@ -9,7 +9,7 @@ Here are some technical choices that have been taken and may not be intuitive:
 when putting methods in another file (tryed a lot)
 * types and functional code are "separated" with returning `as NextAutocompletionChoices`
 this seems like the best way to choose what to display in the autocomplete suggestion
-while avoiding a class extension nighmare like in zod
+while avoiding a class extension nighmare like in zod although is not as strict as zod
 Eg: when typing `_.object().`, `partial` and `complete` are suggested but `greaterThan`
 is not
 
