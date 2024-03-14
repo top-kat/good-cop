@@ -1,6 +1,6 @@
 {
   "name": "good-cop",
-  "version": "1.1.31",
+  "version": "1.1.32",
   "type": "commonjs",
   "main": "./dist/index-frontend.js",
   "exports": {
