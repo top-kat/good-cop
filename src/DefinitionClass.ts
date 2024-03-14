@@ -153,6 +153,7 @@ export class Definition<
     /** force this field to be the userId instead of any id */
     forceUserId() {
         return this._newDef({
+            name: 'forceUserId',
             format: ctx => {
                 const { method, fields, fieldAddr, user } = ctx
                 const isSystem = getId(user) === systemUserId
@@ -238,6 +239,7 @@ export class Definition<
     /** an object who's keys are locale and values are translation string. Eg: `{ fr: 'Salut', en: 'Hi' }` */
     translation() {
         return this._newDef({
+            name: 'translation',
             mainType: 'object',
             errorMsg: defaultTypeError('{ [countryCodeIso]: translationString }', false),
             validate: ctx => isType(ctx.value, 'object') && Object.entries(ctx.value).every(([countryCode, translationStr]) => typeof translationStr === 'string' && /[a-z][a-z]/.test(countryCode)),
@@ -396,6 +398,7 @@ export class Definition<
     }
     boolean() {
         return this._newDef({
+            name: 'boolean',
             mainType: 'boolean',
             errorMsg: defaultTypeError('boolean'),
             // format: ctx => !!ctx.value, commented because we want "strict mode"
@@ -422,6 +425,7 @@ export class Definition<
     objectId() {
         return this._newDef({
             ...string(),
+            name: 'objectId',
             format: ctx => ctx.value.toString(),
             validate: ctx => ctx.value?.length === 24,
         }) as any as NextAutocompletionChoices<ReturnType<typeof this._newDef<string>>, StringMethods>
@@ -430,6 +434,7 @@ export class Definition<
     email() {
         return this._newDef({
             ...string(),
+            name: 'email',
             format: ctx => ctx.value?.toLowerCase?.()?.trim(),
             errorMsg: defaultTypeError('email', false),
             validate: ctx => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(ctx.value),
@@ -443,6 +448,7 @@ export class Definition<
     url() {
         return this._newDef({
             ...string(),
+            name: 'url',
             format: ctx => typeof ctx.value === 'number' ? ctx.value.toString() : ctx.value,
             errorMsg: defaultTypeError('url', false),
             validate: ctx => /^https?:\/\/.+/.test(ctx.value)
@@ -465,9 +471,17 @@ export class Definition<
     }) {
         return this._newDef({
             ...string(),
-            errorMsg: `Password doesn't match regexp ${regexp.toString()} or do not match the condition minLength:${minLength} and maxLength:${maxLength}`,
+            name: 'password',
+            errorMsg: ctx => ctx.value.length >= minLength
+                ? `Password is inferior than minLength of ${minLength}`
+                : ctx.value.length <= maxLength
+                    ? `Password is superior than maxLength of ${maxLength}`
+                    : `Password doesn't match regexp ${regexp.toString()}`,
+            validateBeforeFormatting: ctx =>
+                regexp.test(ctx.value)
+                && ctx.value.length >= minLength
+                && ctx.value.length <= maxLength,
             format: async ctx => await encrypt(ctx.value),
-            validate: ctx => regexp.test(ctx.value) && ctx.value.length >= minLength && ctx.value.length <= maxLength
         }) as any as
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef< string >>,
@@ -478,6 +492,7 @@ export class Definition<
     enum<T extends string[]>(possibleValues: [...T] | readonly [...T]) {
         return this._newDef({
             ...string(),
+            name: 'enum',
             tsTypeStr: possibleValues.length ? `'${possibleValues.join(`' | '`)}'` : 'never',
             errorMsg: ctx => `Value "${ctx.value}" do not match allowed values ${possibleValues.join(',')}`,
             validate: ctx => possibleValues.includes(ctx.value),
@@ -490,6 +505,7 @@ export class Definition<
     //SECOND LEVEL----------------------------
     lowerCase() {
         return this._newDef({
+            name: 'lowerCase',
             errorMsg: defaultTypeError('string'),
             format: ctx => typeof ctx.value === 'string' ? ctx.value.toLowerCase() : ctx.value,
             priority: 10, // may be applied before email() for example
@@ -504,6 +520,7 @@ export class Definition<
     }
     upperCase() {
         return this._newDef({
+            name: 'upperCase',
             errorMsg: defaultTypeError('string'),
             format: ctx => typeof ctx.value === 'string' ? ctx.value.toUpperCase() : ctx.value,
             priority: 10, // may be applied before email() for example
@@ -518,6 +535,7 @@ export class Definition<
     }
     trim() {
         return this._newDef({
+            name: 'trim',
             errorMsg: defaultTypeError('string'),
             format: ctx => typeof ctx.value === 'string' ? ctx.value.trim() : ctx.value,
             priority: 10, // may be applied before email() for example
@@ -536,6 +554,7 @@ export class Definition<
     ) {
         const regexp = typeof regexpOrStr === 'string' ? new RegExp(parseRegexp(regexpOrStr, regexpOptions)) : regexpOrStr
         return this._newDef({
+            name: 'regexp',
             errorMsg: ctx => `Entry ${ctx.value} do not match ${regexp}`,
             validate: ctx => regexp.test(ctx.value),
             priority: 55, // may be applied after string() for example
@@ -572,6 +591,7 @@ export class Definition<
     integer() {
         return this._newDef({
             ...number,
+            name: 'number',
             format: ctx => parseInt(ctx.value)
         }) as any as
             NextAutocompletionChoices<
@@ -584,6 +604,7 @@ export class Definition<
     float() {
         return this._newDef({
             ...number,
+            name: 'float',
             format: ctx => parseFloat(ctx.value),
         }) as any as
             NextAutocompletionChoices<
@@ -688,6 +709,7 @@ export class Definition<
     /** Number should be between min and max inclusive (min and max are allowed values) */
     between(min: number, max: number) {
         return this._newDef({
+            name: 'between',
             errorMsg: ctx => `Value ${ctx.value} should be between ${min} and ${max} (inclusive)`,
             validate: ctx => ctx.value >= min && ctx.value <= max,
         }) as any as
@@ -701,6 +723,7 @@ export class Definition<
     }
     round2() {
         return this._newDef({
+            name: 'round2',
             format: ctx => Math.round(ctx.value * 100) / 100,
         }) as any as
             NextAutocompletionChoices<
@@ -713,6 +736,7 @@ export class Definition<
     }
     positive() {
         return this._newDef({
+            name: 'positiveNumber',
             errorMsg: ctx => `Value ${ctx.value} should be positive`,
             validate: ctx => ctx.value >= 0,
         }) as any as
@@ -729,6 +753,7 @@ export class Definition<
     //----------------------------------------
     date() {
         return this._newDef({
+            name: 'date',
             mainType: 'date',
             errorMsg: defaultTypeError('date', false),
             // May be 01 Jan 1901 00:00:00 GMT || 2012-01-01T12:12:01.595Z
@@ -747,6 +772,7 @@ export class Definition<
     date8() {
         return this._newDef({
             ...number,
+            name: 'date8',
             errorMsg: defaultTypeError('date8', false),
             validate: ctx => isDateIntOrStringValid(ctx.value, false, 8),
             format: ctx => (typeof ctx.value === 'string' ? parseInt(ctx.value) : ctx.value),
@@ -761,6 +787,7 @@ export class Definition<
     date12() {
         return this._newDef({
             ...number,
+            name: 'date12',
             errorMsg: defaultTypeError('date12', false),
             validate: ctx => isDateIntOrStringValid(ctx.value, false, 12),
             format: ctx => (typeof ctx.value === 'string' ? parseInt(ctx.value) : ctx.value),
@@ -775,6 +802,7 @@ export class Definition<
     year() {
         return this._newDef({
             ...number,
+            name: 'year',
             errorMsg: defaultTypeError('year', false),
             validate: ctx => isDateIntOrStringValid(ctx.value, false, 4),
             format: ctx => (typeof ctx.value === 'string' ? parseInt(ctx.value) : ctx.value),
@@ -788,6 +816,7 @@ export class Definition<
     }
     isFuture() {
         return this._newDef({
+            name: 'isFutureDate',
             errorMsg: ctx => `Date should be in the future. Actual date: ${dateArray(ctx.value)?.join('/')}`,
             validate: ctx => getDateAsInt12(ctx.value) > getDateAsInt12(),
         }) as any as
@@ -806,7 +835,7 @@ export class Definition<
         return this._newDef(undefType) as any as
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef<
-                    void
+                    undefined
                 >>
             >
     }
@@ -815,12 +844,13 @@ export class Definition<
         return this._newDef(undefType) as any as
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef<
-                    void
+                    undefined
                 >>
             >
     }
     null() {
         return this._newDef({
+            name: 'null',
             validate: ctx => ctx.value === null,
             format: ctx => ctx.value === null ? ctx.value : null,
             tsTypeStr: `null`,
@@ -836,6 +866,7 @@ export class Definition<
     //----------------------------------------
     length(length: number, comparisonOperator: '<' | '>' | '===' = '===') {
         return this._newDef({
+            name: 'length',
             errorMsg: ctx => `Wrong length for value at ${ctx.fieldAddr}. Expected length (${comparisonOperator} ${length}) but got length ${ctx.value && ctx.value.length}`,
             validate: ctx => isset(ctx.value) ? comparisonOperator === '>' ? ctx.value?.length > length : comparisonOperator === '<' ? ctx.value?.length < length : ctx.value?.length === length : true,
         }) as any as
@@ -849,6 +880,7 @@ export class Definition<
     }
     minLength(minLength: number) {
         return this._newDef({
+            name: 'minLength',
             errorMsg: ctx => `Wrong length for value at ${ctx.fieldAddr}. Expected minLength (${minLength}) but got length ${ctx.value && ctx.value.length}`,
             validate: ctx => typeof ctx.value === 'undefined' ? true : ctx.value?.length >= minLength,
         }) as any as
@@ -862,6 +894,7 @@ export class Definition<
     }
     maxLength(maxLength: number) {
         return this._newDef({
+            name: 'maxLength',
             errorMsg: ctx => `Wrong length for value at ${ctx.fieldAddr}. Expected minLength (${maxLength}) but got length ${ctx.value && ctx.value.length}`,
             validate: ctx => typeof ctx.value === 'undefined' ? true : ctx.value?.length <= maxLength,
         }) as any as
@@ -879,6 +912,7 @@ export class Definition<
     /** Formatting happens first, before every validations */
     onFormat(callback: ((ctx: DefCtx) => any) | ((ctx: DefCtx) => Promise<any>)) {
         return this._newDef({
+            name: 'onFormat',
             format: async ctx => {
                 await callback(ctx)
                 return ctx.value
@@ -894,6 +928,7 @@ export class Definition<
     }
     default(defaultValue: ((ctx: DefCtx) => any) | (string | any[] | Record<string, any> | Date | boolean | number | null)) {
         return this._newDef({
+            name: 'default',
             priority: 1,
             format: ctx => {
                 if (typeof ctx.value === 'undefined') {
@@ -917,7 +952,10 @@ export class Definition<
     // OPTIONAL / REQUIRED
     //----------------------------------------
     optional() {
-        return this._newDef({ required: false }) as any as
+        return this._newDef({
+            name: 'optional',
+            required: false,
+        }) as any as
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef<
                     typeof this.tsTypeRead,
@@ -940,7 +978,10 @@ export class Definition<
     }
     /** useful for database types where some fields may be always defined in read (_id, creationDate...) but not required on creation */
     alwaysDefinedInRead() {
-        return this._newDef({ alwaysDefinedInRead: true }) as any as
+        return this._newDef({
+            name: 'alwaysDefinedInRead',
+            alwaysDefinedInRead: true
+        }) as any as
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef<
                     typeof this.tsTypeRead,
@@ -981,6 +1022,7 @@ export class Definition<
     /** Make the callback return false to unvalidate this field and trigger an error. Note: validation happens after formating */
     onValidate(callback: (ctx: DefCtx) => any) {
         return this._newDef({
+            name: 'onValidate',
             validate: async ctx => {
                 if (await callback(ctx) === false) return false
                 else return true
@@ -996,6 +1038,7 @@ export class Definition<
     }
     promise() {
         return this._newDef({
+            name: 'promise',
             priority: 99, // should pass after Array or any types
             errorMsg: ctx => `Expected: typeof Promise but got ${typeof ctx.value}`,
             validate: ctx => typeof ctx.value?.then === 'function', // /!\ promise type should not concern in app validation so this should never apply
@@ -1018,6 +1061,7 @@ export class Definition<
         type InferTypesOrWrite<T> = T extends [infer A, ...infer R] ? A extends GenericDef ? [A['tsTypeWrite'], ...InferTypesOrRead<R>] : [] : []
 
         return this._newDef({
+            name: 'typesOr',
             errorMsg: ctx => `Value ${ctx.value} should be one of the following types: ${types.join(', ')}`,
             mongoType: 'mixed',
             async validate(ctx) {
@@ -1045,6 +1089,7 @@ export class Definition<
     }
     unique() {
         return this._newDef({
+            name: 'unique',
             errorMsg: ctx => `Item should be unique. Another item with value: "${ctx.value}" for field "${ctx.fieldAddr}" has been found`,
             // TODO ?? add validator
             mongoType: (obj, definitions) => {
