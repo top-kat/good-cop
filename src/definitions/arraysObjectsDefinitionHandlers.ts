@@ -135,7 +135,7 @@ function tsTypeRecursive(fnName: 'tsTypeStr' | 'tsTypeStrForWrite', definitionCh
 
                 const optional = newKey.endsWith('?')
                 const parsedKey = newKey.replace(/\?$/, '')
-                newObjStr += `${indentationUnit}'${parsedKey}'${optional ? '?' : ''}: ${tsValStr.replace(/\n/g, `\n${indentationUnit}`)}\n`
+                newObjStr += `${indentationUnit}${parsedKey.includes('[') ? parsedKey : `'${parsedKey}'`}${optional ? '?' : ''}: ${tsValStr.replace(/\n/g, `\n${indentationUnit}`)}\n`
             }
             return newObjStr.length ? `{\n${newObjStr}}` : '{}'
         },
