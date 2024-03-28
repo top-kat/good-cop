@@ -13,6 +13,15 @@ export const sharedDefinitions = {
         mongoType: 'string',
         tsTypeStr: 'string',
     }),
+    boolean: {
+        name: 'boolean',
+        mainType: 'boolean',
+        errorMsg: defaultTypeError('boolean'),
+        // format: ctx => !!ctx.value, commented because we want "strict mode"
+        validate: ctx => typeof ctx.value === 'boolean',
+        mongoType: 'boolean',
+        tsTypeStr: 'boolean',
+    },
     required: {
         name: 'required',
         priority: 5, // should be run after default

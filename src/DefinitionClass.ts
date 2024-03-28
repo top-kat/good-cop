@@ -13,7 +13,7 @@ while avoiding a class extension nighmare like in zod although is not as strict 
 Eg: when typing `_.object().`, `partial` and `complete` are suggested but `greaterThan`
 is not
 
-/!\ For this to work, any new function added may be added to /!\:
+/!\ TO CREATE A NEW METHOD /!\:
 => FirstLevelTypes: the types displayed on first autocomplete suggestion
 => UniversalMethods: the types displayed everywhere else
 => Then you may select additional methods to suggest via `NextAutocompletionChoices` in the definition
@@ -36,7 +36,7 @@ import { DefCtx, InferTypeRead, InferTypeWrite, DefinitionObj, DefinitionPartial
 import { isType, isset, getId, capitalize1st, isObject, DescriptiveError, isDateIntOrStringValid, parseRegexp, ErrorOptions, getDateAsInt12, dateArray } from 'topkat-utils'
 
 
-const { required, number, round2, lt, gt, gte, lte, undefType, string, wrapperTypeStr } = sharedDefinitions
+const { required, number, round2, lt, gt, gte, lte, undefType, string, wrapperTypeStr, boolean } = sharedDefinitions
 
 
 
@@ -383,7 +383,7 @@ export class Definition<
             >
     }
     //----------------------------------------
-    // COMMON TYPES
+    // ANY
     //----------------------------------------
     any() {
         return this._newDef({
@@ -396,15 +396,34 @@ export class Definition<
                 ReturnType<typeof this._newDef< any, any >>
             >
     }
+    //----------------------------------------
+    // BOOLEAN
+    //----------------------------------------
     boolean() {
+        return this._newDef(boolean) as any as
+            NextAutocompletionChoices<
+                ReturnType<typeof this._newDef< boolean, boolean >>,
+                'mergeWith'
+            >
+    }
+    true() {
         return this._newDef({
-            name: 'boolean',
-            mainType: 'boolean',
-            errorMsg: defaultTypeError('boolean'),
-            // format: ctx => !!ctx.value, commented because we want "strict mode"
-            validate: ctx => typeof ctx.value === 'boolean',
-            mongoType: 'boolean',
-            tsTypeStr: 'boolean',
+            ...boolean,
+            name: 'true',
+            validate: ctx => ctx.value === true,
+            tsTypeStr: 'true',
+        }) as any as
+            NextAutocompletionChoices<
+                ReturnType<typeof this._newDef< boolean, boolean >>,
+                'mergeWith'
+            >
+    }
+    false() {
+        return this._newDef({
+            ...boolean,
+            name: 'false',
+            validate: ctx => ctx.value === false,
+            tsTypeStr: 'false',
         }) as any as
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef< boolean, boolean >>,

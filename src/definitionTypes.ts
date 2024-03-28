@@ -10,7 +10,7 @@ export type TypedExclude<T extends keyof Definition, K extends keyof Definition>
 
 export type EnsureIsDefMethod<T extends keyof Definition> = T
 
-export type FirstLevelTypes = EnsureIsDefMethod<'any' | 'array' | 'boolean' | 'date' | 'date12' | 'date8' | 'email' | 'enum' | 'float' | 'genericObject' | 'model' | 'year' | 'url' | 'tuple' | 'typesOr' | 'undefined' | 'string' | 'regexp' | 'percentage' | 'object' | 'translation' | 'number' | 'mongoModel' | 'n' | 'name' | 'ref' | 'void' | 'null' | 'integer' | 'objectId' | 'password'>
+export type FirstLevelTypes = EnsureIsDefMethod<'any' | 'array' | 'boolean' | 'true' | 'false' | 'date' | 'date12' | 'date8' | 'email' | 'enum' | 'float' | 'genericObject' | 'model' | 'year' | 'url' | 'tuple' | 'typesOr' | 'undefined' | 'string' | 'regexp' | 'percentage' | 'object' | 'translation' | 'number' | 'mongoModel' | 'n' | 'name' | 'ref' | 'void' | 'null' | 'integer' | 'objectId' | 'password'>
 
 
 export type UniversalMethods = EnsureIsDefMethod<'alwaysDefinedInRead' | '_definitions' | 'tsTypeRead' | 'tsTypeWrite' | 'default' | 'errorExtraInfos' | 'formatAndValidate' | 'onFormat' | 'onValidate' | '_pushNewDef' | 'getDefinitionValue' | 'getTsTypeAsString' | '_getObjectCache' | '_getDefinitionObjFlat' | '_refValue' | '_getMongoType' | 'isRequired' | 'isRequiredType' | 'getName' | 'isType' | 'getMainType' | 'ts' | 'required' | 'unique' | 'optional' | 'promise'>
@@ -47,6 +47,7 @@ export type MainTypes = Exclude<MongoTypesString, 'objectId' | 'mixed'> | 'array
 export type DefinitionPartialFn = () => DefinitionPartial & { priority: number } // usually possible in real js
 
 export type DefinitionPartial = NoExtraProperties<{
+    /** A string representation of the type BUT NOT TYPESCRIPT */
     mainType?: MainTypes
     /** Name of the definition for used for debugging purpose */
     name?: string
