@@ -5,13 +5,13 @@ import { isset } from 'topkat-utils'
 
 
 export const sharedDefinitions = {
-    string: (acceptEmpty = false) => ({
+    string: ({ acceptEmpty = false, hardCodedValue = undefined as string | undefined } = {}) => ({
         mainType: 'string',
-        errorMsg: defaultTypeError('string'),
-        format: ctx => (typeof ctx.value === 'number' ? ctx.value.toString() : typeof ctx.value === 'string' ? ctx.value?.trim() : ctx.value),
-        validate: ctx => typeof ctx.value === 'string' && (acceptEmpty || ctx.value.length),
+        errorMsg: defaultTypeError(hardCodedValue || 'string'),
+        format: ctx => hardCodedValue ? hardCodedValue : (typeof ctx.value === 'number' ? ctx.value.toString() : typeof ctx.value === 'string' ? ctx.value?.trim() : ctx.value),
+        validate: ctx => hardCodedValue ? ctx.value === hardCodedValue : typeof ctx.value === 'string' && (acceptEmpty || ctx.value.length),
         mongoType: 'string',
-        tsTypeStr: 'string',
+        tsTypeStr: hardCodedValue ? `'${hardCodedValue}'` : 'string',
     }),
     boolean: {
         name: 'boolean',

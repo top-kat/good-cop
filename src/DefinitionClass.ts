@@ -433,10 +433,17 @@ export class Definition<
     //----------------------------------------
     // STRING
     //----------------------------------------
-    string(acceptEmpty = false) {
-        return this._newDef(string(acceptEmpty)) as any as
+    string<HardCoded extends string | undefined>({ acceptEmpty = false, hardCodedValue = undefined as HardCoded } = {}) {
+        return this._newDef(string({ acceptEmpty, hardCodedValue })) as any as
             NextAutocompletionChoices<
-                ReturnType<typeof this._newDef<string>>,
+                ReturnType<typeof this._newDef<HardCoded extends string ? HardCoded : string>>,
+                StringMethods
+            >
+    }
+    stringConstant<T extends string>(hardCodedValue: T) {
+        return this._newDef(string({ hardCodedValue })) as any as
+            NextAutocompletionChoices<
+                ReturnType<typeof this._newDef<T>>,
                 StringMethods
             >
     }
@@ -1158,6 +1165,10 @@ export const _ = new Definition().init()
 // }
 
 // const __ = new Definition<Modelssss, 'aa'>().init()
+
+// const hardCodedString = __.string({ hardCodedValue: 'tt' }).tsTypeRead
+// const normalstring = __.string().tsTypeRead
+// const hardCodedString2 = __.stringConstant('coucou').tsTypeRead
 
 // const populated = __.ref('bb', true).tsTypeRead
 // const notPop = __.ref('bb').tsTypeRead
