@@ -514,17 +514,18 @@ export class Definition<
                 StringMethods
             >
     }
-    /** Predefined list of values. Eg: status: _.enum(['success', 'error', 'pending']) */
-    enum<T extends string[]>(possibleValues: [...T] | readonly [...T]) {
+    /** Predefined list of values. Eg: status: _.enum(['success', 'error', 'pending']) OR _.enum([1, 2, 3]) */
+    enum<T extends string[] | number[]>(possibleValues: [...T] | readonly [...T]) {
+        const isNumber = typeof possibleValues[0] === 'number'
         return this._newDef({
-            ...string(),
+            ...(isNumber ? number : string()),
             name: 'enum',
-            tsTypeStr: possibleValues.length ? `'${possibleValues.join(`' | '`)}'` : 'never',
+            tsTypeStr: possibleValues.length ? isNumber ? `${possibleValues.join(` | `)}` : `'${possibleValues.join(`' | '`)}'` : 'never',
             errorMsg: ctx => `Value "${ctx.value}" do not match allowed values ${possibleValues.join(',')}`,
             validate: ctx => possibleValues.includes(ctx.value),
         }) as any as
             NextAutocompletionChoices<
-                ReturnType<typeof this._newDef< T[number]>>,
+                ReturnType<typeof this._newDef<T[number]>>,
                 TypedExclude<StringMethods, 'match'>
             >
     }
