@@ -517,6 +517,8 @@ export class Definition<
     /** Predefined list of values. Eg: status: _.enum(['success', 'error', 'pending']) OR _.enum([1, 2, 3]) */
     enum<T extends string[] | number[]>(possibleValues: [...T] | readonly [...T]) {
         const isNumber = typeof possibleValues[0] === 'number'
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
+        const that = this // NOT SURE WHY NEEDED but ot fixes a bug 🙃
         return this._newDef({
             ...(isNumber ? number : string()),
             name: 'enum',
@@ -525,7 +527,7 @@ export class Definition<
             validate: ctx => possibleValues.includes(ctx.value),
         }) as any as
             NextAutocompletionChoices<
-                ReturnType<typeof this._newDef<T[number]>>,
+                ReturnType<typeof that._newDef<T[number]>>,
                 TypedExclude<StringMethods, 'match'>
             >
     }
