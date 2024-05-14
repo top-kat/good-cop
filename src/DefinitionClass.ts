@@ -33,7 +33,7 @@ import { getFieldValueForDefinitions } from './helpers/findInDefinitions'
 
 import { DefCtx, InferTypeRead, InferTypeWrite, DefinitionObj, DefinitionPartial, AutoWritedFieldNames, DefinitionClassReceivedModelType, InferTypeArrRead, InferTypeArrWrite, FirstLevelTypes, TypedExclude, NumberMethods, StringMethods, GenericDef, NextAutocompletionChoices, LengthMethods, DateMethods } from './definitionTypes'
 
-import { isType, isset, getId, capitalize1st, isObject, DescriptiveError, isDateIntOrStringValid, parseRegexp, ErrorOptions, getDateAsInt12, dateArray } from 'topkat-utils'
+import { isType, isset, getId, capitalize1st, isObject, DescriptiveError, isDateIntOrStringValid, parseRegexp, ErrorOptions, getDateAsInt12, dateArray, recursiveGenericFunctionSync } from 'topkat-utils'
 
 
 const { required, number, round2, lt, gt, gte, lte, undefType, string, wrapperTypeStr, boolean } = sharedDefinitions
@@ -132,17 +132,39 @@ export class Definition<
         T extends DefinitionObj,
         U extends readonly AutoWritedFieldNames[]
     >(
-        autoWriteFields: U, object: T
+        autoWriteFields: U,
+        model: T
     ) {
         const _ = new Definition()
-        const untyped = object as Record<string, any>
+        const untyped = model as Record<string, any>
         untyped._id = _.objectId().alwaysDefinedInRead()
-        if (autoWriteFields.includes('creationDate')) untyped.creationDate = _.date().default(() => new Date())
-        if (autoWriteFields.includes('creator')) untyped.creator = _.ref('user').default(ctx => getId(ctx.user))
-        if (autoWriteFields.includes('lastUpdateDate')) untyped.lastUpdateDate = _.date().onFormat(() => new Date())
-        if (autoWriteFields.includes('lastUpdater')) untyped.lastUpdater = _.ref('user').default(ctx => getId(ctx.user)).onFormat(ctx => isAnonymousUser(ctx.user._id) ? undefined : getId(ctx.user))
+        if (autoWriteFields.includes('creationDate')) {
+            untyped.creationDate = _.date().default(() => new Date())
+        }
+        if (autoWriteFields.includes('creator')) {
+            untyped.creator = _.ref('user').default(ctx => getId(ctx.user))
+        }
+        if (autoWriteFields.includes('lastUpdateDate')) {
+            untyped.lastUpdateDate = _.date().onFormat(() => new Date())
+        }
+        if (autoWriteFields.includes('lastUpdater')) {
+            untyped.lastUpdater = _.ref('user').default(ctx => getId(ctx.user)).onFormat(ctx => isAnonymousUser(ctx.user._id) ? undefined : getId(ctx.user))
+        }
 
-        return this._newDef(getArrObjDef(object || {}, 'object')) as any as
+        // ACCEPT NULL FOR ALL SUBOBJECTS that are not required as null is a valid mongo value
+        recursiveGenericFunctionSync(model, (item: { _definitions: DefinitionPartial[] }) => {
+            if (
+                item._definitions
+                && item._definitions.length
+                && !item._definitions.some(d => d.required)
+            ) {
+                for (const definition of (item._definitions as DefinitionPartial[])) {
+                    if (typeof definition.acceptNull !== 'boolean') definition.acceptNull = true
+                }
+            }
+        })
+
+        return this._newDef(getArrObjDef(model || {}, 'object')) as any as
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef<
                     InferTypeRead<T> & MongoFieldsRead<U[number]>,

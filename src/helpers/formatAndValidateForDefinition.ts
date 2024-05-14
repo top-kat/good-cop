@@ -76,12 +76,16 @@ export async function formatAndValidateDefinitionPartials(
         defCtx.definition = def
         if (def.name) defCtx.errorExtraInfos.definition = def.name
 
+        if (def.acceptNull && defCtx.value === null) return defCtx.value
+
         if ((value !== undefined || triggerOnUndefineds) && methods.includes(method)) {
+            // VALIDATE before formatting
             if (
                 disableValidation !== true
                 && def.validateBeforeFormatting
                 && !await def.validateBeforeFormatting(defCtx)
             ) await validationErr()
+            // FORMAT
             if (
                 disableFormatting !== true
                 && def.format
@@ -89,6 +93,7 @@ export async function formatAndValidateDefinitionPartials(
                 const formattedValue = await def.format(defCtx)
                 if (typeof formattedValue !== 'undefined') defCtx.value = formattedValue
             }
+            // VALIDATE
             if (
                 disableValidation !== true
                 && def.validate

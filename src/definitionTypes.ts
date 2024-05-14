@@ -90,6 +90,8 @@ export type DefinitionPartial = NoExtraProperties<{
     isParent?: boolean
     /** used to determine the number of nested generic objects, when generic type is used */
     nbNestedGenericObjects?: 1 | 2 | 3
+    /** Determine that null is a valid value for the field */
+    acceptNull?: boolean
 }>
 
 

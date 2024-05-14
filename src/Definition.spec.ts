@@ -1,7 +1,6 @@
 
 import { _ } from './DefinitionClass'
 
-
 // TODO refactor and improve readability on this
 
 describe('Definition', () => {
@@ -202,6 +201,50 @@ describe('Definition', () => {
         it('complete3', async () => {
             expect(await complete.formatAndValidate({ email: 'coucou', name: 'rtr' })).toEqual({ email: 'coucou', name: 'rtr' })
         })
+
+    })
+
+    describe(`MONGO MODEL`, () => {
+
+        const mongoModel = _.mongoModel(['creationDate', 'creator', 'lastUpdateDate', 'lastUpdater'], {
+            coucou: _.string(),
+            subObj: {
+                jesus: _.boolean().required()
+            },
+            arr: [{
+                laReineDéNèje: _.array(_.object({ libéréDélivray: _.number() }))
+            }]
+        })
+
+        it('MongoModel autoUpdate fields', () => {
+            expect(mongoModel.getTsTypeAsString().read).toMatch(/'creationDate': Date\s+'creator': string \| User\s+'lastUpdateDate'?: Date\s+'lastUpdater': string | User/)
+        })
+
+        it(`All optional values are null and it's OK 😎`, async () => {
+            expect(async () => await mongoModel.formatAndValidate({
+                coucou: null,
+                subObj: {
+                    jesus: `il fo kroire en lui`
+                },
+                arr: [{
+                    laReineDéNèje: [{
+                        libéréDélivray: null
+                    }, {
+                        libéréDélivray: null
+                    }]
+                }]
+            }))
+        })
+
+        it(`One required value is null and that's not OK 🛂`, async () => {
+            expect(async () => await mongoModel.formatAndValidate({
+                coucou: null,
+                subObj: {
+                    jesus: null
+                },
+            })).rejects.toThrow('Field jesus is required')
+        })
+
 
     })
 })
