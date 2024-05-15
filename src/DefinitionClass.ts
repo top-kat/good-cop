@@ -138,6 +138,8 @@ export class Definition<
         const _ = new Definition()
         const untyped = model as Record<string, any>
         untyped._id = _.objectId().alwaysDefinedInRead()
+
+        // AUTO WRITE FIELDS
         if (autoWriteFields.includes('creationDate')) {
             untyped.creationDate = _.date().default(() => new Date())
         }
@@ -164,7 +166,7 @@ export class Definition<
             }
         })
 
-        return this._newDef(getArrObjDef(model || {}, 'object')) as any as
+        return this._newDef(getArrObjDef(model || {}, 'object', { deleteForeignKeys: true })) as any as
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef<
                     InferTypeRead<T> & MongoFieldsRead<U[number]>,
@@ -345,9 +347,15 @@ export class Definition<
     object<
         T extends DefinitionObj
     >(
-        object: T = {} as T
+        object: T = {} as T,
+        {
+            /** Whenever to delete fields that are not included in the original model */
+            deleteForeignKeys = false
+        } = {}
     ) {
-        return this._newDef(getArrObjDef(object || {}, 'object')) as any as
+        return this._newDef(getArrObjDef(object || {}, 'object', {
+            deleteForeignKeys
+        })) as any as
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef<
                     InferTypeRead<T>,

@@ -3,6 +3,8 @@ import { _ } from './DefinitionClass'
 
 // TODO refactor and improve readability on this
 
+
+
 describe('Definition', () => {
 
     describe(`String def single`, () => {
@@ -21,10 +23,11 @@ describe('Definition', () => {
             expect(await stringDef.formatAndValidate(1)).toEqual('1')
         })
 
-        it('stringDef4 throw', async () => {
-            expect(async () => await stringDef.formatAndValidate(['r', true])).rejects.toThrow()
-        })
-
+        throwMsgHelper(
+            'stringDef4 throw',
+            stringDef.formatAndValidate(['r', true]),
+            `Expected type 'string' but got type array for value`
+        )
     })
 
     describe(`Number def`, () => {
@@ -41,20 +44,24 @@ describe('Definition', () => {
         const arrDef = _.array(_.string())
 
         it('stringDef', () => {
-            expect(arrDef.getTsTypeAsString()).toEqual({ 'read': 'Array<string>', 'write': 'Array<string>' })
+            expect(arrDef.getTsTypeAsString())
+                .toEqual({ 'read': 'Array<string>', 'write': 'Array<string>' })
         })
 
         it('stringDef2', async () => {
-            expect(await arrDef.formatAndValidate(['coucou', 1])).toEqual(['coucou', '1'])
+            expect(await arrDef.formatAndValidate(['coucou', 1]))
+                .toEqual(['coucou', '1'])
         })
 
         it('stringDef4 throw', async () => {
-            expect(async () => await arrDef.formatAndValidate(null)).rejects.toThrow()
+            expect(async () => await arrDef.formatAndValidate(null))
+                .rejects.toThrow(`Expected type 'array' but got type object for value null`)
         })
 
 
         it('stringDef5 throw', async () => {
-            expect(async () => await arrDef.formatAndValidate(['e', true])).rejects.toThrow()
+            expect(async () => await arrDef.formatAndValidate(['e', true]))
+                .rejects.toThrow(`Expected type 'string' but got type boolean for value true`)
         })
 
     })
@@ -72,19 +79,36 @@ describe('Definition', () => {
             })
         })
 
-        it('objDef2', async () => {
-            expect(await objDef.formatAndValidate({ name: 22, number: '3' })).toEqual({ name: '22', number: 3 })
+        it('objDef2 with foreign fields allowed', async () => {
+            expect(
+                await objDef.formatAndValidate({ name: 22, number: '3', foreignField: 'koukou' })
+            ).toEqual({ name: '22', number: 3, foreignField: 'koukou' })
         })
 
         it('objDef3 throw', async () => {
-            expect(async () => await objDef.formatAndValidate(22)).rejects.toThrow()
+            expect(
+                async () => await objDef.formatAndValidate(22)
+            ).rejects.toThrow(`Expected type 'object' but got type number for value 22`)
         })
 
 
         it('stringDef5 throw', async () => {
-            expect(async () => await objDef.formatAndValidate({ name: true })).rejects.toThrow()
+            expect(
+                async () => await objDef.formatAndValidate({ name: true })
+            ).rejects.toThrow(`Expected type 'string' but got type boolean for value true`)
         })
 
+    })
+
+
+    describe(`OBJECT with foreign fields not allowed`, () => {
+
+        const objDef = _.object({ name: _.string(), number: _.number() }, { deleteForeignKeys: true })
+        it('objDef2 with foreign fields NOT allowed', async () => {
+            expect(
+                await objDef.formatAndValidate({ name: 22, number: '3', foreignField: 'koukou' })
+            ).toEqual({ name: '22', number: 3 })
+        })
     })
 
 
@@ -128,13 +152,13 @@ describe('Definition', () => {
 
         it('wrongArr in obj', async () => {
             // TODO check error return
-            expect(async () => await objDef.formatAndValidate(wrongArr)).rejects.toThrow()
+            expect(async () => await objDef.formatAndValidate(wrongArr)).rejects.toThrow(`Expected type 'string' but got type object for value null`)
         })
 
         const wrongArrTyple = { ...rightBody, subObj: { ...rightSubobj, tuple: ['a', false] } }
 
         it('wrongArrTyple', async () => {
-            expect(async () => await objDef.formatAndValidate(wrongArrTyple)).rejects.toThrow()
+            expect(async () => await objDef.formatAndValidate(wrongArrTyple)).rejects.toThrow(`Expected type 'date' but got false`)
         })
 
         const typesOrSecondType = { ...rightBody, subObj: { ...rightSubobj, typeOr: 9 } }
@@ -147,7 +171,7 @@ describe('Definition', () => {
         const typesOrWrongType = { ...rightBody, subObj: { ...rightSubobj, typeOr: [null, 2] } }
 
         it('typesOrWrongType', async () => {
-            expect(async () => await objDef.formatAndValidate(typesOrWrongType)).rejects.toThrow()
+            expect(async () => await objDef.formatAndValidate(typesOrWrongType)).rejects.toThrow(`Value ,2 should be one of the following types: [object Object], [object Object]`)
         })
 
     })
@@ -170,7 +194,7 @@ describe('Definition', () => {
         })
 
         it('merge3 throw email missing', async () => {
-            expect(async () => await objDef.formatAndValidate({ name: 22 })).rejects.toThrow()
+            expect(async () => await objDef.formatAndValidate({ name: 22 })).rejects.toThrow('Field email is required')
         })
         it('merge4 name missing = OK', async () => {
             expect(await objDef.formatAndValidate({ email: 22 })).toEqual({ email: '22' })
@@ -248,3 +272,20 @@ describe('Definition', () => {
 
     })
 })
+
+
+
+
+//----------------------------------------
+// HELPER
+//----------------------------------------
+
+function throwMsgHelper(itMsg: string, fn: Promise<any>, expectedMsg: string) {
+    it(itMsg, async () => {
+        try {
+            await fn
+        } catch (err) {
+            expect((err as any)?.message).toContain(expectedMsg)
+        }
+    })
+}

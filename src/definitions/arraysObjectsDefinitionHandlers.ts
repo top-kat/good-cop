@@ -25,19 +25,31 @@ const objDefPartials: DefinitionPartial = {
     validate: ctx => isObject(ctx.value),
 }
 
-export const getArrObjDef = (objOrArr, type: 'object' | 'array') => ({
-    ...(type === 'object' ? objDefPartials : arrDefPartials),
-    format: async ctx => await formatAndValidateRecursive(ctx, objOrArr, ctx.value, ctx.fieldAddr),
-    mongoType: () => mongoTypeRecursive(objOrArr),
-    tsTypeStr: () => tsTypeRecursive('tsTypeStr', objOrArr),
-    tsTypeStrForWrite: () => tsTypeRecursive('tsTypeStrForWrite', objOrArr),
-    objectCache: objOrArr,
-    isParent: true,
-})
+export function getArrObjDef(
+    objOrArr,
+    type: 'object' | 'array',
+    config?: { deleteForeignKeys: boolean }
+) {
+    return {
+        ...(type === 'object' ? objDefPartials : arrDefPartials),
+        format: async ctx => await formatAndValidateRecursive(ctx, objOrArr, ctx.value, ctx.fieldAddr, config?.deleteForeignKeys),
+        mongoType: () => mongoTypeRecursive(objOrArr),
+        tsTypeStr: () => tsTypeRecursive('tsTypeStr', objOrArr),
+        tsTypeStrForWrite: () => tsTypeRecursive('tsTypeStrForWrite', objOrArr),
+        objectCache: objOrArr,
+        isParent: true,
+    }
+}
 
-async function formatAndValidateRecursive(ctx: DefCtx, obj: DefinitionObjChild, value: any, addr: string) {
+async function formatAndValidateRecursive(
+    ctx: DefCtx,
+    obj: DefinitionObjChild,
+    value: any,
+    addr: string,
+    deleteForeignKeys = false
+) {
     return await triggerOnObjectTypeAsync(obj, {
-        errorExtraInfos: { modelName: ctx.modelName, addressInParent: addr },
+        errorExtraInfos: { modelName: ctx.modelName, addressInParent: addr, deleteForeignKeys },
         //==============
         async onArray([def]) {
             const output = [] as any[]
@@ -79,7 +91,7 @@ async function formatAndValidateRecursive(ctx: DefCtx, obj: DefinitionObjChild, 
                     // FOREIGN FIELDS HANDLER
                     if (typeof output[k] === 'undefined' && typeof value[k] !== 'undefined') {
                         C.warning(false, `FOREIGN KEY not defined in model => body.${ctx.fieldAddr + `.${k}`} for model ${ctx.modelName}`)
-                        output[k] = value[k]
+                        if (!deleteForeignKeys) output[k] = value[k]
                     }
                 }
             }
