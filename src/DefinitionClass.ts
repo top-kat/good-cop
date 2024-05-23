@@ -166,7 +166,9 @@ export class Definition<
             }
         })
 
-        return this._newDef(getArrObjDef(model || {}, 'object', { deleteForeignKeys: true })) as any as
+        return this._newDef(getArrObjDef(model || {}, 'object', {
+            deleteForeignKeys: false // actually tried that but led to a bug where $push and all mongo instruction where deleted
+        })) as any as
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef<
                     InferTypeRead<T> & MongoFieldsRead<U[number]>,
