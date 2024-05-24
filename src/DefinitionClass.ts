@@ -902,7 +902,7 @@ export class Definition<
     }
     /** Should be used if the value is expected to be undefined */
     void() {
-        return this._newDef(undefType) as any as
+        return this._newDef({ ...undefType, tsTypeStr: 'void' }) as any as
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef<
                     void
