@@ -530,9 +530,9 @@ export class Definition<
         return this._newDef({
             ...string(),
             name: 'password',
-            errorMsg: ctx => ctx.value.length >= minLength
+            errorMsg: ctx => ctx.value.length < minLength
                 ? `Password is inferior than minLength of ${minLength}`
-                : ctx.value.length <= maxLength
+                : ctx.value.length > maxLength
                     ? `Password is superior than maxLength of ${maxLength}`
                     : `Password doesn't match regexp ${regexp.toString()}`,
             validateBeforeFormatting: ctx =>
