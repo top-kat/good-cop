@@ -90,7 +90,9 @@ async function formatAndValidateRecursive(
                 for (const k in value) {
                     // FOREIGN FIELDS HANDLER
                     if (typeof output[k] === 'undefined' && typeof value[k] !== 'undefined') {
-                        C.warning(false, `FOREIGN KEY not defined in model => body.${ctx.fieldAddr + `.${k}`} for model ${ctx.modelName}`)
+                        if (!k.startsWith('$')) { // { $push: ... } is actually allowed in mongo
+                            C.warning(false, `FOREIGN KEY not defined in model => body.${ctx.fieldAddr + `${k}`} for model ${ctx.modelName}`)
+                        }
                         if (!deleteForeignKeys) output[k] = value[k]
                     }
                 }
