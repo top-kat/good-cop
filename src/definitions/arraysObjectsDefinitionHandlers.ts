@@ -125,7 +125,7 @@ const indentationUnit = '    '
 
 function tsTypeRecursive(fnName: 'tsTypeStr' | 'tsTypeStrForWrite', definitionChild: DefinitionObjChild) {
     return triggerOnObjectType(definitionChild, {
-        errorExtraInfos: { msg: 'mongoTypeNotDefinedForModel' },
+        errorExtraInfos: { msg: 'mongoTypeNotDefinedForModel' }, // TODO add extra infos on field name
         onArray(arr): string {
             return `Array<${arr.map(item => tsTypeRecursive(fnName, item)).join(', ')}>`
         },

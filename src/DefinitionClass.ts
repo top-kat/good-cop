@@ -231,28 +231,30 @@ export class Definition<
     }
     /** An object which keys can be anything but where the value shall be typed. Eg: { [k: string]: number } */
     genericObject<
-        T extends DefinitionObj | GenericDef,
-        FieldName extends string | [string, string] | [string, string, string]
+        FieldName extends string | [string, string] | [string, string, string],
+        ValueType extends DefinitionObj | GenericDef
     >(
-        fieldName: FieldName, objectOrDef?: T
+        /** field name can be a string or an array, will be typed as { [string1]: { [string2]: myType } } */
+        keyName: FieldName = 'key' as FieldName,
+        valueType: ValueType = this.any() as any as ValueType
     ) {
-        type Read = FieldName extends string ? { [k: string]: InferTypeRead<T> } :
-            FieldName extends [string, string] ? { [k: string]: { [k: string]: InferTypeRead<T> } } :
-            { [k: string]: { [k: string]: { [k: string]: InferTypeRead<T> } } }
-        type Write = FieldName extends string ? { [k: string]: InferTypeRead<T> } :
-            FieldName extends [string, string] ? { [k: string]: { [k: string]: InferTypeRead<T> } } :
-            { [k: string]: { [k: string]: { [k: string]: InferTypeWrite<T> } } }
+        type Read = FieldName extends string ? { [k: string]: InferTypeRead<ValueType> } :
+            FieldName extends [string, string] ? { [k: string]: { [k: string]: InferTypeRead<ValueType> } } :
+            { [k: string]: { [k: string]: { [k: string]: InferTypeRead<ValueType> } } }
+        type Write = FieldName extends string ? { [k: string]: InferTypeRead<ValueType> } :
+            FieldName extends [string, string] ? { [k: string]: { [k: string]: InferTypeRead<ValueType> } } :
+            { [k: string]: { [k: string]: { [k: string]: InferTypeWrite<ValueType> } } }
 
-        const realObj = typeof fieldName === 'string' ? { [`__${fieldName}`]: objectOrDef } :
-            fieldName.length === 2 ? { [`__${fieldName[0]}`]: { [`__${fieldName[1]}`]: objectOrDef } } :
-                { [`__${fieldName[0]}`]: { [`__${fieldName[1]}`]: { [`__${fieldName[2]}`]: objectOrDef } } }
+        const realObj = typeof keyName === 'string' ? { [`__${keyName}`]: valueType } :
+            keyName.length === 2 ? { [`__${keyName[0]}`]: { [`__${keyName[1]}`]: valueType } } :
+                { [`__${keyName[0]}`]: { [`__${keyName[1]}`]: { [`__${keyName[2]}`]: valueType } } }
 
         // eslint-disable-next-line @typescript-eslint/no-this-alias
-        const That = this // dunno why I need this sheet on those lines buit linter happy
+        const That = this // dunno why I need this shit on those lines buit linter happy
 
         return this._newDef({
             ...getArrObjDef(realObj || {}, 'object'),
-            nbNestedGenericObjects: typeof fieldName === 'string' ? 1 : fieldName.length
+            nbNestedGenericObjects: typeof keyName === 'string' ? 1 : keyName.length
         }) as any as
             NextAutocompletionChoices<
                 ReturnType<typeof That._newDef<
