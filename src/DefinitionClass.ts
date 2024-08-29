@@ -467,10 +467,12 @@ export class Definition<
     //----------------------------------------
     // STRING
     //----------------------------------------
-    string<HardCoded extends string | undefined>({ acceptEmpty = false, hardCodedValue = undefined as HardCoded } = {}) {
-        return this._newDef(string({ acceptEmpty, hardCodedValue })) as any as
+    string({
+        acceptEmpty = false,
+    } = {}) {
+        return this._newDef(string({ acceptEmpty })) as any as
             NextAutocompletionChoices<
-                ReturnType<typeof this._newDef<HardCoded extends string ? HardCoded : string>>,
+                ReturnType<typeof this._newDef<string>>,
                 StringMethods
             >
     }
