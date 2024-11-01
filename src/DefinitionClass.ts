@@ -254,6 +254,7 @@ export class Definition<
 
         return this._newDef({
             ...getArrObjDef(realObj || {}, 'object'),
+            mongoType: () => mongoose.Schema.Types.Mixed,
             nbNestedGenericObjects: typeof keyName === 'string' ? 1 : keyName.length
         }) as any as
             NextAutocompletionChoices<
@@ -357,9 +358,10 @@ export class Definition<
             deleteForeignKeys = false
         } = {}
     ) {
-        return this._newDef(getArrObjDef(object || {}, 'object', {
-            deleteForeignKeys
-        })) as any as
+        return this._newDef({
+            ...getArrObjDef(object || {}, 'object', { deleteForeignKeys }),
+            mongoType: () => mongoose.Schema.Types.Mixed,
+        }) as any as
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef<
                     InferTypeRead<T>,
