@@ -1,34 +1,10 @@
 
-import { _ } from './DefinitionClass'
 
-// TODO refactor and improve readability on this
+import { _ } from '../src/DefinitionClass'
 
 
 
 describe('Definition', () => {
-
-    describe(`String def single`, () => {
-
-        const stringDef = _.n('myString').string()
-
-        it('stringDef', () => {
-            expect(stringDef.getTsTypeAsString()).toEqual({ 'read': 'string', 'write': 'string' })
-        })
-
-        it('check formatting', async () => {
-            expect(await stringDef.formatAndValidate('rere')).toEqual('rere')
-        })
-
-        it('number is converted to string', async () => {
-            expect(await stringDef.formatAndValidate(1)).toEqual('1')
-        })
-
-        throwMsgHelper(
-            'stringDef4 throw',
-            stringDef.formatAndValidate(['r', true]),
-            `Expected type 'string' but got type array for value`
-        )
-    })
 
     describe(`Number def`, () => {
 
@@ -272,20 +248,3 @@ describe('Definition', () => {
 
     })
 })
-
-
-
-
-//----------------------------------------
-// HELPER
-//----------------------------------------
-
-function throwMsgHelper(itMsg: string, fn: Promise<any>, expectedMsg: string) {
-    it(itMsg, async () => {
-        try {
-            await fn
-        } catch (err) {
-            expect((err as any)?.message).toContain(expectedMsg)
-        }
-    })
-}

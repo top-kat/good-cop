@@ -1,0 +1,57 @@
+
+
+
+import { _ } from '../src/DefinitionClass'
+import { throwMsgHelper } from './throwMsgHelper'
+
+
+describe(`String definition`, () => {
+
+    const stringDef = _.n('myString').string({ acceptEmpty: true })
+
+        it('checks the return types of read or write as a string', () => {
+            expect(stringDef.getTsTypeAsString()).toEqual({ 'read': 'string', 'write': 'string' })
+        })
+
+        it('correctly formats and validates strings', async () => {
+            expect(await stringDef.formatAndValidate('rere')).toEqual('rere')
+        })
+
+        it('converts a number to a string', async () => {
+            expect(await stringDef.formatAndValidate(1)).toEqual('1')
+        })
+
+        it('accepts an empty string', async () => {
+            expect(await stringDef.formatAndValidate('')).toEqual('')
+        })
+
+        it('handles a string with special characters', async () => {
+            const result = await stringDef.formatAndValidate('hello!@#$')
+            expect(result).toEqual('hello!@#$')
+        })
+
+        //FIX THIS ONE SHOULD THROW ERROR
+        it('returns a string if passed a boolean', async () => {
+            const result = await stringDef.formatAndValidate(true)
+            expect(result).toEqual('true')
+        })
+
+        it('trims leading and trailing spaces from the string', async () => {
+            const result = await stringDef.formatAndValidate('  hello world  ')
+            expect(result).toEqual('hello world')
+        })
+
+        it('throws an error when passed an object', async () => {
+            await expect(stringDef.formatAndValidate({id:1})).rejects.toThrow('Expected type \'string\' but got type object for value')
+        })
+
+        it('throws an error when passed an array', async () => {
+            await expect(stringDef.formatAndValidate([])).rejects.toThrow('Expected type \'string\' but got type array for value')
+        })
+
+        throwMsgHelper(
+            'stringDef4 throw',
+            stringDef.formatAndValidate(['r', true]),
+            `Expected type 'string' but got type array for value`
+        )
+})
