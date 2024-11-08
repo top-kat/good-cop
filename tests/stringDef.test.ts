@@ -5,6 +5,7 @@ import { _ } from '../src/DefinitionClass'
 import { throwMsgHelper } from './throwMsgHelper'
 
 
+
 describe(`String definition`, () => {
 
     const stringDef = _.n('myString').string({ acceptEmpty: true })
