@@ -30,19 +30,17 @@ describe(`String definition`, () => {
             expect(result).toEqual('hello!@#$')
         })
 
-        //FIX THIS ONE SHOULD THROW ERROR
-        it('returns a string if passed a boolean', async () => {
-            const result = await stringDef.formatAndValidate(true)
-            expect(result).toEqual('true')
-        })
-
         it('trims leading and trailing spaces from the string', async () => {
             const result = await stringDef.formatAndValidate('  hello world  ')
             expect(result).toEqual('hello world')
         })
 
+        it('throws an error if passed a boolean', async () => {
+            await expect(stringDef.formatAndValidate(true)).rejects.toThrow('Expected type \'string\' but got type boolean for value')
+        })
+
         it('throws an error when passed an object', async () => {
-            await expect(stringDef.formatAndValidate({id:1})).rejects.toThrow('Expected type \'string\' but got type object for value')
+            await expect(stringDef.formatAndValidate({ id: 1 })).rejects.toThrow('Expected type \'string\' but got type object for value')
         })
 
         it('throws an error when passed an array', async () => {
