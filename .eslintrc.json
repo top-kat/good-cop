@@ -55,10 +55,6 @@
             "never"
         ],
         "prefer-spread": 0,
-        "array-bracket-spacing": [
-            "warn",
-            "never"
-        ],
         "keyword-spacing": 1,
         "arrow-body-style": 0,
         "no-multi-spaces": 1,
