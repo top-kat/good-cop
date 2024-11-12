@@ -49,7 +49,6 @@ describe(`Object with additional properties not allowed`, () => {
 
     const objectDef = _.object({ name: _.string(), number: _.number() }, { deleteForeignKeys: true })
 
-
     it('objDef', () => {
         expect(objectDef.getTsTypeAsString()).toEqual({
             read: `{\n    'name'?: string\n    'number'?: number\n}`,
