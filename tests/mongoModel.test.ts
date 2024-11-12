@@ -5,15 +5,16 @@ import { _ } from '../src/DefinitionClass'
 
 
 
-describe(`Mongo Model defenition`, () => {
+describe('Mongo Model definition', () => {
 
     const mongoModel = _.mongoModel(['creationDate', 'creator', 'lastUpdateDate', 'lastUpdater'], {
-        coucou: _.string(),
-        subObj: {
-            myBoolean: _.boolean().required()
+        modelStringValue: _.string(),
+        modelSubObject
+        : {
+            myBooleanValue: _.boolean().required()
         },
-        arr: [{
-            myArray: _.array(_.object({ myNumber: _.number() }))
+        modelArray: [{
+            myArrayValue: _.array(_.object({ myNumberValue: _.number() }))
         }]
     })
 
@@ -21,29 +22,26 @@ describe(`Mongo Model defenition`, () => {
         expect(mongoModel.getTsTypeAsString().read).toMatch(/'creationDate': Date\+'creator': string \| User\s+'lastUpdateDate'?: Date\s+'lastUpdater':string | User/)
     })
 
-    it(`All optional values are null and it's OK 😎`, async () => {
+    it('Optional values can be null', async () => {
         expect(async () => await mongoModel.formatAndValidate({
-            coucou: null,
-            subObj: {
-                myBoolean: `il fo kroire en lui`
-            },
-            arr: [{
-                myArray: [{
-                myNumber: null
-            },
-            {
-                myNumber: null
+            modelStringValue: null,
+            modelSubObject: { myBooleanValue: 'boolean value is present' },
+            modelArray: [{
+                myArrayValue: [{
+                myNumberValue: null
             }]
             }]
         }))
     })
 
-    it(`One required value is null and that's not OK 🛂`, async () => {
-        expect(async () => await mongoModel.formatAndValidate({
-            coucou: null,
-            subObj: {
-                myBoolean: null
-            },
-        })).rejects.toThrow('Field myBoolean is required')
+    it('Required value cannot be null', async () => {
+        await expect(mongoModel.formatAndValidate({
+            modelStringValue: 'string value is present',
+            modelSubObject: { myBooleanValue: null },
+            modelArray: [{
+                myArrayValue:
+                [{ myNumberValue: null }]
+            }]
+        })).rejects.toThrow('Field myBooleanValue is required');
     })
 })
