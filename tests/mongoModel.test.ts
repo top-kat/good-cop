@@ -18,11 +18,11 @@ describe('Mongo Model definition', () => {
         }]
     })
 
-    it('MongoModel autoUpdate fields', () => {
+    it('mongoModel autoUpdate fields', () => {
         expect(mongoModel.getTsTypeAsString().read).toMatch(/'creationDate': Date\+'creator': string \| User\s+'lastUpdateDate'?: Date\s+'lastUpdater':string | User/)
     })
 
-    it('Optional values can be null', async () => {
+    it('optional values can be null', async () => {
         expect(async () => await mongoModel.formatAndValidate({
             modelStringValue: null,
             modelSubObject: { myBooleanValue: 'boolean value is present' },
@@ -34,7 +34,7 @@ describe('Mongo Model definition', () => {
         }))
     })
 
-    it('Required value cannot be null', async () => {
+    it('required value cannot be null', async () => {
         await expect(mongoModel.formatAndValidate({
             modelStringValue: 'string value is present',
             modelSubObject: { myBooleanValue: null },
