@@ -22,18 +22,58 @@ is not
 
 import mongoose from 'mongoose' // only used for typings, may not be compatible if used in frontend
 import { MaybeArray } from './core-types'
+import { TranslationObj } from './core-types'
 import { DefinitionBase } from './DefinitionBaseClass'
 import { sharedDefinitions } from './definitions/sharedDefinitions'
-import { getArrObjDef } from './definitions/arraysObjectsDefinitionHandlers'
 import { defaultTypeError } from './helpers/definitionGenericHelpers'
-import { TranslationObj } from './core-types'
-import { formatAndValidateDefinitionPartials } from './helpers/formatAndValidateForDefinition'
-import { MongoFieldsRead, MongoFieldsWrite, MongoTypeObj, isAnonymousUser, mongoTypeMapping, systemUserId } from './helpers/backendDefinitionsHelpers'
 import { getFieldValueForDefinitions } from './helpers/findInDefinitions'
+import { getArrObjDef } from './definitions/arraysObjectsDefinitionHandlers'
+import { formatAndValidateDefinitionPartials } from './helpers/formatAndValidateForDefinition'
+import { 
+    isAnonymousUser,
+    MongoTypeObj,
+    MongoFieldsRead,
+    MongoFieldsWrite,
+    mongoTypeMapping,
+    systemUserId,
+ } from './helpers/backendDefinitionsHelpers'
 
-import { DefCtx, InferTypeRead, InferTypeWrite, DefinitionObj, DefinitionPartial, AutoWritedFieldNames, DefinitionClassReceivedModelType, InferTypeArrRead, InferTypeArrWrite, FirstLevelTypes, TypedExclude, NumberMethods, StringMethods, GenericDef, NextAutocompletionChoices, LengthMethods, DateMethods } from './definitionTypes'
+import { 
+    AutoWritedFieldNames, 
+    DateMethods,
+    DefCtx, 
+    DefinitionObj, 
+    DefinitionPartial, 
+    DefinitionClassReceivedModelType, 
+    FirstLevelTypes, 
+    GenericDef, 
+    InferTypeRead, 
+    InferTypeWrite, 
+    InferTypeArrRead, 
+    InferTypeArrWrite, 
+    LengthMethods, 
+    NextAutocompletionChoices, 
+    NumberMethods, 
+    StringMethods, 
+    TypedExclude, 
+} from './definitionTypes'
 
-import { isType, isset, getId, capitalize1st, isObject, DescriptiveError, isDateIntOrStringValid, parseRegexp, ErrorOptions, getDateAsInt12, dateArray, recursiveGenericFunctionSync } from 'topkat-utils'
+import { 
+    capitalize1st,
+    DescriptiveError,
+    dateArray,
+    ErrorOptions,
+    getDateAsInt12,
+    getId,
+    isType,
+    isset,
+    isObject,
+    isDateIntOrStringValid,
+    parseRegexp,
+    recursiveGenericFunctionSync
+} from 'topkat-utils'
+
+
 
 
 const { required, number, round2, lt, gt, gte, lte, undefType, string, wrapperTypeStr, boolean } = sharedDefinitions

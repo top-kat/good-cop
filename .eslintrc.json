@@ -80,7 +80,7 @@
         "camelcase": 0,
         "import/no-cycle": 0,
         "prefer-const": 1,
-        "no-trailing-spaces": 1,
+        "no-trailing-spaces": 0,
         "import/prefer-default-export": 0,
         "no-case-declarations": 0,
         "@typescript-eslint/no-explicit-any": 0,
