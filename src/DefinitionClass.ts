@@ -306,12 +306,18 @@ export class Definition<
             >
     }
     /** an object who's keys are locale and values are translation string. Eg: `{ fr: 'Salut', en: 'Hi' }` */
+    
     translation() {
         return this._newDef({
             name: 'translation',
             mainType: 'object',
             errorMsg: defaultTypeError('{ [countryCodeIso]: translationString }', false),
-            validate: ctx => isType(ctx.value, 'object') && Object.entries(ctx.value).every(([countryCode, translationStr]) => typeof translationStr === 'string' && /[a-z][a-z]/.test(countryCode)),
+            validate: ctx => 
+                isType(ctx.value, 'object') &&
+                Object.entries(ctx.value).every(([countryCode, translationStr]) =>
+                    typeof translationStr === 'string' &&
+                    /^[A-Za-z]{2}$/.test(countryCode)
+                ),
             mongoType: 'object',
             tsTypeStr: 'TranslationObj',
         }) as any as
