@@ -668,7 +668,7 @@ export class Definition<
         const regexp = typeof regexpOrStr === 'string' ? new RegExp(parseRegexp(regexpOrStr, regexpOptions)) : regexpOrStr
         return this._newDef({
             name: 'regexp',
-            errorMsg: ctx => `Entry ${ctx.value} does not match ${regexp}`,
+            errorMsg: ctx => `Entry ${ctx.value} does not match ${regexp.source}`,
             validate: ctx => regexp.test(ctx.value),
             priority: 55, // may be applied after string() for example
         }) as any as

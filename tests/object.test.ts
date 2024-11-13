@@ -10,7 +10,7 @@ describe(`Simple Object`, () => {
 
     const objectDef = _.object({ name: _.string(), number: _.number(), bool: _.boolean() })
 
-    it('objDef', () => {
+    it('checks the return types of read or write as a string', () => {
         expect(objectDef.getTsTypeAsString()).toEqual({
             read: `{\n    'name'?: string\n    'number'?: number\n    'bool'?: boolean\n}`,
             write: `{\n    'name'?: string\n    'number'?: number\n    'bool'?: boolean\n}`,
@@ -49,7 +49,7 @@ describe(`Object with additional properties not allowed`, () => {
 
     const objectDef = _.object({ name: _.string(), number: _.number() }, { deleteForeignKeys: true })
 
-    it('objDef', () => {
+    it('checks the return types of read or write as a string', () => {
         expect(objectDef.getTsTypeAsString()).toEqual({
             read: `{\n    'name'?: string\n    'number'?: number\n}`,
             write: `{\n    'name'?: string\n    'number'?: number\n}`,
@@ -79,7 +79,7 @@ describe(`Complex Object`, () => {
         }
     })
 
-    it('objDef', () => {
+    it('checks the return types of read or write as a string', () => {
         expect(objDef.getTsTypeAsString()).toEqual({
             read: `{\n    'arr'?: Array<string>\n    'arr2'?: Array<string>\n    'subObj'?: {\n        'name'?: 'a' | 'b'\n        'tuple'?: [string, Date]\n        'typeOr'?: number | boolean\n        'subArr'?: Array<string>\n    }\n}`,
             write: `{\n    'arr'?: Array<string>\n    'arr2'?: Array<string>\n    'subObj'?: {\n        'name'?: 'a' | 'b'\n        'tuple'?: [string, Date]\n        'typeOr'?: number | boolean\n        'subArr'?: Array<string>\n    }\n}`,
