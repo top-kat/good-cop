@@ -7,7 +7,7 @@ import { _ } from '../src/DefinitionClass'
 
 describe(`Date definition`, () => {
 
-
+    const now = new Date()
     const dateDef = _.n('myDate').date()
 
     it('checks the return types of read or write as any', () => {
@@ -15,7 +15,7 @@ describe(`Date definition`, () => {
     })
 
     it('accepts a valid date', async()=>{
-        expect(await dateDef.formatAndValidate(new Date())).toEqual(new Date())
+        expect(await dateDef.formatAndValidate(now)).toEqual(now)
     })
 
     it('throws an error when passed a string', async () => {
