@@ -9,7 +9,7 @@ describe(`Boolean`, () => {
 
     const booleanDef = _.boolean()
 
-    it('boolean definition', () => {
+    it('checks the return types of read or write as a string', () => {
         expect(booleanDef.getTsTypeAsString()).toEqual({ 'read': 'boolean', 'write': 'boolean' })
     })
 

@@ -10,7 +10,7 @@ describe(`Array of strings`, () => {
     const stringArrayDef = _.array(_.string())
 
 
-    
+
     it('stringArrayDef', () => {
         expect(stringArrayDef.getTsTypeAsString())
             .toEqual({ 'read': 'Array<string>', 'write': 'Array<string>' })
