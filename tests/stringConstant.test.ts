@@ -5,9 +5,9 @@ import { _ } from '../src/DefinitionClass'
 
 
 
-describe(`String constant definition`, () => {
+describe(`String constant`, () => {
 
-    const stringConstantDef = _.n('stringConstant').stringConstant('stringConstant')
+    const stringConstantDef = _.stringConstant('stringConstant')
 
     //ATT: need to check return type here
         it('checks the return types of read or write as a string', () => {

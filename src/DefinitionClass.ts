@@ -607,7 +607,7 @@ export class Definition<
             ...(isNumber ? number : string()),
             name: 'enum',
             tsTypeStr: possibleValues.length ? isNumber ? `${possibleValues.join(` | `)}` : `'${possibleValues.join(`' | '`)}'` : 'never',
-            errorMsg: ctx => `Value "${ctx.value}" do not match allowed values ${possibleValues.join(',')}`,
+            errorMsg: ctx => `Value "${ctx.value}" does not match allowed values ${possibleValues.join(',')}`,
             validate: ctx => possibleValues.includes(ctx.value),
         }) as any as
             NextAutocompletionChoices<

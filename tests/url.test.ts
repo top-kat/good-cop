@@ -5,9 +5,9 @@ import { _ } from '../src/DefinitionClass'
 
 
 
-describe('Url definition', () => {
+describe('Url', () => {
 
-    const urlDef = _.n('myUrl').url()
+    const urlDef = _.url()
 
     it('urlDef', () => {
         expect(urlDef.getTsTypeAsString()).toEqual({ 'read': 'string', 'write': 'string' })

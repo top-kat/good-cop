@@ -5,7 +5,7 @@ import { _ } from '../src/DefinitionClass'
 
 
 
-describe('Mongo Model definition', () => {
+describe('Mongo Model', () => {
 
     const mongoModel = _.mongoModel(['creationDate', 'creator', 'lastUpdateDate', 'lastUpdater'], {
         modelStringValue: _.string(),

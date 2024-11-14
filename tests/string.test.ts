@@ -6,9 +6,9 @@ import { throwMsgHelper } from './throwMsgHelper'
 
 
 
-describe(`String definition`, () => {
+describe(`String`, () => {
 
-    const stringDef = _.n('myString').string({ acceptEmpty: true })
+    const stringDef = _.string({ acceptEmpty: true })
 
         it('checks the return types of read or write as a string', () => {
             expect(stringDef.getTsTypeAsString()).toEqual({ 'read': 'string', 'write': 'string' })

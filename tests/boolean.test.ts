@@ -5,9 +5,9 @@ import { _ } from '../src/DefinitionClass'
 
 
 
-describe(`Boolean definition`, () => {
+describe(`Boolean`, () => {
 
-    const booleanDef = _.n('myBoolean').boolean()
+    const booleanDef = _.boolean()
 
     it('boolean definition', () => {
         expect(booleanDef.getTsTypeAsString()).toEqual({ 'read': 'boolean', 'write': 'boolean' })

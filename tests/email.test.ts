@@ -5,11 +5,11 @@ import { _ } from '../src/DefinitionClass'
 
 
 
-describe('Email definition', () => {
+describe('Email', () => {
 
-    const emailDef = _.n('myEmail').email()
+    const emailDef = _.email()
 
-    it('numberDef', () => {
+    it('checks the return types of read or write as a string', () => {
         expect(emailDef.getTsTypeAsString()).toEqual({ 'read': 'string', 'write': 'string' })
     })
 

@@ -5,12 +5,12 @@ import { _ } from '../src/DefinitionClass'
 
 
 
-describe(`Date8 definition`, () => {
+describe(`Date8`, () => {
 
     const validDateString = '20231113'
     // const invalidDateString = '20231332'
 
-    const date8Def = _.n('myDate').date8()
+    const date8Def = _.date8()
 
     it('checks the return types of read or write as any', () => {
         expect(date8Def.getTsTypeAsString()).toEqual({ 'read': 'number', 'write': 'number' })

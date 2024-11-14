@@ -5,11 +5,11 @@ import { _ } from '../src/DefinitionClass'
 
 
 
-describe(`Mergewith definition`, () => {
+describe(`Mergewith`, () => {
 
     const mergeWithDef = _.object({ name: _.string() }).mergeWith({ email: _.string().required() })
 
-    it('mergeWithDef', () => {
+    it('checks the return types of read or write as a string', () => {
         expect(mergeWithDef.getTsTypeAsString()).toEqual({
             read: `{\n    'name'?: string\n    'email': string\n}`,
             write: `{\n    'name'?: string\n    'email': string\n}`,
@@ -27,8 +27,4 @@ describe(`Mergewith definition`, () => {
     it('throws error when missing required entry', async () => {
         expect(async () => await mergeWithDef.formatAndValidate({ name: 22 })).rejects.toThrow('Field email is required')
     })
-
-    // it('throws error when another unknown entry is added', async () => {
-    //     expect(async () => await mergeWithDef.formatAndValidate({ name: 22, email:'22', age:25 })).rejects.toThrow('unknown additional entry')
-    // })
 })

@@ -5,11 +5,11 @@ import { _ } from '../src/DefinitionClass'
 
 
 
-describe(`Complete definition`, () => {
+describe(`Complete`, () => {
 
     const complete = _.object({ name: _.string() }).mergeWith({ email: _.string().required() }).complete()
 
-    it('completeDef', () => {
+    it('checks the return types of read or write as a string', () => {
         expect(complete.getTsTypeAsString().read).toContain('Required<')
     })
 

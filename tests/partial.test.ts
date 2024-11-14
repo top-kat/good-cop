@@ -4,7 +4,7 @@ import { _ } from '../src/DefinitionClass'
 
 
 
-describe(`Partial definition`, () => {
+describe(`Partial`, () => {
 
     const partial = _.object({ name: _.string() }).mergeWith({ email: _.string().required() }).partial()
 

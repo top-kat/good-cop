@@ -5,12 +5,13 @@ import { _ } from '../src/DefinitionClass'
 
 
 
-describe(`Regexp definition`, () => {
+describe(`Regexp`, () => {
 
     const regexString = 'string'
     const invalidRegexString = 'invalidString'
-
     const regexpDef = _.n('myRegExp').regexp(regexString)
+
+    
 
     it('checks the return types of read or write as any', () => {
         expect(regexpDef.getTsTypeAsString()).toEqual({ 'read': 'any', 'write': 'any' })
@@ -26,11 +27,13 @@ describe(`Regexp definition`, () => {
     });
 })
 
-describe(`Regexp definition with RegExp type`, () => {
+describe(`Regexp with RegExp type`, () => {
+
     const regex = new RegExp('string')
     const invalidRegexString = 'invalidString'
-
     const regexpDefWithRegExp = _.n('myRegExp').regexp(regex);
+
+
 
     it('allows for a matching regexp with RegExp object', async () => {
         expect(await regexpDefWithRegExp.formatAndValidate('string')).toEqual('string');

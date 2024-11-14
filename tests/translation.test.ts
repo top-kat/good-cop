@@ -7,7 +7,7 @@ import { _ } from '../src/DefinitionClass'
 
 describe(`Translation Object`, () => {
 
-   const transDef = _.n('translation').translation()
+   const transDef = _.translation()
 
    it('checks the return types of read or write as a string', () => {
     expect(transDef.getTsTypeAsString()).toEqual({ 'read': 'TranslationObj', 'write': 'TranslationObj' })

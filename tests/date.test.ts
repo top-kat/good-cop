@@ -5,10 +5,10 @@ import { _ } from '../src/DefinitionClass'
 
 
 
-describe(`Date definition`, () => {
+describe(`Date`, () => {
 
     const now = new Date()
-    const dateDef = _.n('myDate').date()
+    const dateDef = _.date()
 
     it('checks the return types of read or write as any', () => {
         expect(dateDef.getTsTypeAsString()).toEqual({ 'read': 'Date', 'write': 'Date' })

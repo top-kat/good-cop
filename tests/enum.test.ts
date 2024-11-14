@@ -13,15 +13,22 @@ describe('Enum Validation', () => {
             read: "'string1' | 'string2'",  // eslint-disable-line
             write: "'string1' | 'string2'"  // eslint-disable-line
         });
+    })
+
+    it('accepts individual strings and validates them', async () => {
+        const validValue: Array<typeof enumDef.tsTypeRead> = ['string1', 'string2']
+
+        for (const value of validValue) {
+            const result = await enumDef.formatAndValidate(value)
+            expect(result).toEqual(value)
+        }
+    })
+
+    it('throws an error if elements do not match', async () => {
+        const inValidValues = [1, 2];
+    
+        for (const value of inValidValues) {
+            await expect(enumDef.formatAndValidate(value)).rejects.toThrow(`Value "${value}" does not match allowed values string1,string2`);
+        }
     });
-
-    //ATT: maybe not the best way to test this
-    // it('accepts individual strings and validates them', async () => {
-    //     const validValues = ['string1', 'string2'];
-
-    //     for (const value of validValues) {
-    //         const result = await enumDef.formatAndValidate([value])
-    //         expect(result).toEqual([value])
-    //     }
-    // });
-});
+})

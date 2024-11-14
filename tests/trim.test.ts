@@ -5,9 +5,9 @@ import { _ } from '../src/DefinitionClass'
 
 
 
-describe(`Trim definition`, () => {
+describe(`Trim`, () => {
 
-    const trimDef = _.n('myString').string().trim()
+    const trimDef = _.string().trim()
 
         it('checks the return types of read or write as a string', () => {
             expect(trimDef.getTsTypeAsString()).toEqual({ 'read': 'string', 'write': 'string' })

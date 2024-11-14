@@ -5,9 +5,9 @@ import { _ } from '../src/DefinitionClass'
 
 
 
-describe('Number definition', () => {
+describe('Number', () => {
 
-    const numberDef = _.n('myNumber').number()
+    const numberDef = _.number()
 
     it('checks the return types of read or write as a string', () => {
         expect(numberDef.getTsTypeAsString()).toEqual({ 'read': 'number', 'write': 'number' })

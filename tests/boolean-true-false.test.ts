@@ -5,11 +5,11 @@ import { _ } from '../src/DefinitionClass'
 
 
 //TRUE BOOLEAN
-describe(`True boolean definition`, () => {
+describe(`True boolean`, () => {
 
-    const trueBooleanDef = _.n('myTrueBoolean').true()
+    const trueBooleanDef = _.true()
 
-    it('true boolean definition', () => {
+    it('checks the return types of read or write as a string', () => {
         expect(trueBooleanDef.getTsTypeAsString()).toEqual({ 'read': 'true', 'write': 'true' })
     })
 
@@ -28,11 +28,11 @@ describe(`True boolean definition`, () => {
 })
 
 //FALSE BOOLEAN
-describe(`False boolean definition`, () => {
+describe(`False boolean`, () => {
 
-    const falseBooleanDef = _.n('myTrueBoolean').false()
+    const falseBooleanDef = _.false()
 
-    it('true boolean definition', () => {
+    it('checks the return types of read or write as a string', () => {
         expect(falseBooleanDef.getTsTypeAsString()).toEqual({ 'read': 'false', 'write': 'false' })
     })
 
