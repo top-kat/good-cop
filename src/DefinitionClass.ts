@@ -136,7 +136,7 @@ export class Definition<
             const model = this._models?.[dbId as any]?.[modelName as any]
             if (!model) throw new DescriptiveError(`Model not found. Please make you provided a model with the name "${modelName.toString()}" when initiating good-cop. Make sure you BUILDED the app correctly`, { dbId, modelName, modelNames: Object.keys(this._models || {}) })
             return { ...model._definitions[0], tsTypeStr: undefined }
-        }]) as any as
+        }]) as
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef<
                     ModelsType[A][B][C]
@@ -157,7 +157,7 @@ export class Definition<
             tsTypeStr: (alwaysPopulated ? '' : `string | `) + `${capitalize1st(modelName as string)}`,
             tsTypeStrForWrite: `string`,
             ref: modelName as string,
-        }) as any as
+        }) as
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef<
                     AlwaysPopulated extends true
@@ -208,7 +208,7 @@ export class Definition<
 
         return this._newDef(getArrObjDef(model || {}, 'object', {
             deleteForeignKeys: false // actually tried that but led to a bug where $push and all mongo instruction where deleted
-        })) as any as
+        })) as
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef<
                     InferTypeRead<T> & MongoFieldsRead<U[number]>,
@@ -227,7 +227,7 @@ export class Definition<
                 else if (!(isSystem && isset(ctx.fields[fieldAddr]))) ctx.fields[fieldAddr] = getId(user) // ALLOW system to update this field if set
                 return fields[fieldAddr]
             },
-        }) as any as
+        }) as
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef<
                     typeof this.tsTypeRead,
@@ -260,7 +260,7 @@ export class Definition<
     >(
         array?: R,
     ) {
-        return this._newDef(getArrObjDef(array ? [array] : [], 'array')) as any as
+        return this._newDef(getArrObjDef(array ? [array] : [], 'array')) as
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef<
                     InferTypeArrRead<Array<R>>,
@@ -278,35 +278,37 @@ export class Definition<
         keyName: FieldName = 'key' as FieldName,
         valueType: ValueType = this.any() as any as ValueType
     ) {
-        type Read = FieldName extends string ? { [k: string]: InferTypeRead<ValueType> } :
-            FieldName extends [string, string] ? { [k: string]: { [k: string]: InferTypeRead<ValueType> } } :
-            { [k: string]: { [k: string]: { [k: string]: InferTypeRead<ValueType> } } }
-        type Write = FieldName extends string ? { [k: string]: InferTypeRead<ValueType> } :
-            FieldName extends [string, string] ? { [k: string]: { [k: string]: InferTypeRead<ValueType> } } :
-            { [k: string]: { [k: string]: { [k: string]: InferTypeWrite<ValueType> } } }
+        type Read = FieldName extends string 
+        ? { [k: string]: InferTypeRead<ValueType> } 
+        : FieldName extends [string, string] 
+            ? { [k: string]: { [k: string]: InferTypeRead<ValueType> } } 
+            : { [k: string]: { [k: string]: { [k: string]: InferTypeRead<ValueType> } } }
 
-        const realObj = typeof keyName === 'string' ? { [`__${keyName}`]: valueType } :
-            keyName.length === 2 ? { [`__${keyName[0]}`]: { [`__${keyName[1]}`]: valueType } } :
-                { [`__${keyName[0]}`]: { [`__${keyName[1]}`]: { [`__${keyName[2]}`]: valueType } } }
+        type Write = FieldName extends string 
+        ? { [k: string]: InferTypeRead<ValueType> } 
+        : FieldName extends [string, string] 
+            ? { [k: string]: { [k: string]: InferTypeRead<ValueType> } } 
+            : { [k: string]: { [k: string]: { [k: string]: InferTypeWrite<ValueType> } } }
 
-        // eslint-disable-next-line @typescript-eslint/no-this-alias
-        const That = this // dunno why I need this shit on those lines buit linter happy
+        const realObj = typeof keyName === 'string' 
+        ? { [`__${keyName}`]: valueType } 
+        : keyName.length === 2 
+            ? { [`__${keyName[0]}`]: { [`__${keyName[1]}`]: valueType } } 
+            : { [`__${keyName[0]}`]: { [`__${keyName[1]}`]: { [`__${keyName[2]}`]: valueType } } }
+
 
         return this._newDef({
             ...getArrObjDef(realObj || {}, 'object'),
             mongoType: () => mongoose.Schema.Types.Mixed,
             nbNestedGenericObjects: typeof keyName === 'string' ? 1 : keyName.length
-        }) as any as
+        }) as
             NextAutocompletionChoices<
-                ReturnType<typeof That._newDef<
-                    Read,
-                    Write
-                >>,
+                ReturnType<typeof this._newDef< Read, Write >>,
                 'partial' | 'complete'
             >
     }
+
     /** an object who's keys are locale and values are translation string. Eg: `{ fr: 'Salut', en: 'Hi' }` */
-    
     translation() {
         return this._newDef({
             name: 'translation',
@@ -320,13 +322,14 @@ export class Definition<
                 ),
             mongoType: 'object',
             tsTypeStr: 'TranslationObj',
-        }) as any as
+        }) as
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef<
                     TranslationObj
                 >>
             >
     }
+
     /** Only valid on objects, allow to merge two objects */
     mergeWith<T extends DefinitionObj>(
         object: T
@@ -340,7 +343,7 @@ export class Definition<
         // eslint-disable-next-line @typescript-eslint/no-this-alias
         const That = this // dunno why I need this sheet on those lines buit linter happy
         // Object.assign(this.object, object)
-        return this._newDef() as any as
+        return this._newDef() as
             NextAutocompletionChoices<
                 ReturnType<typeof That._newDef<
                     InferTypeRead<T> & typeof That.tsTypeRead,
@@ -349,6 +352,7 @@ export class Definition<
                 'partial' | 'complete'
             >
     }
+
     /** Array of predefined size and value: Eg: { signature: _.tuple([_.date(), _.string()]) } */
     tuple<
         R extends GenericDef[]
@@ -387,7 +391,7 @@ export class Definition<
             tsTypeStrForWrite: () => `[${array.map(def => def.getTsTypeAsString().write).join(', ')}]`,
             objectCache: array as any,
             isParent: true,
-        }) as any as
+        }) as
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef<
                     InferTupleRead<R>,
@@ -395,6 +399,7 @@ export class Definition<
                 >>
             >
     }
+
     object<
         T extends DefinitionObj
     >(
@@ -407,7 +412,7 @@ export class Definition<
         return this._newDef({
             ...getArrObjDef(object || {}, 'object', { deleteForeignKeys }),
             mongoType: () => mongoose.Schema.Types.Mixed,
-        }) as any as
+        }) as
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef<
                     InferTypeRead<T>,
@@ -416,12 +421,13 @@ export class Definition<
                 'complete' | 'partial' | 'mergeWith'
             >
     }
+
     /** For all props of an object type to be OPTIONAL */
     partial() {
         const objDef = this._definitions.find(d => d.name === 'object')
         if (objDef) {
             const realObjDef = typeof objDef === 'function' ? objDef() : objDef
-            const obj = realObjDef.objectCache as any as Record<string, Definition>
+            const obj = realObjDef.objectCache as Record<string, Definition>
             for (const def of Object.values(obj)) {
                 // remove eventually required defs
                 def._definitions = def._definitions.filter(d => d.name !== 'required')
@@ -436,101 +442,175 @@ export class Definition<
                 'mergeWith'
             >
     }
-    /** For all props of an object type to be REQUIRED */
-    complete() {
-        const objDef = this._definitions.find(d => d.name === 'object')
-        if (objDef) {
-            const realObjDef = typeof objDef === 'function' ? objDef() : objDef
-            const obj = realObjDef.objectCache as any as Record<string, Definition | Definition[]>
-            for (const [name, def] of Object.entries(obj)) {
-                if (Array.isArray(def)) {
-                    // put it as a definition array, but only in js, we doesn't
-                    // care about ts since it's already typed
-                    obj[name] = _.array(def[0]).required() as any
-                } else {
-                    const requiredDefFound = def._definitions.find(d => d.name === 'required')
-                    if (!requiredDefFound) {
-                        def._pushNewDef(required)
-                    }
-                }
-            }
-        }
-        return this._newDef(wrapperTypeStr(this, 'Required')) as
-            NextAutocompletionChoices<
-                ReturnType<typeof this._newDef<
-                    Required<typeof this.tsTypeRead>,
-                    Required<typeof this.tsTypeWrite>
-                >>,
-                'mergeWith'
-            >
-    }
-    //----------------------------------------
-    // ANY
-    //----------------------------------------
+
     any() {
         return this._newDef({
             mainType: 'any',
             validate: () => true,
             mongoType: 'mixed',
             tsTypeStr: 'any',
-        }) as any as
+        }) as
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef< any, any >>
             >
     }
-    //----------------------------------------
-    // BOOLEAN
-    //----------------------------------------
+
     boolean() {
-        return this._newDef(boolean) as any as
+        return this._newDef(boolean) as
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef< boolean, boolean >>,
                 'mergeWith'
             >
     }
-    true() {
+
+    date() {
         return this._newDef({
-            ...boolean,
-            name: 'true',
-            validate: ctx => ctx.value === true,
-            tsTypeStr: 'true',
-        }) as any as
+            name: 'date',
+            mainType: 'date',
+            errorMsg: defaultTypeError('date', false),
+            // May be 01 Jan 1901 00:00:00 GMT || 2012-01-01T12:12:01.595Z
+            format: ctx => typeof ctx.value === 'string' && (/\d{4}-\d{1,2}-\d{1,2}T\d+:\d+:\d+.*/.test(ctx.value) || /\d+ [A-Za-z]+ \d+/.test(ctx.value)) ? new Date(ctx.value) : ctx.value,
+            validate: ctx => ctx.value instanceof Date,
+            mongoType: 'date',
+            tsTypeStr: 'Date',
+        }) as
             NextAutocompletionChoices<
-                ReturnType<typeof this._newDef< boolean, boolean >>,
-                'mergeWith'
+                ReturnType<typeof this._newDef<
+                    Date
+                >>,
+                DateMethods
             >
     }
+
+    date8() {
+        return this._newDef({
+            ...number,
+            name: 'date8',
+            errorMsg: defaultTypeError('date8', false),
+            validate: ctx => isDateIntOrStringValid(ctx.value, false, 8),
+            format: ctx => (typeof ctx.value === 'string' ? parseInt(ctx.value) : ctx.value),
+        }) as
+            NextAutocompletionChoices<
+                ReturnType<typeof this._newDef< number >>,
+                DateMethods
+            >
+    }
+
+    date12() {
+        return this._newDef({
+            ...number,
+            name: 'date12',
+            errorMsg: defaultTypeError('date12', false),
+            validate: ctx => isDateIntOrStringValid(ctx.value, false, 12),
+            format: ctx => (typeof ctx.value === 'string' ? parseInt(ctx.value) : ctx.value),
+        }) as
+            NextAutocompletionChoices<
+                ReturnType<typeof this._newDef< number >>,
+                DateMethods
+            >
+    }
+    /** simple emial validation: /^[^\s@]+@[^\s@]+\.[^\s@]+$/ */
+    email() {
+        return this._newDef({
+            ...string(),
+            name: 'email',
+            format: ctx => ctx.value?.toLowerCase().trim(),
+            errorMsg: defaultTypeError('email', false),
+            validate: ctx => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(ctx.value),
+        }) as
+            NextAutocompletionChoices<
+                ReturnType<typeof this._newDef< string >>,
+                StringMethods
+        >
+    }
+    /** Predefined list of values. Eg: status: _.enum(['success', 'error', 'pending']) OR _.enum([1, 2, 3]) */
+    enum<T extends string[] | number[]>(possibleValues: [...T] | readonly [...T]) {
+        const isNumber = typeof possibleValues[0] === 'number'
+        // eslint-disable-next-line @typescript-eslint/no-this-alias
+        const that = this // NOT SURE WHY NEEDED but ot fixes a bug 🙃
+        return this._newDef({
+            ...(isNumber ? number : string()),
+            name: 'enum',
+            tsTypeStr: possibleValues.length ? isNumber ? `${possibleValues.join(` | `)}` : `'${possibleValues.join(`' | '`)}'` : 'never',
+            errorMsg: ctx => `Value "${ctx.value}" does not match allowed values ${possibleValues.join(',')}`,
+            validate: ctx => possibleValues.includes(ctx.value),
+        }) as
+            NextAutocompletionChoices<
+                ReturnType<typeof that._newDef<T[number]>>,
+                TypedExclude<StringMethods, 'match'>
+            >
+    }
+
+    integer() {
+        return this._newDef({
+            ...number,
+            name: 'number',
+            format: ctx => parseInt(ctx.value)
+        }) as
+            NextAutocompletionChoices<
+                ReturnType<typeof this._newDef<
+                    number
+                >>,
+                TypedExclude<NumberMethods, 'round2'>
+            >
+    }
+
     false() {
         return this._newDef({
             ...boolean,
             name: 'false',
             validate: ctx => ctx.value === false,
             tsTypeStr: 'false',
-        }) as any as
+        }) as
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef< boolean, boolean >>,
                 'mergeWith'
             >
     }
-    //----------------------------------------
-    // STRING
-    //----------------------------------------
-    string({
-        acceptEmpty = false,
-    } = {}) {
-        return this._newDef(string({ acceptEmpty })) as any as
+
+    float() {
+        return this._newDef({
+            ...number,
+            name: 'float',
+            format: ctx => parseFloat(ctx.value),
+        }) as
+            NextAutocompletionChoices<
+                ReturnType<typeof this._newDef<
+                    number
+                >>,
+                NumberMethods
+            >
+    }
+
+    true() {
+        return this._newDef({
+            ...boolean,
+            name: 'true',
+            validate: ctx => ctx.value === true,
+            tsTypeStr: 'true',
+        }) as
+            NextAutocompletionChoices<
+                ReturnType<typeof this._newDef< boolean, boolean >>,
+                'mergeWith'
+            >
+    }
+
+    string({ acceptEmpty = false } = {}) {
+        return this._newDef(string({ acceptEmpty })) as
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef<string>>,
                 StringMethods
-            >
+        >
     }
+
     stringConstant<T extends string>(hardCodedValue: T) {
-        return this._newDef(string({ hardCodedValue })) as any as
+        return this._newDef(string({ hardCodedValue })) as
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef<T>>,
                 StringMethods
             >
     }
+
     /** String alias for readability. 24 char mongoDb id */
     objectId() {
         return this._newDef({
@@ -538,22 +618,9 @@ export class Definition<
             name: 'objectId',
             format: ctx => ctx.value.toString(),
             validate: ctx => ctx.value?.length === 24,
-        }) as any as NextAutocompletionChoices<ReturnType<typeof this._newDef<string>>, StringMethods>
+        }) as NextAutocompletionChoices<ReturnType<typeof this._newDef<string>>, StringMethods>
     }
-    /** simple emial validation: /^[^\s@]+@[^\s@]+\.[^\s@]+$/ */
-    email() {
-        return this._newDef({
-            ...string(),
-            name: 'email',
-            format: ctx => ctx.value?.toLowerCase?.()?.trim(),
-            errorMsg: defaultTypeError('email', false),
-            validate: ctx => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(ctx.value),
-        }) as any as
-            NextAutocompletionChoices<
-                ReturnType<typeof this._newDef< string >>,
-                StringMethods
-            >
-    }
+
     /** Simple url validation: /^https?:\/\/.+/ */
     url() {
         return this._newDef({
@@ -562,12 +629,13 @@ export class Definition<
             format: ctx => typeof ctx.value === 'number' ? ctx.value.toString() : ctx.value,
             errorMsg: defaultTypeError('url', false),
             validate: ctx => /^https?:\/\/.+/.test(ctx.value)
-        }) as any as
+        }) as
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef< string >>,
                 StringMethods
             >
     }
+
     password({
         regexp = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).*$/, // at least one upperCase, one lowerCase and a digit
         minLength = 8,
@@ -592,37 +660,20 @@ export class Definition<
                 && ctx.value.length >= minLength
                 && ctx.value.length <= maxLength,
             format: async ctx => await encrypt(ctx.value),
-        }) as any as
+        }) as
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef< string >>,
                 StringMethods
             >
     }
-    /** Predefined list of values. Eg: status: _.enum(['success', 'error', 'pending']) OR _.enum([1, 2, 3]) */
-    enum<T extends string[] | number[]>(possibleValues: [...T] | readonly [...T]) {
-        const isNumber = typeof possibleValues[0] === 'number'
-        // eslint-disable-next-line @typescript-eslint/no-this-alias
-        const that = this // NOT SURE WHY NEEDED but ot fixes a bug 🙃
-        return this._newDef({
-            ...(isNumber ? number : string()),
-            name: 'enum',
-            tsTypeStr: possibleValues.length ? isNumber ? `${possibleValues.join(` | `)}` : `'${possibleValues.join(`' | '`)}'` : 'never',
-            errorMsg: ctx => `Value "${ctx.value}" does not match allowed values ${possibleValues.join(',')}`,
-            validate: ctx => possibleValues.includes(ctx.value),
-        }) as any as
-            NextAutocompletionChoices<
-                ReturnType<typeof that._newDef<T[number]>>,
-                TypedExclude<StringMethods, 'match'>
-            >
-    }
-    //SECOND LEVEL----------------------------
+
     lowerCase() {
         return this._newDef({
             name: 'lowerCase',
             errorMsg: defaultTypeError('string'),
             format: ctx => typeof ctx.value === 'string' ? ctx.value.toLowerCase() : ctx.value,
             priority: 10, // may be applied before email() for example
-        }) as any as
+        }) as
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef<
                     typeof this.tsTypeRead,
@@ -631,13 +682,14 @@ export class Definition<
                 TypedExclude<StringMethods, 'upperCase' | 'lowerCase'>
             >
     }
+
     upperCase() {
         return this._newDef({
             name: 'upperCase',
             errorMsg: defaultTypeError('string'),
             format: ctx => typeof ctx.value === 'string' ? ctx.value.toUpperCase() : ctx.value,
             priority: 10, // may be applied before email() for example
-        }) as any as
+        }) as
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef<
                     typeof this.tsTypeRead,
@@ -646,13 +698,14 @@ export class Definition<
                 TypedExclude<StringMethods, 'upperCase' | 'lowerCase'>
             >
     }
+
     trim() {
         return this._newDef({
             name: 'trim',
             errorMsg: defaultTypeError('string'),
             format: ctx => typeof ctx.value === 'string' ? ctx.value.trim() : ctx.value,
             priority: 10, // may be applied before email() for example
-        }) as any as
+        }) as
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef<
                     typeof this.tsTypeRead,
@@ -661,6 +714,7 @@ export class Definition<
                 TypedExclude<StringMethods, 'trim'>
             >
     }
+
     regexp(
         regexpOrStr: string | RegExp,
         regexpOptions?: Parameters<typeof parseRegexp>[1]
@@ -671,7 +725,7 @@ export class Definition<
             errorMsg: ctx => `Entry ${ctx.value} does not match ${regexp.source}`,
             validate: ctx => regexp.test(ctx.value),
             priority: 55, // may be applied after string() for example
-        }) as any as
+        }) as
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef<
                     string
@@ -679,8 +733,9 @@ export class Definition<
                 TypedExclude<StringMethods, 'match'>
             >
     }
+
     match(...params: [Parameters<typeof this['regexp']>[0], Parameters<typeof this['regexp']>[1]]) {
-        return this.regexp(...params) as any as
+        return this.regexp(...params) as
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef<
                     typeof this.tsTypeRead,
@@ -689,11 +744,9 @@ export class Definition<
                 TypedExclude<StringMethods, 'match'>
             >
     }
-    //----------------------------------------
-    // NUMBER
-    //----------------------------------------
+
     number() {
-        return this._newDef(number) as any as
+        return this._newDef(number) as
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef<
                     number
@@ -701,34 +754,9 @@ export class Definition<
                 NumberMethods
             >
     }
-    integer() {
-        return this._newDef({
-            ...number,
-            name: 'number',
-            format: ctx => parseInt(ctx.value)
-        }) as any as
-            NextAutocompletionChoices<
-                ReturnType<typeof this._newDef<
-                    number
-                >>,
-                TypedExclude<NumberMethods, 'round2'>
-            >
-    }
-    float() {
-        return this._newDef({
-            ...number,
-            name: 'float',
-            format: ctx => parseFloat(ctx.value),
-        }) as any as
-            NextAutocompletionChoices<
-                ReturnType<typeof this._newDef<
-                    number
-                >>,
-                NumberMethods
-            >
-    }
+
     percentage() {
-        return this._newDef(round2) as any as
+        return this._newDef(round2) as
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef<
                     number
@@ -736,96 +764,38 @@ export class Definition<
                 NumberMethods
             >
     }
-    //SECOND LEVEL----------------------------
-    max(maxVal: number) {
-        return this._newDef(lte(maxVal)) as any as
+
+
+
+    //--------------------------------------------------------------------
+    //--------------------------------------------------------------------
+    //----------------------------SECOND LEVEL----------------------------
+    //--------------------------------------------------------------------
+    //--------------------------------------------------------------------
+
+
+
+    /** useful for database types where some fields may be always defined in read (_id, creationDate...) but not required on creation */
+    alwaysDefinedInRead() {
+        return this._newDef({
+            name: 'alwaysDefinedInRead',
+            alwaysDefinedInRead: true
+        }) as
             NextAutocompletionChoices<
-                ReturnType<typeof this._newDef<
+            ReturnType<typeof this._newDef<
                     typeof this.tsTypeRead,
                     typeof this.tsTypeWrite
-                >>,
-                TypedExclude<NumberMethods, 'max' | 'lt' | 'lte' | 'lessThan'>
-            >
+            >>,
+            (typeof this)['tsTypeRead'] extends string ? StringMethods : (typeof this)['tsTypeRead'] extends number ? NumberMethods : never
+        >
     }
-    lte(maxVal: number) {
-        return this._newDef(lte(maxVal)) as any as
-            NextAutocompletionChoices<
-                ReturnType<typeof this._newDef<
-                    typeof this.tsTypeRead,
-                    typeof this.tsTypeWrite
-                >>,
-                TypedExclude<NumberMethods, 'max' | 'lt' | 'lte' | 'lessThan'>
-            >
-    }
-    /** less than */
-    lt(maxVal: number) {
-        return this._newDef(lt(maxVal)) as any as
-            NextAutocompletionChoices<
-                ReturnType<typeof this._newDef<
-                    typeof this.tsTypeRead,
-                    typeof this.tsTypeWrite
-                >>,
-                TypedExclude<NumberMethods, 'max' | 'lt' | 'lte' | 'lessThan'>
-            >
-    }
-    lessThan(maxVal: number) {
-        return this._newDef(lt(maxVal)) as any as
-            NextAutocompletionChoices<
-                ReturnType<typeof this._newDef<
-                    typeof this.tsTypeRead,
-                    typeof this.tsTypeWrite
-                >>,
-                TypedExclude<NumberMethods, 'max' | 'lt' | 'lte' | 'lessThan'>
-            >
-    }
-    min(minVal: number) {
-        return this._newDef(gte(minVal)) as any as
-            NextAutocompletionChoices<
-                ReturnType<typeof this._newDef<
-                    typeof this.tsTypeRead,
-                    typeof this.tsTypeWrite
-                >>,
-                TypedExclude<NumberMethods, 'min' | 'gt' | 'gte' | 'greaterThan'>
-            >
-    }
-    gte(minVal: number) {
-        return this._newDef(gte(minVal)) as any as
-            NextAutocompletionChoices<
-                ReturnType<typeof this._newDef<
-                    typeof this.tsTypeRead,
-                    typeof this.tsTypeWrite
-                >>,
-                TypedExclude<NumberMethods, 'min' | 'gt' | 'gte' | 'greaterThan'>
-            >
-    }
-    greaterThan(minVal: number) {
-        return this._newDef(gt(minVal)) as any as
-            NextAutocompletionChoices<
-                ReturnType<typeof this._newDef<
-                    typeof this.tsTypeRead,
-                    typeof this.tsTypeWrite
-                >>,
-                TypedExclude<NumberMethods, 'min' | 'gt' | 'gte' | 'greaterThan'>
-            >
-    }
-    /** greaterThan */
-    gt(minVal: number) {
-        return this._newDef(gt(minVal)) as any as
-            NextAutocompletionChoices<
-                ReturnType<typeof this._newDef<
-                    typeof this.tsTypeRead,
-                    typeof this.tsTypeWrite
-                >>,
-                TypedExclude<NumberMethods, 'min' | 'gt' | 'gte' | 'greaterThan'>
-            >
-    }
-    /** Number should be between min and max inclusive (min and max are allowed values) */
+
     between(min: number, max: number) {
         return this._newDef({
             name: 'between',
             errorMsg: ctx => `Value ${ctx.value} should be between ${min} and ${max} (inclusive)`,
             validate: ctx => ctx.value >= min && ctx.value <= max,
-        }) as any as
+        }) as
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef<
                     typeof this.tsTypeRead,
@@ -834,11 +804,156 @@ export class Definition<
                 TypedExclude<NumberMethods, 'min' | 'gt' | 'gte' | 'greaterThan' | 'max' | 'lt' | 'lte' | 'lessThan'>
             >
     }
+
+    /** For all props of an object type to be REQUIRED */
+    complete() {
+        const objDef = this._definitions.find(definition => definition.name === 'object')
+        if (objDef) {
+            const realObjDef = typeof objDef === 'function' ? objDef() : objDef
+            const obj = realObjDef.objectCache as Record<string, Definition | Definition[]>
+            for (const [name, def] of Object.entries(obj)) {
+                if (Array.isArray(def)) {
+                    // put it as a definition array, but only in js, we don't
+                    // care about ts since it's already typed
+                    obj[name] = _.array(def[0]).required() as any
+                } else {
+                    const requiredDefFound = def._definitions.find(d => d.name === 'required')
+                    if (!requiredDefFound) {
+                        def._pushNewDef(required)
+                    }
+                }
+            }
+        }
+        return this._newDef(wrapperTypeStr(this, 'Required')) as
+            NextAutocompletionChoices<
+                ReturnType<typeof this._newDef<
+                    Required<typeof this.tsTypeRead>,
+                    Required<typeof this.tsTypeWrite>
+                >>,
+                'mergeWith'
+            >
+    }
+
+    gte(minVal: number) {
+        return this._newDef(gte(minVal)) as
+            NextAutocompletionChoices<
+                ReturnType<typeof this._newDef<
+                    typeof this.tsTypeRead,
+                    typeof this.tsTypeWrite
+                >>,
+                TypedExclude<NumberMethods, 'min' | 'gt' | 'gte' | 'greaterThan'>
+            >
+    }
+
+    greaterThan(minVal: number) {
+        return this._newDef(gt(minVal)) as
+            NextAutocompletionChoices<
+                ReturnType<typeof this._newDef<
+                    typeof this.tsTypeRead,
+                    typeof this.tsTypeWrite
+                >>,
+                TypedExclude<NumberMethods, 'min' | 'gt' | 'gte' | 'greaterThan'>
+            >
+    }
+
+    gt(minVal: number) {
+        return this._newDef(gt(minVal)) as
+            NextAutocompletionChoices<
+                ReturnType<typeof this._newDef<
+                    typeof this.tsTypeRead,
+                    typeof this.tsTypeWrite
+                >>,
+                TypedExclude<NumberMethods, 'min' | 'gt' | 'gte' | 'greaterThan'>
+            >
+    }
+
+    isFuture() {
+        return this._newDef({
+            name: 'isFutureDate',
+            errorMsg: ctx => `Date should be in the future. Actual date: ${dateArray(ctx.value)?.join('/')}`,
+            validate: ctx => getDateAsInt12(ctx.value) > getDateAsInt12(),
+        }) as
+            NextAutocompletionChoices<
+                ReturnType<typeof this._newDef< number >>,
+                DateMethods
+            >
+    }
+
+    length(length: number, comparisonOperator: '<' | '>' | '===' = '===') {
+        return this._newDef({
+            name: 'length',
+            errorMsg: ctx => `Wrong length for value '${ctx.value}'. Expected length (${comparisonOperator} ${length}) but got length (${comparisonOperator} ${ctx.value && ctx.value.length})`,
+            validate: ctx => isset(ctx.value) ? comparisonOperator === '>' ? ctx.value?.length > length : comparisonOperator === '<' ? ctx.value?.length < length : ctx.value?.length === length : true,
+        }) as
+            NextAutocompletionChoices<
+                ReturnType<typeof this._newDef<
+                    typeof this.tsTypeRead,
+                    typeof this.tsTypeWrite
+                >>,
+                (typeof this)['tsTypeRead'] extends any[] ? never : StringMethods
+            >
+    }
+
+    lessThan(maxVal: number) {
+        return this._newDef(lt(maxVal)) as
+            NextAutocompletionChoices<
+                ReturnType<typeof this._newDef<
+                    typeof this.tsTypeRead,
+                    typeof this.tsTypeWrite
+                >>,
+                TypedExclude<NumberMethods, 'max' | 'lt' | 'lte' | 'lessThan'>
+            >
+    }
+
+    max(maxVal: number) {
+        return this._newDef(lte(maxVal)) as
+            NextAutocompletionChoices<
+                ReturnType<typeof this._newDef<
+                    typeof this.tsTypeRead,
+                    typeof this.tsTypeWrite
+                >>,
+                TypedExclude<NumberMethods, 'max' | 'lt' | 'lte' | 'lessThan'>
+            >
+    }
+
+    lte(maxVal: number) {
+        return this._newDef(lte(maxVal)) as
+            NextAutocompletionChoices<
+                ReturnType<typeof this._newDef<
+                    typeof this.tsTypeRead,
+                    typeof this.tsTypeWrite
+                >>,
+                TypedExclude<NumberMethods, 'max' | 'lt' | 'lte' | 'lessThan'>
+            >
+    }
+
+    lt(maxVal: number) {
+        return this._newDef(lt(maxVal)) as
+            NextAutocompletionChoices<
+                ReturnType<typeof this._newDef<
+                    typeof this.tsTypeRead,
+                    typeof this.tsTypeWrite
+                >>,
+                TypedExclude<NumberMethods, 'max' | 'lt' | 'lte' | 'lessThan'>
+            >
+    }
+
+    min(minVal: number) {
+        return this._newDef(gte(minVal)) as
+            NextAutocompletionChoices<
+                ReturnType<typeof this._newDef<
+                    typeof this.tsTypeRead,
+                    typeof this.tsTypeWrite
+                >>,
+                TypedExclude<NumberMethods, 'min' | 'gt' | 'gte' | 'greaterThan'>
+            >
+    }
+
     round2() {
         return this._newDef({
             name: 'round2',
             format: ctx => Math.round(ctx.value * 100) / 100,
-        }) as any as
+        }) as
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef<
                     typeof this.tsTypeRead,
@@ -847,12 +962,13 @@ export class Definition<
                 TypedExclude<NumberMethods, 'round2'>
             >
     }
+
     positive() {
         return this._newDef({
             name: 'positiveNumber',
             errorMsg: ctx => `Value ${ctx.value} should be positive`,
             validate: ctx => ctx.value >= 0,
-        }) as any as
+        }) as
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef<
                     typeof this.tsTypeRead,
@@ -861,57 +977,7 @@ export class Definition<
                 TypedExclude<NumberMethods, 'positive'>
             >
     }
-    //----------------------------------------
-    // DATES
-    //----------------------------------------
-    date() {
-        return this._newDef({
-            name: 'date',
-            mainType: 'date',
-            errorMsg: defaultTypeError('date', false),
-            // May be 01 Jan 1901 00:00:00 GMT || 2012-01-01T12:12:01.595Z
-            format: ctx => typeof ctx.value === 'string' && (/\d{4}-\d{1,2}-\d{1,2}T\d+:\d+:\d+.*/.test(ctx.value) || /\d+ [A-Za-z]+ \d+/.test(ctx.value)) ? new Date(ctx.value) : ctx.value,
-            validate: ctx => ctx.value instanceof Date,
-            mongoType: 'date',
-            tsTypeStr: 'Date',
-        }) as any as
-            NextAutocompletionChoices<
-                ReturnType<typeof this._newDef<
-                    Date
-                >>,
-                DateMethods
-            >
-    }
-    date8() {
-        return this._newDef({
-            ...number,
-            name: 'date8',
-            errorMsg: defaultTypeError('date8', false),
-            validate: ctx => isDateIntOrStringValid(ctx.value, false, 8),
-            format: ctx => (typeof ctx.value === 'string' ? parseInt(ctx.value) : ctx.value),
-        }) as any as
-            NextAutocompletionChoices<
-                ReturnType<typeof this._newDef<
-                    number
-                >>,
-                DateMethods
-            >
-    }
-    date12() {
-        return this._newDef({
-            ...number,
-            name: 'date12',
-            errorMsg: defaultTypeError('date12', false),
-            validate: ctx => isDateIntOrStringValid(ctx.value, false, 12),
-            format: ctx => (typeof ctx.value === 'string' ? parseInt(ctx.value) : ctx.value),
-        }) as any as
-            NextAutocompletionChoices<
-                ReturnType<typeof this._newDef<
-                    number
-                >>,
-                DateMethods
-            >
-    }
+
     year() {
         return this._newDef({
             ...number,
@@ -919,84 +985,47 @@ export class Definition<
             errorMsg: defaultTypeError('year', false),
             validate: ctx => isDateIntOrStringValid(ctx.value, false, 4),
             format: ctx => (typeof ctx.value === 'string' ? parseInt(ctx.value) : ctx.value),
-        }) as any as
+        }) as
             NextAutocompletionChoices<
-                ReturnType<typeof this._newDef<
-                    number
-                >>,
+                ReturnType<typeof this._newDef< number >>,
                 DateMethods
             >
     }
-    isFuture() {
-        return this._newDef({
-            name: 'isFutureDate',
-            errorMsg: ctx => `Date should be in the future. Actual date: ${dateArray(ctx.value)?.join('/')}`,
-            validate: ctx => getDateAsInt12(ctx.value) > getDateAsInt12(),
-        }) as any as
-            NextAutocompletionChoices<
-                ReturnType<typeof this._newDef<
-                    number
-                >>,
-                DateMethods
-            >
-    }
-    //----------------------------------------
-    // UNDEFINED / EMPTY
-    //----------------------------------------
-    /** Should be used if the value is expected to be undefined */
-    undefined() {
-        return this._newDef(undefType) as any as
-            NextAutocompletionChoices<
-                ReturnType<typeof this._newDef<
-                    void
-                >>
-            >
-    }
+
     /** Should be used if the value is expected to be undefined */
     void() {
-        return this._newDef({ ...undefType, tsTypeStr: 'void' }) as any as
+        return this._newDef({ ...undefType, tsTypeStr: 'void' }) as
             NextAutocompletionChoices<
-                ReturnType<typeof this._newDef<
-                    void
-                >>
-            >
+                ReturnType<typeof this._newDef< void >>
+        >
     }
+
+    /** Should be used if the value is expected to be undefined */
+    undefined() {
+        return this._newDef(undefType) as
+            NextAutocompletionChoices<
+                ReturnType<typeof this._newDef< undefined >>
+        >
+    }
+
     null() {
         return this._newDef({
             name: 'null',
             validate: ctx => ctx.value === null,
             format: ctx => ctx.value === null ? ctx.value : null,
-            tsTypeStr: `null`,
-        }) as any as
+            tsTypeStr: 'null',
+        }) as
             NextAutocompletionChoices<
-                ReturnType<typeof this._newDef<
-                    null
-                >>
+                ReturnType<typeof this._newDef< null >>
             >
     }
-    //----------------------------------------
-    // LENGTH
-    //----------------------------------------
-    length(length: number, comparisonOperator: '<' | '>' | '===' = '===') {
-        return this._newDef({
-            name: 'length',
-            errorMsg: ctx => `Wrong length for value '${ctx.value}'. Expected length (${comparisonOperator} ${length}) but got length (${comparisonOperator} ${ctx.value && ctx.value.length})`,
-            validate: ctx => isset(ctx.value) ? comparisonOperator === '>' ? ctx.value?.length > length : comparisonOperator === '<' ? ctx.value?.length < length : ctx.value?.length === length : true,
-        }) as any as
-            NextAutocompletionChoices<
-                ReturnType<typeof this._newDef<
-                    typeof this.tsTypeRead,
-                    typeof this.tsTypeWrite
-                >>,
-                (typeof this)['tsTypeRead'] extends any[] ? never : StringMethods
-            >
-    }
+
     minLength(minLength: number) {
         return this._newDef({
             name: 'minLength',
             errorMsg: ctx => `Wrong length for value at '${ctx.value}'. Expected minLength (${minLength}) but got length (${ctx.value && ctx.value.length})`,
             validate: ctx => typeof ctx.value === 'undefined' ? true : ctx.value?.length >= minLength,
-        }) as any as
+        }) as
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef<
                     typeof this.tsTypeRead,
@@ -1005,12 +1034,13 @@ export class Definition<
                 (typeof this)['tsTypeRead'] extends any[] ? never : StringMethods
             >
     }
+
     maxLength(maxLength: number) {
         return this._newDef({
             name: 'maxLength',
             errorMsg: ctx => `Wrong length for value at '${ctx.value}'. Expected maxLength (${maxLength}) but got length (${ctx.value && ctx.value.length})`,
             validate: ctx => typeof ctx.value === 'undefined' ? true : ctx.value?.length <= maxLength,
-        }) as any as
+        }) as
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef<
                     typeof this.tsTypeRead,
@@ -1019,9 +1049,7 @@ export class Definition<
                 (typeof this)['tsTypeRead'] extends any[] ? never : StringMethods
             >
     }
-    //----------------------------------------
-    // TRANSFORM
-    //----------------------------------------
+
     /** Formatting happens first, before every validations */
     onFormat(callback: ((ctx: DefCtx) => any) | ((ctx: DefCtx) => Promise<any>)) {
         return this._newDef({
@@ -1030,7 +1058,7 @@ export class Definition<
                 await callback(ctx)
                 return ctx.value
             }
-        }) as any as
+        }) as
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef<
                     typeof this.tsTypeRead,
@@ -1039,6 +1067,7 @@ export class Definition<
                 (typeof this)['tsTypeRead'] extends string ? StringMethods : (typeof this)['tsTypeRead'] extends number ? NumberMethods : never
             >
     }
+
     default(defaultValue: ((ctx: DefCtx) => any) | (string | any[] | Record<string, any> | Date | boolean | number | null)) {
         return this._newDef({
             name: 'default',
@@ -1052,7 +1081,7 @@ export class Definition<
             triggerOnUndefineds: true,
             alwaysDefinedInRead: true,
             methods: 'create'
-        }) as any as
+        }) as
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef<
                     typeof this.tsTypeRead,
@@ -1061,14 +1090,12 @@ export class Definition<
                 (typeof this)['tsTypeRead'] extends string ? StringMethods : (typeof this)['tsTypeRead'] extends number ? NumberMethods : never
             >
     }
-    //----------------------------------------
-    // OPTIONAL / REQUIRED
-    //----------------------------------------
+
     optional() {
         return this._newDef({
             name: 'optional',
             required: false,
-        }) as any as
+        }) as
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef<
                     typeof this.tsTypeRead,
@@ -1078,8 +1105,9 @@ export class Definition<
                 (typeof this)['tsTypeRead'] extends string ? StringMethods : (typeof this)['tsTypeRead'] extends number ? NumberMethods : never
             >
     }
+    
     required() {
-        return this._newDef(required) as any as
+        return this._newDef(required) as
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef<
                     typeof this.tsTypeRead,
@@ -1089,26 +1117,15 @@ export class Definition<
                 (typeof this)['tsTypeRead'] extends string ? StringMethods : (typeof this)['tsTypeRead'] extends number ? NumberMethods : never
             >
     }
-    /** useful for database types where some fields may be always defined in read (_id, creationDate...) but not required on creation */
-    alwaysDefinedInRead() {
-        return this._newDef({
-            name: 'alwaysDefinedInRead',
-            alwaysDefinedInRead: true
-        }) as any as
-            NextAutocompletionChoices<
-                ReturnType<typeof this._newDef<
-                    typeof this.tsTypeRead,
-                    typeof this.tsTypeWrite
-                >>,
-                (typeof this)['tsTypeRead'] extends string ? StringMethods : (typeof this)['tsTypeRead'] extends number ? NumberMethods : never
-            >
-    }
+
+
+
     //----------------------------------------
     // MISC
     //----------------------------------------
     /** Append extra infos to any errors that may throw during format and validate */
     errorExtraInfos(errorExtraInfos: ErrorOptions) {
-        return this._newDef({ errorExtraInfos }) as any as
+        return this._newDef({ errorExtraInfos }) as
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef<
                     typeof this.tsTypeRead,
@@ -1117,21 +1134,24 @@ export class Definition<
                 (typeof this)['tsTypeRead'] extends string ? StringMethods : (typeof this)['tsTypeRead'] extends number ? NumberMethods : never
             >
     }
+
     /** Alias to write paramName in extraInfos */
     name(name: string, paramNumber?: number) {
         return this._newDef({
             errorExtraInfos: { paramName: name, paramNumber },
             paramName: name
-        }) as any as Pick<typeof this, FirstLevelTypes>
+        }) as Pick<typeof this, FirstLevelTypes>
     }
+
     /** NAME => Alias to write paramName in extraInfos */
     n(name: string, paramNumber?: number) {
         // /!\ DUPLICATE OF NAME
         return this._newDef({
             errorExtraInfos: { paramName: name, paramNumber },
             paramName: name
-        }) as any as Pick<typeof this, FirstLevelTypes>
+        }) as Pick<typeof this, FirstLevelTypes>
     }
+
     /** Make the callback return false to unvalidate this field and trigger an error. Note: validation happens after formating */
     onValidate(callback: (ctx: DefCtx) => any) {
         return this._newDef({
@@ -1140,7 +1160,7 @@ export class Definition<
                 if (await callback(ctx) === false) return false
                 else return true
             }
-        }) as any as
+        }) as
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef<
                     typeof this.tsTypeRead,
@@ -1149,6 +1169,7 @@ export class Definition<
                 (typeof this)['tsTypeRead'] extends string ? StringMethods : (typeof this)['tsTypeRead'] extends number ? NumberMethods : never
             >
     }
+
     promise() {
         return this._newDef({
             name: 'promise',
@@ -1156,7 +1177,7 @@ export class Definition<
             errorMsg: ctx => `Expected: typeof Promise but got ${typeof ctx.value}`,
             validate: ctx => typeof ctx.value?.then === 'function', // /!\ promise type should not concern in app validation so this should never apply
             ...wrapperTypeStr(this, 'Promise')
-        }) as any as
+        }) as
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef<
                     typeof this.tsTypeRead,
@@ -1165,6 +1186,7 @@ export class Definition<
                 (typeof this)['tsTypeRead'] extends string ? StringMethods : (typeof this)['tsTypeRead'] extends number ? NumberMethods : never
             >
     }
+
     /** **Note:** formatting will not work for typesOr checks */
     typesOr<T extends GenericDef[]>(
         types: [...T]
@@ -1191,7 +1213,7 @@ export class Definition<
             },
             tsTypeStr: () => types.map(t => t.getTsTypeAsString().read).join(' | '),
             tsTypeStrForWrite: () => types.map(t => t.getTsTypeAsString().write).join(' | '),
-        }) as any as
+        }) as
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef<
                     InferTypesOrRead<T>[number],
@@ -1200,6 +1222,7 @@ export class Definition<
                 (typeof this)['tsTypeRead'] extends string ? StringMethods : (typeof this)['tsTypeRead'] extends number ? NumberMethods : never
             >
     }
+
     unique() {
         return this._newDef({
             name: 'unique',
@@ -1212,7 +1235,7 @@ export class Definition<
                 if (required) obj.unique = true
                 else obj.index = { unique: true, sparse: true }
             },
-        }) as any as
+        }) as
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef<
                     typeof this.tsTypeRead,
@@ -1221,14 +1244,19 @@ export class Definition<
                 (typeof this)['tsTypeRead'] extends string ? StringMethods : (typeof this)['tsTypeRead'] extends number ? NumberMethods : never
             >
     }
+    
     ts<
         TsTypeRead,
         TsTypeWrite
-    >(tsString: string, tsTypeWrite: string = tsString) {
+    >(
+        tsString: string, 
+        tsTypeWrite: string = tsString
+    )
+        {
         return this._newDef({
             tsTypeStr: tsString,
             tsTypeStrForWrite: tsTypeWrite,
-        }) as any as
+        }) as
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef<
                     TsTypeRead,
@@ -1240,77 +1268,3 @@ export class Definition<
 }
 
 export const _ = new Definition().init()
-
-
-
-// TYPE TESTS
-
-// type Modelssss = {
-//     aa: {
-//         bb: { Read: { a: number }, Write: { a: number } }
-//     }
-// }
-
-// const __ = new Definition<Modelssss, 'aa'>().init()
-
-// const hardCodedString = __.string({ hardCodedValue: 'tt' }).tsTypeRead
-// const normalstring = __.string().tsTypeRead
-// const hardCodedString2 = __.stringConstant('coucou').tsTypeRead
-
-// const populated = __.ref('bb', true).tsTypeRead
-// const notPop = __.ref('bb').tsTypeRead
-
-
-// BASE TYPES
-// const str = __.string().required().lowerCase().isRequiredType
-// const strAZ = __.string().lowerCase().isRequiredType
-// const strWZ = __.string().lowerCase().tsTypeWrite
-// const str2 = __.string().tsTypeRead
-// const lengthTest0 = __.string().maxLength(3).tsTypeRead
-// const lengthTest = __.string().maxLength(3).lowerCase().minLength(4).tsTypeRead
-// const arrLength = __.array(_.string()).minLength(3).tsTypeRead
-
-// // OBJECTS
-// const obj0 = __.object({ name: __.string().required() }).tsTypeRead
-// const obj01 = __.object({ name: __.string() }).tsTypeRead
-// const obj1 = __.object({ name: __.string() }).mergeWith({ email: __.email().required() }).tsTypeRead
-// const obj2 = __.object({ name: __.string() }).mergeWith({ email: __.email().required() }).partial()
-// const obj3 = __.object({ name: __.string() }).mergeWith({ email: __.email().required() }).complete()
-// const complexOne = __.object({
-//     arr: [__.string()],
-//     arr2: __.array(__.string()),
-//     subObj: {
-//         name: __.enum(['a', 'b']),
-//         tuple: __.tuple([__.string(), __.date()]),
-//         typeOr: __.typesOr([__.number(), __.boolean()]),
-//         subArr: [__.email()]
-//     }
-// }).tsTypeRead
-
-// const or = __.typesOr([__.string(), __.number(), __.boolean()]).tsTypeRead
-
-// const tuple2 = __.tuple([__.string(), __.number()]).tsTypeRead
-// const myTuple = ['re', 4] as typeof tuple2
-
-
-
-// const rtpoij = __.object({ name: __.string(), arr1: __.email(), arr2: __.array({ subArr: __.array({ name: __.string() }) }) })
-// const rtpoZEZEij = __.array({ name: __.string(), subObj: { bool: __.boolean() }, arr2: __.array({ subArr: __.array({ name: __.string() }) }) })
-
-// const rtpoZEZEiEEj = __.array({ name: __.string() })
-// const tyeee = rtpoZEZEiEEj.tsTypeRead
-// const apoapo = __.string().tsTypeRead
-// const type = rtpoij.tsTypeRead
-
-
-
-// const aa = __.n('userFields').object({
-//     screenSize: __.string().required(),
-//     deviceId: __.string().required(),
-//     phonePrefix: __.regexp(/^\+\d+$/).required(),
-//     phoneNumber: __.string().minLength(7).maxLength(17).required(),
-//     lang: __.enum(['en', 'fr']).required(),
-//     currency: __.enum(['eur', 'usd']).required(),
-// }).required()
-
-// type BPo = typeof aa.tsTypeRead

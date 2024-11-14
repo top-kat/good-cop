@@ -42,13 +42,6 @@
                 "allowTemplateLiterals": true
             }
         ],
-        "brace-style": [
-            1,
-            "1tbs",
-            {
-                "allowSingleLine": true
-            }
-        ],
         "no-underscore-dangle": 0,
         "space-in-parens": [
             "warn",
