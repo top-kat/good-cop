@@ -10,10 +10,43 @@ export type TypedExclude<T extends keyof Definition, K extends keyof Definition>
 
 export type EnsureIsDefMethod<T extends keyof Definition> = T
 
-export type FirstLevelTypes = EnsureIsDefMethod<'any' | 'array' | 'boolean' | 'true' | 'false' | 'date' | 'date12' | 'date8' | 'email' | 'enum' | 'float' | 'genericObject' | 'model' | 'year' | 'url' | 'tuple' | 'typesOr' | 'undefined' | 'string' | 'stringConstant' | 'regexp' | 'percentage' | 'object' | 'translation' | 'number' | 'mongoModel' | 'n' | 'name' | 'ref' | 'void' | 'null' | 'integer' | 'objectId' | 'password'>
+export type FirstLevelTypes = EnsureIsDefMethod<
+    'any' | 'array' |
+    'boolean' |
+    'date' | 'date12' | 'date8' |
+    'email' | 'enum' |
+    'false' | 'float' |
+    'genericObject' |
+    'integer' |
+    'model' | 'mongoModel' |
+    'n' | 'name' | 'null' | 'number' |
+    'object' | 'objectId' |
+    'password' | 'percentage' |
+    'ref' | 'regexp' |
+    'string' | 'stringConstant' |
+    'translation' | 'true' | 'tuple' | 'typesOr' |
+    'undefined' |
+    'url' |
+    'void' |
+    'year'
+>
 
+export type UniversalMethods = EnsureIsDefMethod<
+    'alwaysDefinedInRead' |
+    '_definitions' | '_getDefinitionObjFlat' | '_getObjectCache' | '_getMongoType' | '_pushNewDef' | '_refValue' |
+    'default' |
+    'errorExtraInfos' |
+    'formatAndValidate' |
+    'getDefinitionValue' | 'getMainType' | 'getName' | 'getTsTypeAsString' |
+    'isRequired' | 'isRequiredType' | 'isType' |
+    'onFormat' | 'onValidate' | 'optional' |
+    'promise' |
+    'required' |
+    'ts' |
+    'tsTypeRead' | 'tsTypeWrite' |
+    'unique'
+>
 
-export type UniversalMethods = EnsureIsDefMethod<'alwaysDefinedInRead' | '_definitions' | 'tsTypeRead' | 'tsTypeWrite' | 'default' | 'errorExtraInfos' | 'formatAndValidate' | 'onFormat' | 'onValidate' | '_pushNewDef' | 'getDefinitionValue' | 'getTsTypeAsString' | '_getObjectCache' | '_getDefinitionObjFlat' | '_refValue' | '_getMongoType' | 'isRequired' | 'isRequiredType' | 'getName' | 'isType' | 'getMainType' | 'ts' | 'required' | 'unique' | 'optional' | 'promise'>
 
 export type LengthMethods = EnsureIsDefMethod<'length' | 'maxLength' | 'minLength'>
 
