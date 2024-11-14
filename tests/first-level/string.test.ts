@@ -2,7 +2,6 @@
 
 
 import { _ } from '../../src/DefinitionClass'
-import { throwMsgHelper } from '../throwMsgHelper'
 
 
 
@@ -47,10 +46,4 @@ describe(`String`, () => {
         it('throws an error when passed an array', async () => {
             await expect(stringDef.formatAndValidate([])).rejects.toThrow('Expected type \'string\' but got type array for value')
         })
-
-        throwMsgHelper(
-            'stringDef4 throw',
-            stringDef.formatAndValidate(['r', true]),
-            `Expected type 'string' but got type array for value`
-        )
 })
