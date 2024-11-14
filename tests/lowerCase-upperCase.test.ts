@@ -5,9 +5,9 @@ import { _ } from '../src/DefinitionClass'
 
 
 
-describe(`Lowercase definition`, () => {
+describe(`Lowercase`, () => {
 
-    const lowerCaseDef = _.n('myLowerCase').string().lowerCase()
+    const lowerCaseDef = _.string().lowerCase()
 
         it('checks the return types of read or write as a string', () => {
             expect(lowerCaseDef.getTsTypeAsString()).toEqual({ 'read': 'string', 'write': 'string' })
@@ -22,9 +22,9 @@ describe(`Lowercase definition`, () => {
         })
 })
 
-describe(`Uppercase definition`, () => {
+describe(`Uppercase`, () => {
 
-    const upperCaseDef = _.n('myUpperCase').string().upperCase()
+    const upperCaseDef = _.string().upperCase()
 
         it('checks the return types of read or write as a string', () => {
             expect(upperCaseDef.getTsTypeAsString()).toEqual({ 'read': 'string', 'write': 'string' })

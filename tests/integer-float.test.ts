@@ -6,9 +6,9 @@ import { _ } from '../src/DefinitionClass'
 
 
 //INTEGER
-describe('Integer definition', () => {
+describe('Integer', () => {
 
-    const integerDef = _.n('myInteger').integer()
+    const integerDef = _.integer()
 
     it('checks the return types of read or write as a string', () => {
         expect(integerDef.getTsTypeAsString()).toEqual({ 'read': 'number', 'write': 'number' })

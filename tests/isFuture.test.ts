@@ -5,9 +5,9 @@ import { _ } from '../src/DefinitionClass'
 
 
 
-describe(`isFuture definition`, () => {
+describe(`isFuture`, () => {
 
-    const isFutureDef = _.n('futureDate').date().isFuture()
+    const isFutureDef = _.date().isFuture()
     const dateForFutureNumber = 203001010000
     const dateForFutureString = new Date('2030-01-01T00:00:00Z');
     const dateForPastString = new Date('1990-01-01T00:00:00Z');
