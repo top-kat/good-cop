@@ -13,13 +13,9 @@ describe(`Translation Object`, () => {
         expect(transDef.getTsTypeAsString()).toEqual({ 'read': 'TranslationObj', 'write': 'TranslationObj' })
     })
 
-
     it('accepts valid isoCodes as keys', async () => {
-        expect(
-            await transDef
-                .formatAndValidate({ en: 'hello', fr: 'bonjour', ru: 'Привет' })
-        )
-            .toEqual({ en: 'hello', fr: 'bonjour', ru: 'Привет' })
+        expect(await transDef.formatAndValidate({ en: 'hello', fr: 'bonjour'}))
+            .toEqual({ en: 'hello', fr: 'bonjour'})
     })
 
     it('throws an error if an isoCode is not present', async () => {

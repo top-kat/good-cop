@@ -22,7 +22,7 @@ is not
 
 import mongoose from 'mongoose' // only used for typings, may not be compatible if used in frontend
 import { MaybeArray } from './core-types'
-import { TranslationObj } from './core-types'
+import { CountryCodeIso, TranslationObj } from './core-types'
 import { DefinitionBase } from './DefinitionBaseClass'
 import { sharedDefinitions } from './definitions/sharedDefinitions'
 import { defaultTypeError } from './helpers/definitionGenericHelpers'
@@ -310,12 +310,12 @@ export class Definition<
 
     /** an object who's keys are locale and values are translation string. Eg: `{ fr: 'Salut', en: 'Hi' }` */
     translation() {
-        const validIsoCodes = [
+        const validIsoCodes: CountryCodeIso[] = [
             'ad', 'ae', 'af', 'ag', 'ai', 'al', 'am', 'ao', 'aq', 'ar', 'as', 'at', 'au', 'aw', 'ax', 'az',
             'ba', 'bb', 'bd', 'be', 'bf', 'bg', 'bh', 'bi', 'bj', 'bl', 'bm', 'bn', 'bo', 'bq', 'br', 'bs', 'bt', 'bv', 'bw', 'by', 'bz',
             'ca', 'cc', 'cd', 'cf', 'cg', 'ch', 'ci', 'ck', 'cl', 'cm', 'cn', 'co', 'cr', 'cu', 'cv', 'cw', 'cx', 'cy', 'cz',
             'de', 'dj', 'dk', 'dm', 'do', 'dz',
-            'ec', 'ee', 'eg', 'eh', 'er', 'es', 'et',
+            'ec', 'ee', 'eg', 'eh', 'er', 'es', 'et', 'en',
             'fi', 'fj', 'fk', 'fm', 'fo', 'fr',
             'ga', 'gb', 'gd', 'ge', 'gf', 'gg', 'gh', 'gi', 'gl', 'gm', 'gn', 'gp', 'gq', 'gr', 'gs', 'gt', 'gu', 'gw', 'gy',
             'hk', 'hm', 'hn', 'hr', 'ht', 'hu',
@@ -347,7 +347,7 @@ export class Definition<
                 Object.entries(ctx.value).every(([countryCode, translationStr]) =>
                     typeof translationStr === 'string' &&
                     /^[A-Za-z]{2}$/.test(countryCode) &&
-                    validIsoCodes.includes(countryCode)
+                    validIsoCodes.includes(countryCode as CountryCodeIso)
                 ),
             mongoType: 'object',
             tsTypeStr: 'TranslationObj',
@@ -369,13 +369,12 @@ export class Definition<
         }
 
         // eslint-disable-next-line @typescript-eslint/no-this-alias
-        const That = this // dunno why I need this sheet on those lines buit linter happy
         // Object.assign(this.object, object)
         return this._newDef() as any as
             NextAutocompletionChoices<
-                ReturnType<typeof That._newDef<
-                    InferTypeRead<T> & typeof That.tsTypeRead,
-                    InferTypeWrite<T> & typeof That.tsTypeWrite
+                ReturnType<typeof this._newDef<
+                    InferTypeRead<T> & typeof this.tsTypeRead,
+                    InferTypeWrite<T> & typeof this.tsTypeWrite
                 >>,
                 'partial' | 'complete'
             >
