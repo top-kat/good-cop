@@ -34,14 +34,14 @@ export const sharedDefinitions = {
     number: {
         mainType: 'number',
         errorMsg: defaultTypeError('number'),
-        validate: ctx => typeof ctx.value === 'number',
+        validate: ctx => typeof ctx.value === 'number' && !isNaN(ctx.value),
         mongoType: 'number',
         tsTypeStr: 'number',
         format: ctx => parseFloat(ctx.value),
     },
     round2: {
         errorMsg: defaultTypeError('number'),
-        validate: ctx => typeof ctx.value === 'number',
+        validate: ctx => typeof ctx.value === 'number' && !isNaN(ctx.value),
         mongoType: 'number',
         tsTypeStr: 'number',
         format: ctx => Math.round(ctx.value * 100) / 100,
