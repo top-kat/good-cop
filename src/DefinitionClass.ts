@@ -617,6 +617,7 @@ export class Definition<
     objectId() {
         return this._newDef({
             ...string(),
+            errorMsg: defaultTypeError('objectId'),
             name: 'objectId',
             format: ctx => ctx.value.toString(),
             validate: ctx => ctx.value?.length === 24,

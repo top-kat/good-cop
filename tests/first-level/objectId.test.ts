@@ -7,36 +7,25 @@ import { _ } from '../../src/DefinitionClass'
 //ATT: not sure the difference between this and object?
 describe(`Object Id`, () => {
 
-    const objectDef = _.object({ name: _.string(), number: _.number(), bool: _.boolean() })
+    const objectDef = _.objectId()
 
-    it('checks the return types of read or write as a string', () => {
-        expect(objectDef.getTsTypeAsString()).toEqual({
-            read: `{\n    'name'?: string\n    'number'?: number\n    'bool'?: boolean\n}`,
-            write: `{\n    'name'?: string\n    'number'?: number\n    'bool'?: boolean\n}`,
-        })
+    it(`Check it doesn't accept empty string`, async () => {
+        await expect(objectDef.formatAndValidate(''))
+            .rejects.toThrow(`Expected type objectId but got type string for value ""`)
     })
 
-    it('allows for additional properties', async () => {
-        expect(
-            await objectDef
-                .formatAndValidate({ name: 22, number: '3', additionalProperty1: 23, addProperty2: 'myString' })
-        )
-            .toEqual({ name: '22', number: 3, additionalProperty1: 23, addProperty2: 'myString' })
+    it(`Check it doesn't accept string greater than 24 characters`, async () => {
+        await expect(objectDef.formatAndValidate('azertyuiopqsdfghjklmwxcvbn'))
+            .rejects.toThrow(`Expected type objectId but got type string for value "azertyuiopqsdfghjklmwxcvbn"`)
     })
 
-    it('throws an error if a string is passed', async () => {
-        await expect(objectDef.formatAndValidate('myString'))
-            .rejects.toThrow(/Expected type object but got type string for value "myString"/);
-    });
-
-    it('throws an error if a number is passed', async () => {
-        await expect(objectDef.formatAndValidate(22))
-            .rejects.toThrow(/Expected type object but got type number for value 22/);
-    });
-
-    it('throws an error if a boolean is passed', async () => {
-        expect(
-            async () => await objectDef.formatAndValidate({ name: true })
-        ).rejects.toThrow(`Expected type string but got type boolean for value true`)
+    it(`Check it doesn't accept string less than 24 characters`, async () => {
+        await expect(objectDef.formatAndValidate('azertyuiopqsd'))
+            .rejects.toThrow(`Expected type objectId but got type string for value "azertyuiopqsd"`)
     })
+
+    it(`Valid objectId 24 characters`, async () => {
+        expect(await objectDef.formatAndValidate('671207eeff7ff7df430c20bf')).toEqual('671207eeff7ff7df430c20bf')
+    })
+
 })
