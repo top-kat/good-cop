@@ -1207,7 +1207,7 @@ export const _ = new Definition().init()
 
 // const __ = new Definition<Modelssss, 'aa'>().init()
 
-// const hardCodedString = __.string({ hardCodedValue: 'tt' }).tsTypeRead
+// const hardCodedString = __.stringConstant('tt').tsTypeRead
 // const normalstring = __.string().tsTypeRead
 // const hardCodedString2 = __.stringConstant('coucou').tsTypeRead
 
@@ -1215,9 +1215,9 @@ export const _ = new Definition().init()
 // const notPop = __.ref('bb').tsTypeRead
 
 
-// BASE TYPES
-// const str = __.string().required().lowerCase().isRequiredType
-// const strAZ = __.string().lowerCase().isRequiredType
+// /* BASE TYPES */
+// const isRequired = __.string().required().lowerCase().isRequiredType
+// const isRequiredFalse = __.string().lowerCase().isRequiredType
 // const strWZ = __.string().lowerCase().tsTypeWrite
 // const str2 = __.string().tsTypeRead
 // const lengthTest0 = __.string().maxLength(3).tsTypeRead
