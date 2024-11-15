@@ -29,15 +29,19 @@ describe('Floating-point definition', () => {
         expect(await floatingPointDef.formatAndValidate('42.2')).toEqual(42.2)
     })
 
-    it('returns NaN when passed a string', async () =>
-        expect(await floatingPointDef.formatAndValidate('hello')).toEqual(NaN)
+    it('returns NaN when passed a string', async () => {
+        await expect(floatingPointDef.formatAndValidate('hello'))
+            .rejects.toThrow(`Expected type number but got type NaN for value null`)
+    }
     )
 
     it('returns NaN when passed an array', async () =>
-        expect(await floatingPointDef.formatAndValidate(['test', 1])).toEqual(NaN)
+        await expect(floatingPointDef.formatAndValidate(['test', 1]))
+            .rejects.toThrow(`Expected type number but got type NaN for value null`)
     )
 
     it('returns NaN when passed an object', async () =>
-        expect(await floatingPointDef.formatAndValidate({ number:6 })).toEqual(NaN)
+        await expect(floatingPointDef.formatAndValidate({ number: 6 }))
+            .rejects.toThrow(`Expected type number but got type NaN for value null`)
     )
 })

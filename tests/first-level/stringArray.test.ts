@@ -33,16 +33,16 @@ describe(`Array of strings`, () => {
 
     it('throws an error when null is passed', async () => {
         expect(async () => await stringArrayDef.formatAndValidate(null))
-            .rejects.toThrow(`Expected type 'array' but got type object for value null`)
+            .rejects.toThrow(`Expected type array but got type object for value null`)
     })
 
     it('throws an error if a boolean is passed', async () => {
         expect(async () => await stringArrayDef.formatAndValidate(['myString1', true]))
-            .rejects.toThrow(`Expected type 'string' but got type boolean for value true`)
+            .rejects.toThrow(`Expected type string but got type boolean for value true`)
     })
 
     it('throws an error if an object is passed', async () => {
-        expect(async () => await stringArrayDef.formatAndValidate(['myString1', { id: 'id' }])).rejects.toThrow('Expected type \'string\' but got type object')
+        expect(async () => await stringArrayDef.formatAndValidate(['myString1', { id: 'id' }])).rejects.toThrow('Expected type string but got type object')
     })
 
 })

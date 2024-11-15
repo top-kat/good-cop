@@ -34,14 +34,17 @@ describe('Integer', () => {
     })
 
     it('returns NaN when passed a string', async () =>
-        expect(await integerDef.formatAndValidate('hello')).toEqual(NaN)
+        await expect(integerDef.formatAndValidate('hello'))
+            .rejects.toThrow(`Expected type number but got type NaN for value null`)
     )
 
     it('returns NaN when passed an array', async () =>
-        expect(await integerDef.formatAndValidate(['test', 1])).toEqual(NaN)
+        await expect(integerDef.formatAndValidate(['test', 1]))
+            .rejects.toThrow(`Expected type number but got type NaN for value null`)
     )
 
     it('returns NaN when passed an object', async () =>
-        expect(await integerDef.formatAndValidate({ number:6 })).toEqual(NaN)
+        await expect(integerDef.formatAndValidate({ number: 6 }))
+            .rejects.toThrow(`Expected type number but got type NaN for value null`)
     )
 })

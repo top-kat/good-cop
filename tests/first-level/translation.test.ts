@@ -7,25 +7,25 @@ import { _ } from '../../src/DefinitionClass'
 
 describe(`Translation Object`, () => {
 
-   const transDef = _.translation()
+    const transDef = _.translation()
 
-   it('checks the return types of read or write as a string', () => {
-    expect(transDef.getTsTypeAsString()).toEqual({ 'read': 'TranslationObj', 'write': 'TranslationObj' })
+    it('checks the return types of read or write as a string', () => {
+        expect(transDef.getTsTypeAsString()).toEqual({ 'read': 'TranslationObj', 'write': 'TranslationObj' })
     })
 
 
-    it('accepts isoCodes as keys', async () =>{
+    it('accepts isoCodes as keys', async () => {
         expect(
             await transDef
-        .formatAndValidate({ en: 'hello', fr: 'bonjour'})
+                .formatAndValidate({ en: 'hello', fr: 'bonjour' })
         )
-        .toEqual({ en: 'hello', fr: 'bonjour'})
+            .toEqual({ en: 'hello', fr: 'bonjour' })
     })
 
     it('throws an error if an isoCode is not present', async () => {
         await expect(transDef.formatAndValidate({ nonIsoCode: 'testman' }))
             .rejects.toThrowError(
-                'Expected type \'{ [countryCodeIso]: translationString }\' but got {\n  "nonIsoCode": "testman"\n}'
+                'Expected type { [countryCodeIso]: translationString } but got {\n  "nonIsoCode": "testman"\n}'
             )
     })
 
@@ -33,7 +33,7 @@ describe(`Translation Object`, () => {
     // it('throws an error if an isoCode is not VALID', async () => {
     //     await expect(transDef.formatAndValidate({ xx: 'testman' }))
     //         .rejects.toThrowError(
-    //             'Expected type \'{ [countryCodeIso]: translationString }\' but got {\n  "xx": "testman"\n}'
+    //             'Expected type { [countryCodeIso]: translationString } but got {\n  "xx": "testman"\n}'
     //         )
     // })
 })

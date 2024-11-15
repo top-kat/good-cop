@@ -25,6 +25,6 @@ describe(`isFuture`, () => {
     })
 
     it('throws an error if value is not date format', () => {
-        expect(isFutureDef.formatAndValidate(dateForFutureNumber)).rejects.toThrow(`Expected type 'date' but got 203001010000`);
+        expect(isFutureDef.formatAndValidate(dateForFutureNumber)).rejects.toThrow(`Expected type date but got 203001010000`);
     })
 })

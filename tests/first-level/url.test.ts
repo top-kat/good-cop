@@ -22,11 +22,11 @@ describe('Url', () => {
     })
 
     it('throws an error if no protocol is used', async () => {
-        await expect(urlDef.formatAndValidate('testman.com')).rejects.toThrow('Expected type \'url\' but got "testman.com"')
+        await expect(urlDef.formatAndValidate('testman.com')).rejects.toThrow('Expected type url but got "testman.com"')
     })
 
     //ATT: could be good to be able to check for a tld too
     // it('throws an error if no tld is used', async () => {
-    //     await expect(urlDef.formatAndValidate('https://testman')).rejects.toThrow('Expected type \'url\' but got "https://testman"')
+    //     await expect(urlDef.formatAndValidate('https://testman')).rejects.toThrow('Expected type url but got "https://testman"')
     // })
 })
