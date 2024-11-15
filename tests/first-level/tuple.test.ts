@@ -21,7 +21,6 @@ describe(`Tuple`, () => {
             .toEqual(['myString1', 1])
     })
 
-    //ATT: is it better to reformat or throw an error here?
     it('reformats in the format defined', async () => {
         await expect(tupleDef.formatAndValidate([1, 'shit']))
             .rejects.toThrow(`Expected type number but got type NaN for value null`)

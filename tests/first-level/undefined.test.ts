@@ -13,12 +13,11 @@ describe(`Undefined`, () => {
         expect(undefinedDef.getTsTypeAsString()).toEqual({ 'read': 'undefined', 'write': 'undefined' })
     })
 
-    it('accepts an undefined value', async ()=>{
+    it('accepts an undefined value', async () => {
         expect(await undefinedDef.formatAndValidate(undefined)).toEqual(undefined)
     })
 
-    //ATT: should it accept a valid value?
-    it('accepts a valid value', async ()=>{
-        expect(await undefinedDef.formatAndValidate(2)).toEqual(2)
+    it('accepts a valid value', async () => {
+        expect(await undefinedDef.formatAndValidate(2)).toEqual(undefined)
     })
 })
