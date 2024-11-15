@@ -22,6 +22,6 @@ describe(`Boolean`, () => {
     })
 
     it('throws an error if the type is not a boolean', async () => {
-        await expect(booleanDef.formatAndValidate('testman')).rejects.toThrow(`Expected type 'boolean' but got type string for value "testman"`);
+        await expect(booleanDef.formatAndValidate('testman')).rejects.toThrow(`Expected type boolean but got type string for value "testman"`);
     })
 })

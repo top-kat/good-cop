@@ -18,14 +18,14 @@ describe('Email', () => {
     })
 
     it('throws an error if no @ is used', async () => {
-        await expect(emailDef.formatAndValidate('testman.com')).rejects.toThrow('Expected type \'email\' but got "testman.com"')
+        await expect(emailDef.formatAndValidate('testman.com')).rejects.toThrow('Expected type email but got "testman.com"')
     })
 
     it('throws an error if no user is used', async () => {
-        await expect(emailDef.formatAndValidate('@.com')).rejects.toThrow('Expected type \'email\' but got "@.com"')
+        await expect(emailDef.formatAndValidate('@.com')).rejects.toThrow('Expected type email but got "@.com"')
     })
 
     it('throws an error if no domain is used', async () => {
-        await expect(emailDef.formatAndValidate('testman@')).rejects.toThrow('Expected type \'email\' but got "testman@"')
+        await expect(emailDef.formatAndValidate('testman@')).rejects.toThrow('Expected type email but got "testman@"')
     })
 })

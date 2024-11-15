@@ -26,6 +26,6 @@ describe(`Date8`, () => {
 
     //ATT: this is still resolving, need to fix logic for INVALID DATE
     // it('throws an error for an invalid 8-digit date string', async () => {
-    //     await expect(date8Def.formatAndValidate(invalidDateString)).rejects.toThrow('Expected type \'date8\' but got "20231332"');
+    //     await expect(date8Def.formatAndValidate(invalidDateString)).rejects.toThrow('Expected type date8 but got "20231332"');
     // }); 
 })
