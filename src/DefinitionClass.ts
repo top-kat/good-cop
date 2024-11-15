@@ -29,36 +29,36 @@ import { defaultTypeError } from './helpers/definitionGenericHelpers'
 import { getFieldValueForDefinitions } from './helpers/findInDefinitions'
 import { getArrObjDef } from './definitions/arraysObjectsDefinitionHandlers'
 import { formatAndValidateDefinitionPartials } from './helpers/formatAndValidateForDefinition'
-import { 
+import {
     isAnonymousUser,
     MongoTypeObj,
     MongoFieldsRead,
     MongoFieldsWrite,
     mongoTypeMapping,
     systemUserId,
- } from './helpers/backendDefinitionsHelpers'
+} from './helpers/backendDefinitionsHelpers'
 
-import { 
-    AutoWritedFieldNames, 
+import {
+    AutoWritedFieldNames,
     DateMethods,
-    DefCtx, 
-    DefinitionObj, 
-    DefinitionPartial, 
-    DefinitionClassReceivedModelType, 
-    FirstLevelTypes, 
-    GenericDef, 
-    InferTypeRead, 
-    InferTypeWrite, 
-    InferTypeArrRead, 
-    InferTypeArrWrite, 
-    LengthMethods, 
-    NextAutocompletionChoices, 
-    NumberMethods, 
-    StringMethods, 
-    TypedExclude, 
+    DefCtx,
+    DefinitionObj,
+    DefinitionPartial,
+    DefinitionClassReceivedModelType,
+    FirstLevelTypes,
+    GenericDef,
+    InferTypeRead,
+    InferTypeWrite,
+    InferTypeArrRead,
+    InferTypeArrWrite,
+    LengthMethods,
+    NextAutocompletionChoices,
+    NumberMethods,
+    StringMethods,
+    TypedExclude,
 } from './definitionTypes'
 
-import { 
+import {
     capitalize1st,
     DescriptiveError,
     dateArray,
@@ -278,23 +278,23 @@ export class Definition<
         keyName: FieldName = 'key' as FieldName,
         valueType: ValueType = this.any() as any as ValueType
     ) {
-        type Read = FieldName extends string 
-        ? { [k: string]: InferTypeRead<ValueType> } 
-        : FieldName extends [string, string] 
-            ? { [k: string]: { [k: string]: InferTypeRead<ValueType> } } 
+        type Read = FieldName extends string
+            ? { [k: string]: InferTypeRead<ValueType> }
+            : FieldName extends [string, string]
+            ? { [k: string]: { [k: string]: InferTypeRead<ValueType> } }
             : { [k: string]: { [k: string]: { [k: string]: InferTypeRead<ValueType> } } }
 
-        type Write = FieldName extends string 
-        ? { [k: string]: InferTypeRead<ValueType> } 
-        : FieldName extends [string, string] 
-            ? { [k: string]: { [k: string]: InferTypeRead<ValueType> } } 
+        type Write = FieldName extends string
+            ? { [k: string]: InferTypeRead<ValueType> }
+            : FieldName extends [string, string]
+            ? { [k: string]: { [k: string]: InferTypeRead<ValueType> } }
             : { [k: string]: { [k: string]: { [k: string]: InferTypeWrite<ValueType> } } }
 
-        const realObj = typeof keyName === 'string' 
-        ? { [`__${keyName}`]: valueType } 
-        : keyName.length === 2 
-            ? { [`__${keyName[0]}`]: { [`__${keyName[1]}`]: valueType } } 
-            : { [`__${keyName[0]}`]: { [`__${keyName[1]}`]: { [`__${keyName[2]}`]: valueType } } }
+        const realObj = typeof keyName === 'string'
+            ? { [`__${keyName}`]: valueType }
+            : keyName.length === 2
+                ? { [`__${keyName[0]}`]: { [`__${keyName[1]}`]: valueType } }
+                : { [`__${keyName[0]}`]: { [`__${keyName[1]}`]: { [`__${keyName[2]}`]: valueType } } }
 
 
         return this._newDef({
@@ -314,7 +314,7 @@ export class Definition<
             name: 'translation',
             mainType: 'object',
             errorMsg: defaultTypeError('{ [countryCodeIso]: translationString }', false),
-            validate: ctx => 
+            validate: ctx =>
                 isType(ctx.value, 'object') &&
                 Object.entries(ctx.value).every(([countryCode, translationStr]) =>
                     typeof translationStr === 'string' &&
@@ -521,7 +521,7 @@ export class Definition<
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef< string >>,
                 StringMethods
-        >
+            >
     }
     /** Predefined list of values. Eg: status: _.enum(['success', 'error', 'pending']) OR _.enum([1, 2, 3]) */
     enum<T extends string[] | number[]>(possibleValues: [...T] | readonly [...T]) {
@@ -600,7 +600,7 @@ export class Definition<
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef<string>>,
                 StringMethods
-        >
+            >
     }
 
     stringConstant<T extends string>(hardCodedValue: T) {
@@ -782,12 +782,12 @@ export class Definition<
             alwaysDefinedInRead: true
         }) as
             NextAutocompletionChoices<
-            ReturnType<typeof this._newDef<
+                ReturnType<typeof this._newDef<
                     typeof this.tsTypeRead,
                     typeof this.tsTypeWrite
-            >>,
-            (typeof this)['tsTypeRead'] extends string ? StringMethods : (typeof this)['tsTypeRead'] extends number ? NumberMethods : never
-        >
+                >>,
+                (typeof this)['tsTypeRead'] extends string ? StringMethods : (typeof this)['tsTypeRead'] extends number ? NumberMethods : never
+            >
     }
 
     between(min: number, max: number) {
@@ -997,7 +997,7 @@ export class Definition<
         return this._newDef({ ...undefType, tsTypeStr: 'void' }) as
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef< void >>
-        >
+            >
     }
 
     /** Should be used if the value is expected to be undefined */
@@ -1005,7 +1005,7 @@ export class Definition<
         return this._newDef(undefType) as
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef< undefined >>
-        >
+            >
     }
 
     null() {
@@ -1105,7 +1105,7 @@ export class Definition<
                 (typeof this)['tsTypeRead'] extends string ? StringMethods : (typeof this)['tsTypeRead'] extends number ? NumberMethods : never
             >
     }
-    
+
     required() {
         return this._newDef(required) as
             NextAutocompletionChoices<
@@ -1244,15 +1244,14 @@ export class Definition<
                 (typeof this)['tsTypeRead'] extends string ? StringMethods : (typeof this)['tsTypeRead'] extends number ? NumberMethods : never
             >
     }
-    
+
     ts<
         TsTypeRead,
         TsTypeWrite
     >(
-        tsString: string, 
+        tsString: string,
         tsTypeWrite: string = tsString
-    )
-        {
+    ) {
         return this._newDef({
             tsTypeStr: tsString,
             tsTypeStrForWrite: tsTypeWrite,
@@ -1268,3 +1267,77 @@ export class Definition<
 }
 
 export const _ = new Definition().init()
+
+
+
+// TYPE TESTS
+
+// type Modelssss = {
+//     aa: {
+//         bb: { Read: { a: number }, Write: { a: number } }
+//     }
+// }
+
+// const __ = new Definition<Modelssss, 'aa'>().init()
+
+// const hardCodedString = __.stringConstant('tt').tsTypeRead
+// const normalstring = __.string().tsTypeRead
+// const hardCodedString2 = __.stringConstant('coucou').tsTypeRead
+
+// const populated = __.ref('bb', true).tsTypeRead
+// const notPop = __.ref('bb').tsTypeRead
+
+
+// /* BASE TYPES */
+// const isRequired = __.string().required().lowerCase().isRequiredType
+// const isRequiredFalse = __.string().lowerCase().isRequiredType
+// const strWZ = __.string().lowerCase().tsTypeWrite
+// const str2 = __.string().tsTypeRead
+// const lengthTest0 = __.string().maxLength(3).tsTypeRead
+// const lengthTest = __.string().maxLength(3).lowerCase().minLength(4).tsTypeRead
+// const arrLength = __.array(_.string()).minLength(3).tsTypeRead
+
+// // OBJECTS
+// const obj0 = __.object({ name: __.string().required() }).tsTypeRead
+// const obj01 = __.object({ name: __.string() }).tsTypeRead
+// const obj1 = __.object({ name: __.string() }).mergeWith({ email: __.email().required() }).tsTypeRead
+// const obj2 = __.object({ name: __.string() }).mergeWith({ email: __.email().required() }).partial()
+// const obj3 = __.object({ name: __.string() }).mergeWith({ email: __.email().required() }).complete()
+// const complexOne = __.object({
+//     arr: [__.string()],
+//     arr2: __.array(__.string()),
+//     subObj: {
+//         name: __.enum(['a', 'b']),
+//         tuple: __.tuple([__.string(), __.date()]),
+//         typeOr: __.typesOr([__.number(), __.boolean()]),
+//         subArr: [__.email()]
+//     }
+// }).tsTypeRead
+
+// const or = __.typesOr([__.string(), __.number(), __.boolean()]).tsTypeRead
+
+// const tuple2 = __.tuple([__.string(), __.number()]).tsTypeRead
+// const myTuple = ['re', 4] as typeof tuple2
+
+
+
+// const rtpoij = __.object({ name: __.string(), arr1: __.email(), arr2: __.array({ subArr: __.array({ name: __.string() }) }) })
+// const rtpoZEZEij = __.array({ name: __.string(), subObj: { bool: __.boolean() }, arr2: __.array({ subArr: __.array({ name: __.string() }) }) })
+
+// const rtpoZEZEiEEj = __.array({ name: __.string() })
+// const tyeee = rtpoZEZEiEEj.tsTypeRead
+// const apoapo = __.string().tsTypeRead
+// const type = rtpoij.tsTypeRead
+
+
+
+// const aa = __.n('userFields').object({
+//     screenSize: __.string().required(),
+//     deviceId: __.string().required(),
+//     phonePrefix: __.regexp(/^\+\d+$/).required(),
+//     phoneNumber: __.string().minLength(7).maxLength(17).required(),
+//     lang: __.enum(['en', 'fr']).required(),
+//     currency: __.enum(['eur', 'usd']).required(),
+// }).required()
+
+// type BPo = typeof aa.tsTypeRead
