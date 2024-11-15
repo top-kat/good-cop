@@ -337,24 +337,24 @@ export class Definition<
             'ye', 'yt',
             'za', 'zm', 'zw'
         ];
-        
+    
         return this._newDef({
             name: 'translation',
             mainType: 'object',
             errorMsg: defaultTypeError('{ [countryCodeIso]: translationString }', false),
-            validate: ctx =>
-                isType(ctx.value, 'object') &&
-                Object.entries(ctx.value).every(([countryCode, translationStr]) =>
+            validate: ctx => {
+                if (!isType(ctx.value, 'object')) return false;
+                return Object.entries(ctx.value).every(([countryCode, translationStr]) => 
                     typeof translationStr === 'string' &&
                     /^[A-Za-z]{2}$/.test(countryCode) &&
                     validIsoCodes.includes(countryCode as CountryCodeIso)
-                ),
+                );
+            },
             mongoType: 'object',
             tsTypeStr: 'TranslationObj',
-        }) as any as
-            NextAutocompletionChoices<
-                ReturnType<typeof this._newDef<TranslationObj>>
-            >;
+        }) as any as NextAutocompletionChoices<
+            ReturnType<typeof this._newDef<TranslationObj>>
+        >;
     }
     
 
