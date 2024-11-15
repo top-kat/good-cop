@@ -554,20 +554,6 @@ export class Definition<
                 TypedExclude<NumberMethods, 'round2'>
             >
     }
-
-    false() {
-        return this._newDef({
-            ...boolean,
-            name: 'false',
-            validate: ctx => ctx.value === false,
-            tsTypeStr: 'false',
-        }) as
-            NextAutocompletionChoices<
-                ReturnType<typeof this._newDef< boolean, boolean >>,
-                'mergeWith'
-            >
-    }
-
     float() {
         return this._newDef({
             ...number,
@@ -582,9 +568,25 @@ export class Definition<
             >
     }
 
+    false() {
+        return this._newDef({
+            ...boolean,
+            errorMsg: defaultTypeError('false'),
+            name: 'false',
+            validate: ctx => ctx.value === false,
+            tsTypeStr: 'false',
+        }) as
+            NextAutocompletionChoices<
+                ReturnType<typeof this._newDef< boolean, boolean >>,
+                'mergeWith'
+            >
+    }
+
+
     true() {
         return this._newDef({
             ...boolean,
+            errorMsg: defaultTypeError('true'),
             name: 'true',
             validate: ctx => ctx.value === true,
             tsTypeStr: 'true',

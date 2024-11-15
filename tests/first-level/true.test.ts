@@ -17,9 +17,8 @@ describe(`True boolean`, () => {
         expect(await trueBooleanDef.formatAndValidate(true)).toEqual(true)
     })
 
-    //ATTENTION: boolean is not enough, error needs to say boolean FALSE
     it('throws an error for false boolean', async () => {
-        await expect(trueBooleanDef.formatAndValidate(false)).rejects.toThrow(`Expected type 'boolean' but got type boolean for value false`);
+        await expect(trueBooleanDef.formatAndValidate(false)).rejects.toThrow(`Expected type 'true' but got type boolean for value false`);
     })
 
     it('throws an error if the type is not a boolean', async () => {
