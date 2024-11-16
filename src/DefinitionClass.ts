@@ -22,7 +22,7 @@ is not
 
 import mongoose from 'mongoose' // only used for typings, may not be compatible if used in frontend
 import { MaybeArray } from './core-types'
-import { TranslationObj } from './core-types'
+import { CountryCodeIso, TranslationObj } from './core-types'
 import { DefinitionBase } from './DefinitionBaseClass'
 import { sharedDefinitions } from './definitions/sharedDefinitions'
 import { defaultTypeError } from './helpers/definitionGenericHelpers'
@@ -314,25 +314,53 @@ export class Definition<
 
     /** an object who's keys are locale and values are translation string. Eg: `{ fr: 'Salut', en: 'Hi' }` */
     translation() {
+        const validIsoCodes: CountryCodeIso[] = [
+            'ad', 'ae', 'af', 'ag', 'ai', 'al', 'am', 'ao', 'aq', 'ar', 'as', 'at', 'au', 'aw', 'ax', 'az',
+            'ba', 'bb', 'bd', 'be', 'bf', 'bg', 'bh', 'bi', 'bj', 'bl', 'bm', 'bn', 'bo', 'bq', 'br', 'bs', 'bt', 'bv', 'bw', 'by', 'bz',
+            'ca', 'cc', 'cd', 'cf', 'cg', 'ch', 'ci', 'ck', 'cl', 'cm', 'cn', 'co', 'cr', 'cu', 'cv', 'cw', 'cx', 'cy', 'cz',
+            'de', 'dj', 'dk', 'dm', 'do', 'dz',
+            'ec', 'ee', 'eg', 'eh', 'er', 'es', 'et', 'en',
+            'fi', 'fj', 'fk', 'fm', 'fo', 'fr',
+            'ga', 'gb', 'gd', 'ge', 'gf', 'gg', 'gh', 'gi', 'gl', 'gm', 'gn', 'gp', 'gq', 'gr', 'gs', 'gt', 'gu', 'gw', 'gy',
+            'hk', 'hm', 'hn', 'hr', 'ht', 'hu',
+            'id', 'ie', 'il', 'im', 'in', 'io', 'iq', 'ir', 'is', 'it',
+            'je', 'jm', 'jo', 'jp',
+            'ke', 'kg', 'kh', 'ki', 'km', 'kn', 'kp', 'kr', 'kw', 'ky', 'kz',
+            'la', 'lb', 'lc', 'li', 'lk', 'lr', 'ls', 'lt', 'lu', 'lv', 'ly',
+            'ma', 'mc', 'md', 'me', 'mf', 'mg', 'mh', 'mk', 'ml', 'mm', 'mn', 'mo', 'mp', 'mq', 'mr', 'ms', 'mt', 'mu', 'mv', 'mw', 'mx', 'my', 'mz',
+            'na', 'nc', 'ne', 'nf', 'ng', 'ni', 'nl', 'no', 'np', 'nr', 'nu', 'nz',
+            'om',
+            'pa', 'pe', 'pf', 'pg', 'ph', 'pk', 'pl', 'pm', 'pn', 'pr', 'pt', 'pw', 'py',
+            'qa',
+            're', 'ro', 'rs', 'ru', 'rw',
+            'sa', 'sb', 'sc', 'sd', 'se', 'sg', 'sh', 'si', 'sj', 'sk', 'sl', 'sm', 'sn', 'so', 'sr', 'ss', 'st', 'sv', 'sx', 'sy', 'sz',
+            'tc', 'td', 'tf', 'tg', 'th', 'tj', 'tk', 'tl', 'tm', 'tn', 'to', 'tr', 'tt', 'tv', 'tw', 'tz',
+            'ua', 'ug', 'um', 'us', 'uy', 'uz',
+            'va', 'vc', 've', 'vg', 'vi', 'vn', 'vu',
+            'wf', 'ws',
+            'ye', 'yt',
+            'za', 'zm', 'zw'
+        ];
+    
         return this._newDef({
             name: 'translation',
             mainType: 'object',
             errorMsg: defaultTypeError('{ [countryCodeIso]: translationString }', false),
-            validate: ctx =>
-                isType(ctx.value, 'object') &&
-                Object.entries(ctx.value).every(([countryCode, translationStr]) =>
+            validate: ctx => {
+                if (!isType(ctx.value, 'object')) return false;
+                return Object.entries(ctx.value).every(([countryCode, translationStr]) => 
                     typeof translationStr === 'string' &&
-                    /^[A-Za-z]{2}$/.test(countryCode)
-                ),
+                    /^[A-Za-z]{2}$/.test(countryCode) &&
+                    validIsoCodes.includes(countryCode as CountryCodeIso)
+                );
+            },
             mongoType: 'object',
             tsTypeStr: 'TranslationObj',
-        }) as any as
-            NextAutocompletionChoices<
-                ReturnType<typeof this._newDef<
-                    TranslationObj
-                >>
-            >
+        }) as any as NextAutocompletionChoices<
+            ReturnType<typeof this._newDef<TranslationObj>>
+        >;
     }
+    
 
     /** Only valid on objects, allow to merge two objects */
     mergeWith<T extends DefinitionObj>(
@@ -345,13 +373,12 @@ export class Definition<
         }
 
         // eslint-disable-next-line @typescript-eslint/no-this-alias
-        const That = this // dunno why I need this sheet on those lines buit linter happy
         // Object.assign(this.object, object)
         return this._newDef() as any as
             NextAutocompletionChoices<
-                ReturnType<typeof That._newDef<
-                    InferTypeRead<T> & typeof That.tsTypeRead,
-                    InferTypeWrite<T> & typeof That.tsTypeWrite
+                ReturnType<typeof this._newDef<
+                    InferTypeRead<T> & typeof this.tsTypeRead,
+                    InferTypeWrite<T> & typeof this.tsTypeWrite
                 >>,
                 'partial' | 'complete'
             >
