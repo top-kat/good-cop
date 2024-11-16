@@ -9,8 +9,7 @@ describe('Mongo Model', () => {
 
     const mongoModel = _.mongoModel(['creationDate', 'creator', 'lastUpdateDate', 'lastUpdater'], {
         modelStringValue: _.string(),
-        modelSubObject
-        : {
+        modelSubObject: {
             myBooleanValue: _.boolean().required()
         },
         modelArray: [{
@@ -23,15 +22,32 @@ describe('Mongo Model', () => {
     })
 
     it('optional values can be null', async () => {
-        expect(async () => await mongoModel.formatAndValidate({
+        expect(await mongoModel.formatAndValidate({
             modelStringValue: null,
-            modelSubObject: { myBooleanValue: 'boolean value is present' },
+            modelSubObject: { myBooleanValue: true },
             modelArray: [{
                 myArrayValue: [{
-                myNumberValue: null
+                    myNumberValue: null
+                }]
             }]
-            }]
-        }))
+        })).toMatchObject({
+            creationDate: expect.any(Date),
+            modelArray: [
+                {
+                    myArrayValue: [
+                        { myNumberValue: null }
+                    ]
+                }
+            ],
+            modelStringValue: null,
+            modelSubObject: { myBooleanValue: true }
+        })
+    })
+
+    it('optional values can be null', async () => {
+        await expect(mongoModel.formatAndValidate({
+            modelSubObject: { myBooleanValue: 'boolean value is present but wrong type' },
+        })).rejects.toThrow('Expected type boolean but got type string for value "boolean value is present but wrong type"')
     })
 
     it('required value cannot be null', async () => {
@@ -39,8 +55,7 @@ describe('Mongo Model', () => {
             modelStringValue: 'string value is present',
             modelSubObject: { myBooleanValue: null },
             modelArray: [{
-                myArrayValue:
-                [{ myNumberValue: null }]
+                myArrayValue: [{ myNumberValue: null }]
             }]
         })).rejects.toThrow('Field myBooleanValue is required');
     })
