@@ -140,35 +140,13 @@ export class Definition<
 
 
 
-    //--------------------------------------------------------------------
-    //--------------------------------------------------------------------
-    //----------------------------FIRST LEVEL-----------------------------
-    //--------------------------------------------------------------------
-    //--------------------------------------------------------------------
+//--------------------------------------------------------------------
+//--------------------------------------------------------------------
+//----------------------------FIRST LEVEL-----------------------------
+//--------------------------------------------------------------------
+//--------------------------------------------------------------------
 
 
-
-    /** This is to get the type of an already defined database model. Eg: model('myDb', 'user') to get the user type from a particular db that you registered at initialization */
-    model<A extends keyof ModelsType, B extends keyof ModelsType[A], C extends keyof ModelsType[A][B] = 'Read'>(
-        dbId: A, modelName: B, modelType: C = 'Read' as C
-    ) {
-        return this._newDef([{
-            mainType: 'object',
-            tsTypeStr: `t.${capitalize1st(dbId.toString())}Models.${capitalize1st(modelName.toString())}Models['${modelType.toString()}']`,
-            dbName: dbId as string,
-            model: modelName as string,
-        }, () => {
-            const model = this._models?.[dbId as any]?.[modelName as any]
-            if (!model) throw new DescriptiveError(`Model not found. Please make you provided a model with the name "${modelName.toString()}" when initiating good-cop. Make sure you BUILDED the app correctly`, { dbId, modelName, modelNames: Object.keys(this._models || {}) })
-            return { ...model._definitions[0], tsTypeStr: undefined }
-        }]) as any as
-            NextAutocompletionChoices<
-                ReturnType<typeof this._newDef<
-                    ModelsType[A][B][C]
-                >>,
-                'partial' | 'complete'
-            >
-    }
 
     array< R extends GenericDef | DefinitionObj >(
         array?: R,
@@ -307,29 +285,28 @@ export class Definition<
             >
     }
 
-    ref<AlwaysPopulated extends boolean>(modelName: keyof ModelsType[DefaultDbId], alwaysPopulated?: AlwaysPopulated) {
-        return this._newDef({
-            mainType: 'string',
-            errorMsg: `Only ObjectIds are accepted on referenced fields`,
-            format: ctx => getId(ctx.value),
-            validate: ctx => isType(ctx.value, 'objectId'),
-            mongoType: typeObj => {
-                typeObj.type = mongoose.Schema.Types.ObjectId
-                typeObj.ref = modelName
-            },
-            tsTypeStr: (alwaysPopulated ? '' : `string | `) + `${capitalize1st(modelName as string)}`,
-            tsTypeStrForWrite: `string`,
-            ref: modelName as string,
-        }) as any as
-            NextAutocompletionChoices<
-                ReturnType<typeof this._newDef<
-                    AlwaysPopulated extends true
-                    ? ModelsType[DefaultDbId][typeof modelName]
-                    : ModelsType[DefaultDbId][typeof modelName] | string,
-                    string
-                >>
-            >
+    /** This is to get the type of an already defined database model. Eg: model('myDb', 'user') to get the user type from a particular db that you registered at initialization */
+    model<A extends keyof ModelsType, B extends keyof ModelsType[A], C extends keyof ModelsType[A][B] = 'Read'>(
+            dbId: A, modelName: B, modelType: C = 'Read' as C
+        ) {
+            return this._newDef([{
+                mainType: 'object',
+                tsTypeStr: `t.${capitalize1st(dbId.toString())}Models.${capitalize1st(modelName.toString())}Models['${modelType.toString()}']`,
+                dbName: dbId as string,
+                model: modelName as string,
+            }, () => {
+                const model = this._models?.[dbId as any]?.[modelName as any]
+                if (!model) throw new DescriptiveError(`Model not found. Please make you provided a model with the name "${modelName.toString()}" when initiating good-cop. Make sure you BUILDED the app correctly`, { dbId, modelName, modelNames: Object.keys(this._models || {}) })
+                return { ...model._definitions[0], tsTypeStr: undefined }
+            }]) as any as
+                NextAutocompletionChoices<
+                    ReturnType<typeof this._newDef<
+                        ModelsType[A][B][C]
+                    >>,
+                    'partial' | 'complete'
+                >
     }
+
     /** With this, you can create mongo models, handling _id field type automatically and creator, lastUpdater... fields */
     mongoModel< T extends DefinitionObj, U extends readonly AutoWritedFieldNames[] >(
         autoWriteFields: U,
@@ -435,56 +412,6 @@ export class Definition<
                 'partial' | 'complete'
             >
     }
-
-    /** an object who's keys are locale and values are translation string. Eg: `{ fr: 'Salut', en: 'Hi' }` */
-    translation() {
-        const validIsoCodes: CountryCodeIso[] = [
-            'ad', 'ae', 'af', 'ag', 'ai', 'al', 'am', 'ao', 'aq', 'ar', 'as', 'at', 'au', 'aw', 'ax', 'az',
-            'ba', 'bb', 'bd', 'be', 'bf', 'bg', 'bh', 'bi', 'bj', 'bl', 'bm', 'bn', 'bo', 'bq', 'br', 'bs', 'bt', 'bv', 'bw', 'by', 'bz',
-            'ca', 'cc', 'cd', 'cf', 'cg', 'ch', 'ci', 'ck', 'cl', 'cm', 'cn', 'co', 'cr', 'cu', 'cv', 'cw', 'cx', 'cy', 'cz',
-            'de', 'dj', 'dk', 'dm', 'do', 'dz',
-            'ec', 'ee', 'eg', 'eh', 'er', 'es', 'et', 'en',
-            'fi', 'fj', 'fk', 'fm', 'fo', 'fr',
-            'ga', 'gb', 'gd', 'ge', 'gf', 'gg', 'gh', 'gi', 'gl', 'gm', 'gn', 'gp', 'gq', 'gr', 'gs', 'gt', 'gu', 'gw', 'gy',
-            'hk', 'hm', 'hn', 'hr', 'ht', 'hu',
-            'id', 'ie', 'il', 'im', 'in', 'io', 'iq', 'ir', 'is', 'it',
-            'je', 'jm', 'jo', 'jp',
-            'ke', 'kg', 'kh', 'ki', 'km', 'kn', 'kp', 'kr', 'kw', 'ky', 'kz',
-            'la', 'lb', 'lc', 'li', 'lk', 'lr', 'ls', 'lt', 'lu', 'lv', 'ly',
-            'ma', 'mc', 'md', 'me', 'mf', 'mg', 'mh', 'mk', 'ml', 'mm', 'mn', 'mo', 'mp', 'mq', 'mr', 'ms', 'mt', 'mu', 'mv', 'mw', 'mx', 'my', 'mz',
-            'na', 'nc', 'ne', 'nf', 'ng', 'ni', 'nl', 'no', 'np', 'nr', 'nu', 'nz',
-            'om',
-            'pa', 'pe', 'pf', 'pg', 'ph', 'pk', 'pl', 'pm', 'pn', 'pr', 'pt', 'pw', 'py',
-            'qa',
-            're', 'ro', 'rs', 'ru', 'rw',
-            'sa', 'sb', 'sc', 'sd', 'se', 'sg', 'sh', 'si', 'sj', 'sk', 'sl', 'sm', 'sn', 'so', 'sr', 'ss', 'st', 'sv', 'sx', 'sy', 'sz',
-            'tc', 'td', 'tf', 'tg', 'th', 'tj', 'tk', 'tl', 'tm', 'tn', 'to', 'tr', 'tt', 'tv', 'tw', 'tz',
-            'ua', 'ug', 'um', 'us', 'uy', 'uz',
-            'va', 'vc', 've', 'vg', 'vi', 'vn', 'vu',
-            'wf', 'ws',
-            'ye', 'yt',
-            'za', 'zm', 'zw'
-        ];
-    
-        return this._newDef({
-            name: 'translation',
-            mainType: 'object',
-            errorMsg: defaultTypeError('{ [countryCodeIso]: translationString }', false),
-            validate: ctx => {
-                if (!isType(ctx.value, 'object')) return false;
-                return Object.entries(ctx.value).every(([countryCode, translationStr]) => 
-                    typeof translationStr === 'string' &&
-                    /^[A-Za-z]{2}$/.test(countryCode) &&
-                    validIsoCodes.includes(countryCode as CountryCodeIso)
-                );
-            },
-            mongoType: 'object',
-            tsTypeStr: 'TranslationObj',
-        }) as any as NextAutocompletionChoices<
-            ReturnType<typeof this._newDef<TranslationObj>>
-        >;
-    }
-    
 
     /** Only valid on objects, allow to merge two objects */
     mergeWith<T extends DefinitionObj>(
@@ -608,36 +535,6 @@ export class Definition<
             >
     }
 
-    true() {
-        return this._newDef({
-            ...boolean,
-            errorMsg: defaultTypeError('true'),
-            name: 'true',
-            validate: ctx => ctx.value === true,
-            tsTypeStr: 'true',
-        }) as any as
-            NextAutocompletionChoices<
-                ReturnType<typeof this._newDef< boolean, boolean >>,
-                'mergeWith'
-            >
-    }
-
-    string({ acceptEmpty = false } = {}) {
-        return this._newDef(string({ acceptEmpty })) as any as
-            NextAutocompletionChoices<
-                ReturnType<typeof this._newDef<string>>,
-                StringMethods
-            >
-    }
-
-    stringConstant<T extends string>(hardCodedValue: T) {
-        return this._newDef(string({ hardCodedValue })) as any as
-            NextAutocompletionChoices<
-                ReturnType<typeof this._newDef<T>>,
-                StringMethods
-            >
-    }
-
     /** String alias for readability. 24 char mongoDb id */
     objectId() {
         return this._newDef({
@@ -649,18 +546,24 @@ export class Definition<
         }) as NextAutocompletionChoices<ReturnType<typeof this._newDef<string>>, StringMethods>
     }
 
-    /** Simple url validation: /^https?:\/\/.+/ */
-    url() {
-        return this._newDef({
-            ...string(),
-            name: 'url',
-            format: ctx => typeof ctx.value === 'number' ? ctx.value.toString() : ctx.value,
-            errorMsg: defaultTypeError('url', false),
-            validate: ctx => /^https?:\/\/.+/.test(ctx.value)
-        }) as any as
+    match(...params: [Parameters<typeof this['regexp']>[0], Parameters<typeof this['regexp']>[1]]) {
+        return this.regexp(...params) as any as
             NextAutocompletionChoices<
-                ReturnType<typeof this._newDef< string >>,
-                StringMethods
+                ReturnType<typeof this._newDef<
+                    typeof this.tsTypeRead,
+                    typeof this.tsTypeWrite
+                >>,
+                TypedExclude<StringMethods, 'match'>
+            >
+    }
+
+    number() {
+        return this._newDef(number) as any as
+            NextAutocompletionChoices<
+                ReturnType<typeof this._newDef<
+                    number
+                >>,
+                NumberMethods
             >
     }
 
@@ -695,51 +598,37 @@ export class Definition<
             >
     }
 
-    lowerCase() {
-        return this._newDef({
-            name: 'lowerCase',
-            errorMsg: defaultTypeError('string'),
-            format: ctx => typeof ctx.value === 'string' ? ctx.value.toLowerCase() : ctx.value,
-            priority: 10, // may be applied before email() for example
-        }) as any as
+    percentage() {
+        return this._newDef(round2) as any as
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef<
-                    typeof this.tsTypeRead,
-                    typeof this.tsTypeWrite
+                    number
                 >>,
-                TypedExclude<StringMethods, 'upperCase' | 'lowerCase'>
+                NumberMethods
             >
     }
 
-    upperCase() {
+    ref<AlwaysPopulated extends boolean>(modelName: keyof ModelsType[DefaultDbId], alwaysPopulated?: AlwaysPopulated) {
         return this._newDef({
-            name: 'upperCase',
-            errorMsg: defaultTypeError('string'),
-            format: ctx => typeof ctx.value === 'string' ? ctx.value.toUpperCase() : ctx.value,
-            priority: 10, // may be applied before email() for example
+            mainType: 'string',
+            errorMsg: `Only ObjectIds are accepted on referenced fields`,
+            format: ctx => getId(ctx.value),
+            validate: ctx => isType(ctx.value, 'objectId'),
+            mongoType: typeObj => {
+                typeObj.type = mongoose.Schema.Types.ObjectId
+                typeObj.ref = modelName
+            },
+            tsTypeStr: (alwaysPopulated ? '' : `string | `) + `${capitalize1st(modelName as string)}`,
+            tsTypeStrForWrite: `string`,
+            ref: modelName as string,
         }) as any as
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef<
-                    typeof this.tsTypeRead,
-                    typeof this.tsTypeWrite
-                >>,
-                TypedExclude<StringMethods, 'upperCase' | 'lowerCase'>
-            >
-    }
-
-    trim() {
-        return this._newDef({
-            name: 'trim',
-            errorMsg: defaultTypeError('string'),
-            format: ctx => typeof ctx.value === 'string' ? ctx.value.trim() : ctx.value,
-            priority: 10, // may be applied before email() for example
-        }) as any as
-            NextAutocompletionChoices<
-                ReturnType<typeof this._newDef<
-                    typeof this.tsTypeRead,
-                    typeof this.tsTypeWrite
-                >>,
-                TypedExclude<StringMethods, 'trim'>
+                    AlwaysPopulated extends true
+                    ? ModelsType[DefaultDbId][typeof modelName]
+                    : ModelsType[DefaultDbId][typeof modelName] | string,
+                    string
+                >>
             >
     }
 
@@ -762,34 +651,97 @@ export class Definition<
             >
     }
 
-    match(...params: [Parameters<typeof this['regexp']>[0], Parameters<typeof this['regexp']>[1]]) {
-        return this.regexp(...params) as any as
+    string({ acceptEmpty = false } = {}) {
+        return this._newDef(string({ acceptEmpty })) as any as
             NextAutocompletionChoices<
-                ReturnType<typeof this._newDef<
-                    typeof this.tsTypeRead,
-                    typeof this.tsTypeWrite
-                >>,
-                TypedExclude<StringMethods, 'match'>
+                ReturnType<typeof this._newDef<string>>,
+                StringMethods
             >
     }
 
-    number() {
-        return this._newDef(number) as any as
+    stringConstant<T extends string>(hardCodedValue: T) {
+        return this._newDef(string({ hardCodedValue })) as any as
             NextAutocompletionChoices<
-                ReturnType<typeof this._newDef<
-                    number
-                >>,
-                NumberMethods
+                ReturnType<typeof this._newDef<T>>,
+                StringMethods
             >
     }
 
-    percentage() {
-        return this._newDef(round2) as any as
+    /** an object who's keys are locale and values are translation string. Eg: `{ fr: 'Salut', en: 'Hi' }` */
+    translation() {
+            const validIsoCodes: CountryCodeIso[] = [
+                'ad', 'ae', 'af', 'ag', 'ai', 'al', 'am', 'ao', 'aq', 'ar', 'as', 'at', 'au', 'aw', 'ax', 'az',
+                'ba', 'bb', 'bd', 'be', 'bf', 'bg', 'bh', 'bi', 'bj', 'bl', 'bm', 'bn', 'bo', 'bq', 'br', 'bs', 'bt', 'bv', 'bw', 'by', 'bz',
+                'ca', 'cc', 'cd', 'cf', 'cg', 'ch', 'ci', 'ck', 'cl', 'cm', 'cn', 'co', 'cr', 'cu', 'cv', 'cw', 'cx', 'cy', 'cz',
+                'de', 'dj', 'dk', 'dm', 'do', 'dz',
+                'ec', 'ee', 'eg', 'eh', 'er', 'es', 'et', 'en',
+                'fi', 'fj', 'fk', 'fm', 'fo', 'fr',
+                'ga', 'gb', 'gd', 'ge', 'gf', 'gg', 'gh', 'gi', 'gl', 'gm', 'gn', 'gp', 'gq', 'gr', 'gs', 'gt', 'gu', 'gw', 'gy',
+                'hk', 'hm', 'hn', 'hr', 'ht', 'hu',
+                'id', 'ie', 'il', 'im', 'in', 'io', 'iq', 'ir', 'is', 'it',
+                'je', 'jm', 'jo', 'jp',
+                'ke', 'kg', 'kh', 'ki', 'km', 'kn', 'kp', 'kr', 'kw', 'ky', 'kz',
+                'la', 'lb', 'lc', 'li', 'lk', 'lr', 'ls', 'lt', 'lu', 'lv', 'ly',
+                'ma', 'mc', 'md', 'me', 'mf', 'mg', 'mh', 'mk', 'ml', 'mm', 'mn', 'mo', 'mp', 'mq', 'mr', 'ms', 'mt', 'mu', 'mv', 'mw', 'mx', 'my', 'mz',
+                'na', 'nc', 'ne', 'nf', 'ng', 'ni', 'nl', 'no', 'np', 'nr', 'nu', 'nz',
+                'om',
+                'pa', 'pe', 'pf', 'pg', 'ph', 'pk', 'pl', 'pm', 'pn', 'pr', 'pt', 'pw', 'py',
+                'qa',
+                're', 'ro', 'rs', 'ru', 'rw',
+                'sa', 'sb', 'sc', 'sd', 'se', 'sg', 'sh', 'si', 'sj', 'sk', 'sl', 'sm', 'sn', 'so', 'sr', 'ss', 'st', 'sv', 'sx', 'sy', 'sz',
+                'tc', 'td', 'tf', 'tg', 'th', 'tj', 'tk', 'tl', 'tm', 'tn', 'to', 'tr', 'tt', 'tv', 'tw', 'tz',
+                'ua', 'ug', 'um', 'us', 'uy', 'uz',
+                'va', 'vc', 've', 'vg', 'vi', 'vn', 'vu',
+                'wf', 'ws',
+                'ye', 'yt',
+                'za', 'zm', 'zw'
+            ];
+        
+            return this._newDef({
+                name: 'translation',
+                mainType: 'object',
+                errorMsg: defaultTypeError('{ [countryCodeIso]: translationString }', false),
+                validate: ctx => {
+                    if (!isType(ctx.value, 'object')) return false;
+                    return Object.entries(ctx.value).every(([countryCode, translationStr]) => 
+                        typeof translationStr === 'string' &&
+                        /^[A-Za-z]{2}$/.test(countryCode) &&
+                        validIsoCodes.includes(countryCode as CountryCodeIso)
+                    );
+                },
+                mongoType: 'object',
+                tsTypeStr: 'TranslationObj',
+            }) as any as NextAutocompletionChoices<
+                ReturnType<typeof this._newDef<TranslationObj>>
+            >;
+    }
+
+    true() {
+        return this._newDef({
+            ...boolean,
+            errorMsg: defaultTypeError('true'),
+            name: 'true',
+            validate: ctx => ctx.value === true,
+            tsTypeStr: 'true',
+        }) as any as
             NextAutocompletionChoices<
-                ReturnType<typeof this._newDef<
-                    number
-                >>,
-                NumberMethods
+                ReturnType<typeof this._newDef< boolean, boolean >>,
+                'mergeWith'
+            >
+    }
+
+    /** Simple url validation: /^https?:\/\/.+/ */
+    url() {
+        return this._newDef({
+            ...string(),
+            name: 'url',
+            format: ctx => typeof ctx.value === 'number' ? ctx.value.toString() : ctx.value,
+            errorMsg: defaultTypeError('url', false),
+            validate: ctx => /^https?:\/\/.+/.test(ctx.value)
+        }) as any as
+            NextAutocompletionChoices<
+                ReturnType<typeof this._newDef< string >>,
+                StringMethods
             >
     }
 
@@ -933,6 +885,38 @@ export class Definition<
             >
     }
 
+    lowerCase() {
+        return this._newDef({
+            name: 'lowerCase',
+            errorMsg: defaultTypeError('string'),
+            format: ctx => typeof ctx.value === 'string' ? ctx.value.toLowerCase() : ctx.value,
+            priority: 10, // may be applied before email() for example
+        }) as any as
+            NextAutocompletionChoices<
+                ReturnType<typeof this._newDef<
+                    typeof this.tsTypeRead,
+                    typeof this.tsTypeWrite
+                >>,
+                TypedExclude<StringMethods, 'upperCase' | 'lowerCase'>
+            >
+    }
+
+    upperCase() {
+        return this._newDef({
+            name: 'upperCase',
+            errorMsg: defaultTypeError('string'),
+            format: ctx => typeof ctx.value === 'string' ? ctx.value.toUpperCase() : ctx.value,
+            priority: 10, // may be applied before email() for example
+        }) as any as
+            NextAutocompletionChoices<
+                ReturnType<typeof this._newDef<
+                    typeof this.tsTypeRead,
+                    typeof this.tsTypeWrite
+                >>,
+                TypedExclude<StringMethods, 'upperCase' | 'lowerCase'>
+            >
+    }
+
     max(maxVal: number) {
         return this._newDef(lte(maxVal)) as any as
             NextAutocompletionChoices<
@@ -1003,6 +987,22 @@ export class Definition<
                     typeof this.tsTypeWrite
                 >>,
                 TypedExclude<NumberMethods, 'positive'>
+            >
+    }
+
+    trim() {
+        return this._newDef({
+            name: 'trim',
+            errorMsg: defaultTypeError('string'),
+            format: ctx => typeof ctx.value === 'string' ? ctx.value.trim() : ctx.value,
+            priority: 10, // may be applied before email() for example
+        }) as any as
+            NextAutocompletionChoices<
+                ReturnType<typeof this._newDef<
+                    typeof this.tsTypeRead,
+                    typeof this.tsTypeWrite
+                >>,
+                TypedExclude<StringMethods, 'trim'>
             >
     }
 
