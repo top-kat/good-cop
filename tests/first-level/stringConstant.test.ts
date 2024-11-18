@@ -15,9 +15,7 @@ describe(`String constant`, () => {
             'write': `'stringConstant'`
         });
     })
-
-    //ATT: these types are weird, and need to be fixed
-
+    
     it('does not accept a different string', async () => {
         expect(await stringConstantDef.formatAndValidate('differentString')).toEqual('stringConstant')
     })

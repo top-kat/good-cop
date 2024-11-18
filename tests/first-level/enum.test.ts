@@ -11,7 +11,7 @@ describe('Enum Validation', () => {
     it('checks the return types of read or write as a string', () => {
         expect(enumDef.getTsTypeAsString()).toEqual({
             read: `'string1' | 'string2'`,
-            write: `'string1' | 'string2`
+            write: `'string1' | 'string2'`
         });
     });
 
