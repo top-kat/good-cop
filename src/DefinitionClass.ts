@@ -120,9 +120,34 @@ export class Definition<
             IsRequired
         >(this._models, newDef, this)
     }
-    //----------------------------------------
-    // BACKEND TYPES
-    //----------------------------------------
+
+    /** This is not a definition. This will output the mongo schema final type for definition. Eg: _.mongoModel([], { field1: _.string(), ... }})._getMongoType() === { field1: { type: String } ... } */
+    _getMongoType() {
+        const definitions = this._definitions
+
+        let mongoTypeOutput = {} as MongoTypeObj | Record<string, any>
+        for (const def of definitions) {
+            const { mongoType } = typeof def === 'function' ? def() : def
+            if (typeof mongoType === 'function') {
+                const result = mongoType(mongoTypeOutput, definitions)
+                if (isObject(result) || Array.isArray(result)) mongoTypeOutput = result
+            } else if (typeof mongoType === 'string') mongoTypeOutput.type = mongoTypeMapping[mongoType] // mongo type string
+            else if (isObject(mongoType)) mongoTypeOutput = mongoType as Record<string, any> // Model
+        }
+
+        return mongoTypeOutput
+    }
+
+
+
+    //--------------------------------------------------------------------
+    //--------------------------------------------------------------------
+    //----------------------------FIRST LEVEL-----------------------------
+    //--------------------------------------------------------------------
+    //--------------------------------------------------------------------
+
+
+
     /** This is to get the type of an already defined database model. Eg: model('myDb', 'user') to get the user type from a particular db that you registered at initialization */
     model<A extends keyof ModelsType, B extends keyof ModelsType[A], C extends keyof ModelsType[A][B] = 'Read'>(
         dbId: A, modelName: B, modelType: C = 'Read' as C
@@ -144,6 +169,144 @@ export class Definition<
                 'partial' | 'complete'
             >
     }
+
+    array< R extends GenericDef | DefinitionObj >(
+        array?: R,
+    ) {
+        return this._newDef(getArrObjDef(array ? [array] : [], 'array')) as any as
+            NextAutocompletionChoices<
+                ReturnType<typeof this._newDef<
+                    InferTypeArrRead<Array<R>>,
+                    InferTypeArrWrite<Array<R>>
+                >>,
+                LengthMethods
+            >
+    }
+
+    any() {
+        return this._newDef({
+            mainType: 'any',
+            validate: () => true,
+            mongoType: 'mixed',
+            tsTypeStr: 'any',
+        }) as any as
+            NextAutocompletionChoices<
+                ReturnType<typeof this._newDef< any, any >>
+            >
+    }
+
+    boolean() {
+        return this._newDef(boolean) as any as
+            NextAutocompletionChoices<
+                ReturnType<typeof this._newDef< boolean, boolean >>,
+                'mergeWith'
+            >
+    }
+
+    date() {
+        return this._newDef({
+            name: 'date',
+            mainType: 'date',
+            errorMsg: defaultTypeError('date', false),
+            // May be 01 Jan 1901 00:00:00 GMT || 2012-01-01T12:12:01.595Z
+            format: ctx => typeof ctx.value === 'string' && (/\d{4}-\d{1,2}-\d{1,2}T\d+:\d+:\d+.*/.test(ctx.value) || /\d+ [A-Za-z]+ \d+/.test(ctx.value)) ? new Date(ctx.value) : ctx.value,
+            validate: ctx => ctx.value instanceof Date,
+            mongoType: 'date',
+            tsTypeStr: 'Date',
+        }) as any as
+            NextAutocompletionChoices<
+                ReturnType<typeof this._newDef<
+                    Date
+                >>,
+                DateMethods
+            >
+    }
+
+    date8() {
+        return this._newDef({
+            ...number,
+            name: 'date8',
+            errorMsg: defaultTypeError('date8', false),
+            validate: ctx => isDateIntOrStringValid(ctx.value, false, 8),
+            format: ctx => (typeof ctx.value === 'string' ? parseInt(ctx.value) : ctx.value),
+        }) as any as
+            NextAutocompletionChoices<
+                ReturnType<typeof this._newDef< number >>,
+                DateMethods
+            >
+    }
+
+    date12() {
+        return this._newDef({
+            ...number,
+            name: 'date12',
+            errorMsg: defaultTypeError('date12', false),
+            validate: ctx => isDateIntOrStringValid(ctx.value, false, 12),
+            format: ctx => (typeof ctx.value === 'string' ? parseInt(ctx.value) : ctx.value),
+        }) as any as
+            NextAutocompletionChoices<
+                ReturnType<typeof this._newDef< number >>,
+                DateMethods
+            >
+    }
+    /** simple emial validation: /^[^\s@]+@[^\s@]+\.[^\s@]+$/ */
+    email() {
+        return this._newDef({
+            ...string(),
+            name: 'email',
+            format: ctx => ctx.value?.toLowerCase().trim(),
+            errorMsg: defaultTypeError('email', false),
+            validate: ctx => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(ctx.value),
+        }) as any as
+            NextAutocompletionChoices<
+                ReturnType<typeof this._newDef< string >>,
+                StringMethods
+            >
+    }
+    /** Predefined list of values. Eg: status: _.enum(['success', 'error', 'pending']) OR _.enum([1, 2, 3]) */
+    enum<T extends string[] | number[]>(possibleValues: [...T] | readonly [...T]) {
+        const isNumber = typeof possibleValues[0] === 'number'
+        return this._newDef({
+            ...(isNumber ? number : string()),
+            name: 'enum',
+            tsTypeStr: possibleValues.length ? isNumber ? `${possibleValues.join(` | `)}` : `'${possibleValues.join(`' | '`)}'` : 'never',
+            errorMsg: ctx => `Value "${ctx.value}" does not match allowed values ${possibleValues.join(',')}`,
+            validate: ctx => possibleValues.includes(ctx.value),
+        }) as any as
+            NextAutocompletionChoices<
+                ReturnType<typeof this._newDef<T[number]>>,
+                TypedExclude<StringMethods, 'match'>
+            >
+    }
+
+    float() {
+        return this._newDef({
+            ...number,
+            name: 'float',
+            format: ctx => parseFloat(ctx.value),
+        }) as any as
+            NextAutocompletionChoices<
+                ReturnType<typeof this._newDef<
+                    number
+                >>,
+                NumberMethods
+            >
+    }
+
+    false() {
+        return this._newDef({
+            ...boolean,
+            errorMsg: defaultTypeError('false'),
+            name: 'false',
+            validate: ctx => ctx.value === false,
+            tsTypeStr: 'false',
+        }) as any as
+            NextAutocompletionChoices<
+                ReturnType<typeof this._newDef< boolean, boolean >>,
+                'mergeWith'
+            >
+    }
+
     ref<AlwaysPopulated extends boolean>(modelName: keyof ModelsType[DefaultDbId], alwaysPopulated?: AlwaysPopulated) {
         return this._newDef({
             mainType: 'string',
@@ -168,10 +331,7 @@ export class Definition<
             >
     }
     /** With this, you can create mongo models, handling _id field type automatically and creator, lastUpdater... fields */
-    mongoModel<
-        T extends DefinitionObj,
-        U extends readonly AutoWritedFieldNames[]
-    >(
+    mongoModel< T extends DefinitionObj, U extends readonly AutoWritedFieldNames[] >(
         autoWriteFields: U,
         model: T
     ) {
@@ -239,45 +399,9 @@ export class Definition<
                 >>
             >
     }
-    /** This is not a definition. This will output the mongo schema final type for definition. Eg: _.mongoModel([], { field1: _.string(), ... }})._getMongoType() === { field1: { type: String } ... } */
-    _getMongoType() {
-        const definitions = this._definitions
 
-        let mongoTypeOutput = {} as MongoTypeObj | Record<string, any>
-        for (const def of definitions) {
-            const { mongoType } = typeof def === 'function' ? def() : def
-            if (typeof mongoType === 'function') {
-                const result = mongoType(mongoTypeOutput, definitions)
-                if (isObject(result) || Array.isArray(result)) mongoTypeOutput = result
-            } else if (typeof mongoType === 'string') mongoTypeOutput.type = mongoTypeMapping[mongoType] // mongo type string
-            else if (isObject(mongoType)) mongoTypeOutput = mongoType as Record<string, any> // Model
-        }
-
-        return mongoTypeOutput
-    }
-
-    //----------------------------------------
-    // ARRAY OBJECT
-    //----------------------------------------
-    array<
-        R extends GenericDef | DefinitionObj,
-    >(
-        array?: R,
-    ) {
-        return this._newDef(getArrObjDef(array ? [array] : [], 'array')) as any as
-            NextAutocompletionChoices<
-                ReturnType<typeof this._newDef<
-                    InferTypeArrRead<Array<R>>,
-                    InferTypeArrWrite<Array<R>>
-                >>,
-                LengthMethods
-            >
-    }
     /** An object which keys can be anything but where the value shall be typed. Eg: { [k: string]: number } */
-    genericObject<
-        FieldName extends string | [string, string] | [string, string, string],
-        ValueType extends DefinitionObj | GenericDef
-    >(
+    genericObject< FieldName extends string | [string, string] | [string, string, string], ValueType extends DefinitionObj | GenericDef >(
         /** field name can be a string or an array, will be typed as { [string1]: { [string2]: myType } } */
         keyName: FieldName = 'key' as FieldName,
         valueType: ValueType = this.any() as any as ValueType
@@ -385,9 +509,7 @@ export class Definition<
     }
 
     /** Array of predefined size and value: Eg: { signature: _.tuple([_.date(), _.string()]) } */
-    tuple<
-        R extends GenericDef[]
-    >(
+    tuple< R extends GenericDef[] >(
         array: [...R]
     ) {
         // sorry don't know why exactly this works but anything else wont
@@ -431,9 +553,7 @@ export class Definition<
             >
     }
 
-    object<
-        T extends DefinitionObj
-    >(
+    object< T extends DefinitionObj >(
         object: T = {} as T,
         {
             /** Whenever to delete fields that are not included in the original model */
@@ -474,104 +594,6 @@ export class Definition<
             >
     }
 
-    any() {
-        return this._newDef({
-            mainType: 'any',
-            validate: () => true,
-            mongoType: 'mixed',
-            tsTypeStr: 'any',
-        }) as any as
-            NextAutocompletionChoices<
-                ReturnType<typeof this._newDef< any, any >>
-            >
-    }
-
-    boolean() {
-        return this._newDef(boolean) as any as
-            NextAutocompletionChoices<
-                ReturnType<typeof this._newDef< boolean, boolean >>,
-                'mergeWith'
-            >
-    }
-
-    date() {
-        return this._newDef({
-            name: 'date',
-            mainType: 'date',
-            errorMsg: defaultTypeError('date', false),
-            // May be 01 Jan 1901 00:00:00 GMT || 2012-01-01T12:12:01.595Z
-            format: ctx => typeof ctx.value === 'string' && (/\d{4}-\d{1,2}-\d{1,2}T\d+:\d+:\d+.*/.test(ctx.value) || /\d+ [A-Za-z]+ \d+/.test(ctx.value)) ? new Date(ctx.value) : ctx.value,
-            validate: ctx => ctx.value instanceof Date,
-            mongoType: 'date',
-            tsTypeStr: 'Date',
-        }) as any as
-            NextAutocompletionChoices<
-                ReturnType<typeof this._newDef<
-                    Date
-                >>,
-                DateMethods
-            >
-    }
-
-    date8() {
-        return this._newDef({
-            ...number,
-            name: 'date8',
-            errorMsg: defaultTypeError('date8', false),
-            validate: ctx => isDateIntOrStringValid(ctx.value, false, 8),
-            format: ctx => (typeof ctx.value === 'string' ? parseInt(ctx.value) : ctx.value),
-        }) as any as
-            NextAutocompletionChoices<
-                ReturnType<typeof this._newDef< number >>,
-                DateMethods
-            >
-    }
-
-    date12() {
-        return this._newDef({
-            ...number,
-            name: 'date12',
-            errorMsg: defaultTypeError('date12', false),
-            validate: ctx => isDateIntOrStringValid(ctx.value, false, 12),
-            format: ctx => (typeof ctx.value === 'string' ? parseInt(ctx.value) : ctx.value),
-        }) as any as
-            NextAutocompletionChoices<
-                ReturnType<typeof this._newDef< number >>,
-                DateMethods
-            >
-    }
-    /** simple emial validation: /^[^\s@]+@[^\s@]+\.[^\s@]+$/ */
-    email() {
-        return this._newDef({
-            ...string(),
-            name: 'email',
-            format: ctx => ctx.value?.toLowerCase().trim(),
-            errorMsg: defaultTypeError('email', false),
-            validate: ctx => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(ctx.value),
-        }) as any as
-            NextAutocompletionChoices<
-                ReturnType<typeof this._newDef< string >>,
-                StringMethods
-            >
-    }
-    /** Predefined list of values. Eg: status: _.enum(['success', 'error', 'pending']) OR _.enum([1, 2, 3]) */
-    enum<T extends string[] | number[]>(possibleValues: [...T] | readonly [...T]) {
-        const isNumber = typeof possibleValues[0] === 'number'
-        // eslint-disable-next-line @typescript-eslint/no-this-alias
-        const that = this // NOT SURE WHY NEEDED but ot fixes a bug 🙃
-        return this._newDef({
-            ...(isNumber ? number : string()),
-            name: 'enum',
-            tsTypeStr: possibleValues.length ? isNumber ? `${possibleValues.join(` | `)}` : `'${possibleValues.join(`' | '`)}'` : 'never',
-            errorMsg: ctx => `Value "${ctx.value}" does not match allowed values ${possibleValues.join(',')}`,
-            validate: ctx => possibleValues.includes(ctx.value),
-        }) as any as
-            NextAutocompletionChoices<
-                ReturnType<typeof that._newDef<T[number]>>,
-                TypedExclude<StringMethods, 'match'>
-            >
-    }
-
     integer() {
         return this._newDef({
             ...number,
@@ -585,34 +607,6 @@ export class Definition<
                 TypedExclude<NumberMethods, 'round2'>
             >
     }
-    float() {
-        return this._newDef({
-            ...number,
-            name: 'float',
-            format: ctx => parseFloat(ctx.value),
-        }) as any as
-            NextAutocompletionChoices<
-                ReturnType<typeof this._newDef<
-                    number
-                >>,
-                NumberMethods
-            >
-    }
-
-    false() {
-        return this._newDef({
-            ...boolean,
-            errorMsg: defaultTypeError('false'),
-            name: 'false',
-            validate: ctx => ctx.value === false,
-            tsTypeStr: 'false',
-        }) as any as
-            NextAutocompletionChoices<
-                ReturnType<typeof this._newDef< boolean, boolean >>,
-                'mergeWith'
-            >
-    }
-
 
     true() {
         return this._newDef({
@@ -1279,10 +1273,7 @@ export class Definition<
             >
     }
 
-    ts<
-        TsTypeRead,
-        TsTypeWrite
-    >(
+    ts< TsTypeRead,TsTypeWrite >(
         tsString: string,
         tsTypeWrite: string = tsString
     ) {
@@ -1301,82 +1292,3 @@ export class Definition<
 }
 
 export const _ = new Definition().init()
-
-
-
-//  ══╦══ ╦   ╦ ╔══╗ ╔══╗   ══╦══ ╔══╗ ╔═══ ══╦══ ═╦═ ╦╗ ╔ ╔══╗
-//    ║   ╚═╦═╝ ╠══╝ ╠═       ║   ╠═   ╚══╗   ║    ║  ║╚╗║ ║ ═╦
-//    ╩     ╩   ╩    ╚══╝     ╩   ╚══╝ ═══╝   ╩   ═╩═ ╩ ╚╩ ╚══╝
-
-// /!\ DONT DELETE /!\
-
-// type Modelssss = {
-//     aa: {
-//         bb: { Read: { a: number }, Write: { a: number } }
-//     }
-// }
-
-// const __ = new Definition<Modelssss, 'aa'>().init()
-
-// const hardCodedString = __.stringConstant('tt').tsTypeRead
-// const normalstring = __.string().tsTypeRead
-// const hardCodedString2 = __.stringConstant('coucou').tsTypeRead
-
-// const populated = __.ref('bb', true).tsTypeRead
-// const notPop = __.ref('bb').tsTypeRead
-
-
-// /* BASE TYPES */
-// const isRequired = __.string().required().lowerCase().isRequiredType
-// const isRequiredFalse = __.string().lowerCase().isRequiredType
-// const strWZ = __.string().lowerCase().tsTypeWrite
-// const str2 = __.string().tsTypeRead
-// const lengthTest0 = __.string().maxLength(3).tsTypeRead
-// const lengthTest = __.string().maxLength(3).lowerCase().minLength(4).tsTypeRead
-// const arrLength = __.array(_.string()).minLength(3).tsTypeRead
-
-// // OBJECTS
-// const obj0 = __.object({ name: __.string().required() }).tsTypeRead
-// const obj01 = __.object({ name: __.string() }).tsTypeRead
-// const obj1 = __.object({ name: __.string() }).mergeWith({ email: __.email().required() }).tsTypeRead
-// const obj2 = __.object({ name: __.string() }).mergeWith({ email: __.email().required() }).partial()
-// const obj3 = __.object({ name: __.string() }).mergeWith({ email: __.email().required() }).complete()
-// const complexOne = __.object({
-//     arr: [__.string()],
-//     arr2: __.array(__.string()),
-//     subObj: {
-//         name: __.enum(['a', 'b']),
-//         tuple: __.tuple([__.string(), __.date()]),
-//         typeOr: __.typesOr([__.number(), __.boolean()]),
-//         subArr: [__.email()]
-//     }
-// }).tsTypeRead
-
-// const or = __.typesOr([__.string(), __.number(), __.boolean()]).tsTypeRead
-
-// const tuple2 = __.tuple([__.string(), __.number()]).tsTypeRead
-// const myTuple = ['re', 4] as typeof tuple2
-
-
-
-// const hardcoreArray = __.array({ name: __.string(), subObj: { bool: __.boolean().required() }, arr2: __.array({ subArr: __.array({ name: __.string() }) }) })
-// type HardcoreArray = typeof hardcoreArray.tsTypeRead
-
-// const simpleArray = __.array({ name: __.string() })
-// type SimpleArray = typeof simpleArray.tsTypeRead
-
-// const hardcoreObject = __.object({ name: __.string(), arr1: __.email(), arr2: __.array({ subArr: __.array({ name: __.string() }) }) })
-// type HardcoreObject = typeof hardcoreObject.tsTypeRead
-
-
-
-// const aa = __.n('userFields').object({
-//     screenSize: __.string().required(),
-//     deviceId: __.string().required(),
-//     phonePrefix: __.regexp(/^\+\d+$/).required(),
-//     phoneNumber: __.string().minLength(7).maxLength(17).required(),
-//     lang: __.enum(['en', 'fr']).required(),
-//     currency: __.enum(['eur', 'usd']).required(),
-// }).required()
-
-// type ObjectType = typeof aa.tsTypeRead
