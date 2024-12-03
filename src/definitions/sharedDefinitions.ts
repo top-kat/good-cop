@@ -34,20 +34,20 @@ export const sharedDefinitions = {
     number: {
         mainType: 'number',
         errorMsg: defaultTypeError('number'),
-        validate: ctx => typeof ctx.value === 'number',
+        validate: ctx => typeof ctx.value === 'number' && !isNaN(ctx.value),
         mongoType: 'number',
         tsTypeStr: 'number',
         format: ctx => parseFloat(ctx.value),
     },
     round2: {
         errorMsg: defaultTypeError('number'),
-        validate: ctx => typeof ctx.value === 'number',
+        validate: ctx => typeof ctx.value === 'number' && !isNaN(ctx.value),
         mongoType: 'number',
         tsTypeStr: 'number',
         format: ctx => Math.round(ctx.value * 100) / 100,
     },
     lt: (maxVal: number) => ({
-        errorMsg: ctx => `Value ${ctx.value} should be strictly below ${maxVal}`,
+        errorMsg: ctx => `Value ${ctx.value} should be strictly below required maximum value ${maxVal}`,
         validate: ctx => ctx.value < maxVal,
     }),
     gt: (minVal: number) => ({
@@ -55,7 +55,7 @@ export const sharedDefinitions = {
         validate: ctx => ctx.value > minVal,
     }),
     lte: (maxVal: number) => ({
-        errorMsg: ctx => `Value ${ctx.value} exceed the maximum allowed of ${maxVal}`,
+        errorMsg: ctx => `Value ${ctx.value} exceeds the maximum allowed value of ${maxVal}`,
         validate: ctx => ctx.value <= maxVal,
     }),
     gte: (minVal: number) => ({

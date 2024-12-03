@@ -14,7 +14,7 @@ const config: Config = {
         '^.+\\.tsx?$': 'ts-jest',
         '^.+\\.js$': '<rootDir>/node_modules/babel-jest',
     },
-    testRegex: ['.*\\.spec\\.[jt]sx?$'],
+    testRegex: ['.*\\.test\\.[jt]sx?$'],
 }
 
 export default config

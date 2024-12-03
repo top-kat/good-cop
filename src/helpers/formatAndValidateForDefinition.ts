@@ -91,7 +91,7 @@ export async function formatAndValidateDefinitionPartials(
                 && def.format
             ) {
                 const formattedValue = await def.format(defCtx)
-                if (typeof formattedValue !== 'undefined') defCtx.value = formattedValue
+                defCtx.value = formattedValue
             }
             // VALIDATE
             if (
