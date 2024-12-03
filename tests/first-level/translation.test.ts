@@ -14,8 +14,8 @@ describe(`Translation Object`, () => {
     })
 
     it('accepts valid isoCodes as keys', async () => {
-        expect(await transDef.formatAndValidate({ en: 'hello', fr: 'bonjour'}))
-            .toEqual({ en: 'hello', fr: 'bonjour'})
+        expect(await transDef.formatAndValidate({ en: 'hello', fr: 'bonjour' }))
+            .toEqual({ en: 'hello', fr: 'bonjour' })
     })
 
     it('throws an error if an isoCode is not present', async () => {
@@ -29,6 +29,6 @@ describe(`Translation Object`, () => {
         await expect(transDef.formatAndValidate({ xx: 'testman' }))
             .rejects.toThrowError(
                 'Expected type { [countryCodeIso]: translationString } but got {\n  "xx": "testman"\n}'
-            );
-    });
+            )
+    })
 })

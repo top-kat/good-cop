@@ -57,6 +57,6 @@ describe('Mongo Model', () => {
             modelArray: [{
                 myArrayValue: [{ myNumberValue: null }]
             }]
-        })).rejects.toThrow('Field myBooleanValue is required');
+        })).rejects.toThrow('Field myBooleanValue is required')
     })
 })

@@ -21,7 +21,7 @@ is not
  */
 
 import mongoose from 'mongoose' // only used for typings, may not be compatible if used in frontend
-import { MaybeArray } from './core-types'
+import { countryIsoCodes, MaybeArray } from './core-types'
 import { CountryCodeIso, TranslationObj } from './core-types'
 import { DefinitionBase } from './DefinitionBaseClass'
 import { sharedDefinitions } from './definitions/sharedDefinitions'
@@ -140,15 +140,15 @@ export class Definition<
 
 
 
-//--------------------------------------------------------------------
-//--------------------------------------------------------------------
-//----------------------------FIRST LEVEL-----------------------------
-//--------------------------------------------------------------------
-//--------------------------------------------------------------------
+    //--------------------------------------------------------------------
+    //--------------------------------------------------------------------
+    //----------------------------FIRST LEVEL-----------------------------
+    //--------------------------------------------------------------------
+    //--------------------------------------------------------------------
 
 
 
-    array< R extends GenericDef | DefinitionObj >(
+    array<R extends GenericDef | DefinitionObj>(
         array?: R,
     ) {
         return this._newDef(getArrObjDef(array ? [array] : [], 'array')) as any as
@@ -287,28 +287,28 @@ export class Definition<
 
     /** This is to get the type of an already defined database model. Eg: model('myDb', 'user') to get the user type from a particular db that you registered at initialization */
     model<A extends keyof ModelsType, B extends keyof ModelsType[A], C extends keyof ModelsType[A][B] = 'Read'>(
-            dbId: A, modelName: B, modelType: C = 'Read' as C
-        ) {
-            return this._newDef([{
-                mainType: 'object',
-                tsTypeStr: `t.${capitalize1st(dbId.toString())}Models.${capitalize1st(modelName.toString())}Models['${modelType.toString()}']`,
-                dbName: dbId as string,
-                model: modelName as string,
-            }, () => {
-                const model = this._models?.[dbId as any]?.[modelName as any]
-                if (!model) throw new DescriptiveError(`Model not found. Please make you provided a model with the name "${modelName.toString()}" when initiating good-cop. Make sure you BUILDED the app correctly`, { dbId, modelName, modelNames: Object.keys(this._models || {}) })
-                return { ...model._definitions[0], tsTypeStr: undefined }
-            }]) as any as
-                NextAutocompletionChoices<
-                    ReturnType<typeof this._newDef<
-                        ModelsType[A][B][C]
-                    >>,
-                    'partial' | 'complete'
-                >
+        dbId: A, modelName: B, modelType: C = 'Read' as C
+    ) {
+        return this._newDef([{
+            mainType: 'object',
+            tsTypeStr: `t.${capitalize1st(dbId.toString())}Models.${capitalize1st(modelName.toString())}Models['${modelType.toString()}']`,
+            dbName: dbId as string,
+            model: modelName as string,
+        }, () => {
+            const model = this._models?.[dbId as any]?.[modelName as any]
+            if (!model) throw new DescriptiveError(`Model not found. Please make you provided a model with the name "${modelName.toString()}" when initiating good-cop. Make sure you BUILDED the app correctly`, { dbId, modelName, modelNames: Object.keys(this._models || {}) })
+            return { ...model._definitions[0], tsTypeStr: undefined }
+        }]) as any as
+            NextAutocompletionChoices<
+                ReturnType<typeof this._newDef<
+                    ModelsType[A][B][C]
+                >>,
+                'partial' | 'complete'
+            >
     }
 
     /** With this, you can create mongo models, handling _id field type automatically and creator, lastUpdater... fields */
-    mongoModel< T extends DefinitionObj, U extends readonly AutoWritedFieldNames[] >(
+    mongoModel<T extends DefinitionObj, U extends readonly AutoWritedFieldNames[]>(
         autoWriteFields: U,
         model: T
     ) {
@@ -378,7 +378,7 @@ export class Definition<
     }
 
     /** An object which keys can be anything but where the value shall be typed. Eg: { [k: string]: number } */
-    genericObject< FieldName extends string | [string, string] | [string, string, string], ValueType extends DefinitionObj | GenericDef >(
+    genericObject<FieldName extends string | [string, string] | [string, string, string], ValueType extends DefinitionObj | GenericDef>(
         /** field name can be a string or an array, will be typed as { [string1]: { [string2]: myType } } */
         keyName: FieldName = 'key' as FieldName,
         valueType: ValueType = this.any() as any as ValueType
@@ -436,7 +436,7 @@ export class Definition<
     }
 
     /** Array of predefined size and value: Eg: { signature: _.tuple([_.date(), _.string()]) } */
-    tuple< R extends GenericDef[] >(
+    tuple<R extends GenericDef[]>(
         array: [...R]
     ) {
         // sorry don't know why exactly this works but anything else wont
@@ -480,7 +480,7 @@ export class Definition<
             >
     }
 
-    object< T extends DefinitionObj >(
+    object<T extends DefinitionObj>(
         object: T = {} as T,
         {
             /** Whenever to delete fields that are not included in the original model */
@@ -669,51 +669,23 @@ export class Definition<
 
     /** an object who's keys are locale and values are translation string. Eg: `{ fr: 'Salut', en: 'Hi' }` */
     translation() {
-            const validIsoCodes: CountryCodeIso[] = [
-                'ad', 'ae', 'af', 'ag', 'ai', 'al', 'am', 'ao', 'aq', 'ar', 'as', 'at', 'au', 'aw', 'ax', 'az',
-                'ba', 'bb', 'bd', 'be', 'bf', 'bg', 'bh', 'bi', 'bj', 'bl', 'bm', 'bn', 'bo', 'bq', 'br', 'bs', 'bt', 'bv', 'bw', 'by', 'bz',
-                'ca', 'cc', 'cd', 'cf', 'cg', 'ch', 'ci', 'ck', 'cl', 'cm', 'cn', 'co', 'cr', 'cu', 'cv', 'cw', 'cx', 'cy', 'cz',
-                'de', 'dj', 'dk', 'dm', 'do', 'dz',
-                'ec', 'ee', 'eg', 'eh', 'er', 'es', 'et', 'en',
-                'fi', 'fj', 'fk', 'fm', 'fo', 'fr',
-                'ga', 'gb', 'gd', 'ge', 'gf', 'gg', 'gh', 'gi', 'gl', 'gm', 'gn', 'gp', 'gq', 'gr', 'gs', 'gt', 'gu', 'gw', 'gy',
-                'hk', 'hm', 'hn', 'hr', 'ht', 'hu',
-                'id', 'ie', 'il', 'im', 'in', 'io', 'iq', 'ir', 'is', 'it',
-                'je', 'jm', 'jo', 'jp',
-                'ke', 'kg', 'kh', 'ki', 'km', 'kn', 'kp', 'kr', 'kw', 'ky', 'kz',
-                'la', 'lb', 'lc', 'li', 'lk', 'lr', 'ls', 'lt', 'lu', 'lv', 'ly',
-                'ma', 'mc', 'md', 'me', 'mf', 'mg', 'mh', 'mk', 'ml', 'mm', 'mn', 'mo', 'mp', 'mq', 'mr', 'ms', 'mt', 'mu', 'mv', 'mw', 'mx', 'my', 'mz',
-                'na', 'nc', 'ne', 'nf', 'ng', 'ni', 'nl', 'no', 'np', 'nr', 'nu', 'nz',
-                'om',
-                'pa', 'pe', 'pf', 'pg', 'ph', 'pk', 'pl', 'pm', 'pn', 'pr', 'pt', 'pw', 'py',
-                'qa',
-                're', 'ro', 'rs', 'ru', 'rw',
-                'sa', 'sb', 'sc', 'sd', 'se', 'sg', 'sh', 'si', 'sj', 'sk', 'sl', 'sm', 'sn', 'so', 'sr', 'ss', 'st', 'sv', 'sx', 'sy', 'sz',
-                'tc', 'td', 'tf', 'tg', 'th', 'tj', 'tk', 'tl', 'tm', 'tn', 'to', 'tr', 'tt', 'tv', 'tw', 'tz',
-                'ua', 'ug', 'um', 'us', 'uy', 'uz',
-                'va', 'vc', 've', 'vg', 'vi', 'vn', 'vu',
-                'wf', 'ws',
-                'ye', 'yt',
-                'za', 'zm', 'zw'
-            ];
-        
-            return this._newDef({
-                name: 'translation',
-                mainType: 'object',
-                errorMsg: defaultTypeError('{ [countryCodeIso]: translationString }', false),
-                validate: ctx => {
-                    if (!isType(ctx.value, 'object')) return false;
-                    return Object.entries(ctx.value).every(([countryCode, translationStr]) => 
-                        typeof translationStr === 'string' &&
-                        /^[A-Za-z]{2}$/.test(countryCode) &&
-                        validIsoCodes.includes(countryCode as CountryCodeIso)
-                    );
-                },
-                mongoType: 'object',
-                tsTypeStr: 'TranslationObj',
-            }) as any as NextAutocompletionChoices<
-                ReturnType<typeof this._newDef<TranslationObj>>
-            >;
+        return this._newDef({
+            name: 'translation',
+            mainType: 'object',
+            errorMsg: defaultTypeError('{ [countryCodeIso]: translationString }', false),
+            validate: ctx => {
+                if (!isType(ctx.value, 'object')) return false
+                return Object.entries(ctx.value).every(([countryCode, translationStr]) =>
+                    typeof translationStr === 'string' &&
+                    /^[A-Za-z]{2}$/.test(countryCode) &&
+                    countryIsoCodes.includes(countryCode as CountryCodeIso)
+                )
+            },
+            mongoType: 'object',
+            tsTypeStr: 'TranslationObj',
+        }) as any as NextAutocompletionChoices<
+            ReturnType<typeof this._newDef<TranslationObj>>
+        >
     }
 
     true() {
@@ -1273,7 +1245,7 @@ export class Definition<
             >
     }
 
-    ts< TsTypeRead,TsTypeWrite >(
+    ts<TsTypeRead, TsTypeWrite>(
         tsString: string,
         tsTypeWrite: string = tsString
     ) {
