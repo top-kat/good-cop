@@ -618,7 +618,7 @@ export class Definition<
                 typeObj.type = mongoose.Schema.Types.ObjectId
                 typeObj.ref = modelName
             },
-            tsTypeStr: (alwaysPopulated ? '' : `string | `) + `${capitalize1st(modelName as string)}`,
+            tsTypeStr: (alwaysPopulated ? '' : `string | modelTypes.`) + `${capitalize1st(modelName as string)}`,
             tsTypeStrForWrite: `string`,
             ref: modelName as string,
         }) as any as

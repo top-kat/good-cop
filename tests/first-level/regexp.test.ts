@@ -51,6 +51,6 @@ describe(`Regexp with RegExp type`, () => {
         expect(regexWithFlags.flags).toBe('i')
 
         // NOW valid because of I (cas insensitive flag)
-        await expect(regexpDefWithFlags.formatAndValidate(invalidRegexString)).toEqual('invalidString')
+        expect(await regexpDefWithFlags.formatAndValidate(invalidRegexString)).toEqual('invalidString')
     })
 })
