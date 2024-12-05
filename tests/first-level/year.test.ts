@@ -5,7 +5,7 @@ import { _ } from '../../src/DefinitionClass'
 
 
 
-describe(`Year`, async () => {
+describe(`Year`, () => {
 
     const currentYear = new Date().getFullYear()
     const yearDef = _.year()
@@ -18,9 +18,13 @@ describe(`Year`, async () => {
         await expect(yearDef.formatAndValidate(currentYear)).resolves.toEqual(currentYear)
     })
 
-    await expect(yearDef.formatAndValidate('22'))
-        .rejects.toThrow(`wrongLengthForDateInt`)
+    it('Only 2 digits should error', async () => {
+        await expect(yearDef.formatAndValidate('22'))
+            .rejects.toThrow(`wrongLengthForDateInt`)
+    })
 
-    await expect(yearDef.formatAndValidate('11223344'))
-        .rejects.toThrow(`wrongLengthForDateInt`)
+    it('More than 4 digits should error', async () => {
+        await expect(yearDef.formatAndValidate('11223344'))
+            .rejects.toThrow(`wrongLengthForDateInt`)
+    })
 })

@@ -18,7 +18,7 @@ describe('Mongo Model', () => {
     })
 
     it('mongoModel autoUpdate fields', () => {
-        expect(mongoModel.getTsTypeAsString().read).toMatch(/'creationDate': Date\+'creator': string \| User\s+'lastUpdateDate'?: Date\s+'lastUpdater':string | User/)
+        expect(mongoModel.getTsTypeAsString().read).toMatch(/'creationDate': Date\+'creator': string \| modelTypes.User\s+'lastUpdateDate'?: Date\s+'lastUpdater':string | modelTypes.User/)
     })
 
     it('optional values can be null', async () => {
