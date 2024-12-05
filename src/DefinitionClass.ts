@@ -21,8 +21,7 @@ is not
  */
 
 import mongoose from 'mongoose' // only used for typings, may not be compatible if used in frontend
-import { countryIsoCodes, MaybeArray } from './core-types'
-import { CountryCodeIso, TranslationObj } from './core-types'
+import { CountryCodeIso, TranslationObj, countryIsoCodes, MaybeArray } from './core-types'
 import { DefinitionBase } from './DefinitionBaseClass'
 import { sharedDefinitions } from './definitions/sharedDefinitions'
 import { defaultTypeError } from './helpers/definitionGenericHelpers'
