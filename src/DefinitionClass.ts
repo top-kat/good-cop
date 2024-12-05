@@ -291,7 +291,7 @@ export class Definition<
     ) {
         return this._newDef([{
             mainType: 'object',
-            tsTypeStr: `modelTypes.${capitalize1st(dbId.toString())}Models.${capitalize1st(modelName.toString())}Models['${modelType.toString()}']`,
+            tsTypeStr: `modelTypes.${capitalize1st(modelName.toString())}Models['${modelType.toString()}']`,
             dbName: dbId as string,
             model: modelName as string,
         }, () => {
