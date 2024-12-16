@@ -98,6 +98,10 @@ export type DefinitionPartial = NoExtraProperties<{
     tsTypeStrForWrite?: (() => string) | string
     /** Use function to modify mongoType object directly, use object to pass a full or a string to define which type to use for mongo for that field */
     mongoType?: ((mongoTypeObj: Record<string, any>, definitions: (DefinitionPartial | DefinitionPartialFn)[]) => any) | MongoTypesString | Record<string, any>
+    /** string representation of the Swagger type */
+    swaggerType?: SwaggerSchema | (() => SwaggerSchema)
+    /** string representation of an example value */
+    exempleValue?: any | (() => any)
     /** should return a truthy value if valid and falsey if not. Actually validation is done AFTER formatting. If you want it differently please use validateBeforeFormatting() */
     validate?: (ctx: DefCtx) => (any | Promise<any>)
     /** This happen BEFORE formatting, unless classic validation should return a truthy value if valid and falsey if not */
@@ -186,6 +190,8 @@ export type GenericDef = {
     tsTypeWrite: any
     isRequiredType: boolean
     getTsTypeAsString: () => ({ read: string, write: string })
+    getSwaggerType: () => SwaggerSchema
+    getExampleValue: () => any
     _definitions: DefinitionPartial[]
 }
 
@@ -256,3 +262,23 @@ export type ProvidedModels = {
         [modelName: string]: Definition
     }
 }
+
+
+
+
+
+export type SwaggerSchema =
+    { type: Record<string, any> } // any
+    | { oneOf: SwaggerSchema[] }
+    | { type: 'string'; format?: 'byte' | 'binary' | 'date' | 'date-time' | 'password' | 'email' | 'uuid' | 'url'; example?: string, enum?: string[] }
+    | { type: 'number'; format?: 'float' | 'double'; example?: number }
+    | { type: 'integer'; format?: 'int32' | 'int64'; example?: number }
+    | { type: 'boolean'; example?: boolean }
+    | { type: 'array'; items: SwaggerSchema | {}; example?: any[] }
+    | {
+        type: 'object';
+        properties?: Record<string, SwaggerSchema>;
+        required?: string[];
+        example?: Record<string, any>;
+    }
+// | { type: string; enum: string[]; example?: string }

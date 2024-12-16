@@ -5,7 +5,7 @@ import { triggerOnObjectType } from './helpers/triggerOnObjectType'
 import { Definition } from './DefinitionClass'
 import { findTypeInDefinitions, getFieldValueForDefinitions } from './helpers/findInDefinitions'
 
-import { DefinitionPartial, DefinitionObjChild, DefinitionPartialFn, ProvidedModels, MainTypes } from './definitionTypes'
+import { DefinitionPartial, DefinitionObjChild, DefinitionPartialFn, ProvidedModels, MainTypes, SwaggerSchema } from './definitionTypes'
 
 import { asArray } from 'topkat-utils'
 
@@ -85,6 +85,15 @@ export class DefinitionBase {
 
         return output
     }
+    getSwaggerType() {
+        const swaggerDef = this.getDefinitionValue('swaggerType')
+        const swDef = (typeof swaggerDef === 'function' ? swaggerDef() : swaggerDef)
+        return swDef || { type: {} } as SwaggerSchema
+    }
+    getExampleValue() {
+        const exempleVal = this.getDefinitionValue('exempleValue')
+        return typeof exempleVal === 'function' ? exempleVal() : exempleVal
+    }
     _getDefinitionObjFlat(
         removeArrayBracketsNotation = false,
         onDefinition: (def: Definition) => any = (def: Definition) => def,
@@ -95,6 +104,10 @@ export class DefinitionBase {
         return obj ? _getDefinitionObjFlat(removeArrayBracketsNotation, onDefinition, obj, addr, objFlat) : {}
     }
 }
+
+
+
+
 
 function _getDefinitionObjFlat(
     this: Definition | any,

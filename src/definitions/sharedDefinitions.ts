@@ -1,7 +1,7 @@
 import { defaultTypeError } from '../helpers/definitionGenericHelpers'
 import { DefinitionPartial } from '../definitionTypes'
 
-import { isset } from 'topkat-utils'
+import { generateToken, isset, randomItemInArray, round2, random } from 'topkat-utils'
 
 
 export const sharedDefinitions = {
@@ -12,6 +12,8 @@ export const sharedDefinitions = {
         validate: ctx => hardCodedValue ? ctx.value === hardCodedValue : typeof ctx.value === 'string' && (acceptEmpty || ctx.value.length),
         mongoType: 'string',
         tsTypeStr: hardCodedValue ? `'${hardCodedValue}'` : 'string',
+        swaggerType: { type: 'number', format: 'float' },
+        exempleValue: () => generateToken(random(10, 30), false, 'alphanumeric'),
     }),
     boolean: {
         name: 'boolean',
@@ -21,6 +23,8 @@ export const sharedDefinitions = {
         validate: ctx => typeof ctx.value === 'boolean',
         mongoType: 'boolean',
         tsTypeStr: 'boolean',
+        swaggerType: { type: 'boolean' },
+        exempleValue: () => randomItemInArray([true, false]),
     },
     required: {
         name: 'required',
@@ -38,6 +42,8 @@ export const sharedDefinitions = {
         mongoType: 'number',
         tsTypeStr: 'number',
         format: ctx => parseFloat(ctx.value),
+        swaggerType: { type: 'number', format: 'float' },
+        exempleValue: () => round2(Math.random() * 10, 3),
     },
     round2: {
         errorMsg: defaultTypeError('number'),
@@ -45,6 +51,8 @@ export const sharedDefinitions = {
         mongoType: 'number',
         tsTypeStr: 'number',
         format: ctx => Math.round(ctx.value * 100) / 100,
+        swaggerType: { type: 'number', format: 'float' },
+        exempleValue: () => round2(Math.random() * 10),
     },
     lt: (maxVal: number) => ({
         errorMsg: ctx => `Value ${ctx.value} should be strictly below required maximum value ${maxVal}`,
@@ -67,6 +75,8 @@ export const sharedDefinitions = {
         validate: () => true,
         format: ctx => typeof ctx.value === 'undefined' ? ctx.value : undefined,
         tsTypeStr: `undefined`,
+        swaggerType: { type: {} },
+        exempleValue: () => round2(Math.random() * 10),
     },
     wrapperTypeStr: (def, wrapperName) => ({
         tsTypeStr: () => {

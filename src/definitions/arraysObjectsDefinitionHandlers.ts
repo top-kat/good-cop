@@ -3,7 +3,7 @@
 import { Definition } from '../DefinitionClass'
 import { validateDefinitionPartials } from '../helpers/formatAndValidateForDefinition'
 import { defaultTypeError } from '../helpers/definitionGenericHelpers'
-import { DefCtx, DefinitionPartial, DefinitionObjChild } from '../definitionTypes'
+import { DefCtx, DefinitionPartial, DefinitionObjChild, SwaggerSchema } from '../definitionTypes'
 import { triggerOnObjectTypeAsync, triggerOnObjectType } from '../helpers/triggerOnObjectType'
 
 import { isObject, C } from 'topkat-utils'
@@ -38,7 +38,8 @@ export function getArrObjDef(
         tsTypeStrForWrite: () => tsTypeRecursive('tsTypeStrForWrite', objOrArr),
         objectCache: objOrArr,
         isParent: true,
-    }
+        swaggerType: () => swaggerTypeRecursive(objOrArr),
+    } satisfies DefinitionPartial
 }
 
 async function formatAndValidateRecursive(
@@ -125,7 +126,7 @@ const indentationUnit = '    '
 
 function tsTypeRecursive(fnName: 'tsTypeStr' | 'tsTypeStrForWrite', definitionChild: DefinitionObjChild) {
     return triggerOnObjectType(definitionChild, {
-        errorExtraInfos: { msg: 'mongoTypeNotDefinedForModel' }, // TODO add extra infos on field name
+        errorExtraInfos: { msg: 'typescriptTypeNotDefinedForModel' }, // TODO add extra infos on field name
         onArray(arr): string {
             return `Array<${arr.map(item => tsTypeRecursive(fnName, item)).join(', ')}>`
         },
@@ -156,6 +157,30 @@ function tsTypeRecursive(fnName: 'tsTypeStr' | 'tsTypeStrForWrite', definitionCh
         onDefinition: (definition): string => {
             const { read, write } = definition.getTsTypeAsString()
             return fnName === 'tsTypeStr' ? read : write
+        },
+    })
+}
+
+
+
+//----------------------------------------
+// SWAGGER TYPE
+//----------------------------------------
+function swaggerTypeRecursive(definitionChild: DefinitionObjChild) {
+    return triggerOnObjectType(definitionChild, {
+        errorExtraInfos: { msg: 'swaggerTypeNotDefinedForModel' },
+        onArray(arr) {
+            return { type: 'array', items: arr[0].getSwaggerType() } satisfies SwaggerSchema
+        },
+        onObject(object: Record<string, Definition>) {
+            const newObjStr = { type: 'object', properties: {} } satisfies SwaggerSchema
+            for (const [k, v] of Object.entries(object)) {
+                newObjStr.properties[k] = v.getSwaggerType()
+            }
+            return newObjStr
+        },
+        onDefinition: definition => {
+            return definition.getSwaggerType()
         },
     })
 }
