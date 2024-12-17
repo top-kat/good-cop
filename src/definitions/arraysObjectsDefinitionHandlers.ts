@@ -171,7 +171,7 @@ function swaggerTypeRecursive(definitionChild: DefinitionObjChild) {
     return triggerOnObjectType(definitionChild, {
         errorExtraInfos: { msg: 'swaggerTypeNotDefinedForModel' },
         onArray(arr: Definition[]) {
-            return { type: 'array', items: arr[0].getSwaggerType() } satisfies SwaggerSchema
+            return { type: 'array', items: arr[0]?.getSwaggerType?.() || {} } satisfies SwaggerSchema
         },
         onObject(object: Record<string, Definition>) {
             const newObjStr = { type: 'object', properties: {} } satisfies SwaggerSchema
