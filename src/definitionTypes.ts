@@ -37,7 +37,7 @@ export type UniversalMethods = EnsureIsDefMethod<
     'default' |
     'errorExtraInfos' |
     'formatAndValidate' |
-    'getDefinitionValue' | 'getMainType' | 'getName' | 'getTsTypeAsString' |
+    'getDefinitionValue' | 'getMainType' | 'getName' | 'getTsTypeAsString' | 'getSwaggerType' | 'getExampleValue' |
     'isRequired' | 'isRequiredType' | 'isType' |
     'onFormat' | 'onValidate' | 'optional' |
     'promise' |
@@ -268,8 +268,8 @@ export type ProvidedModels = {
 
 
 export type SwaggerSchema =
-    { type: Record<string, any> } // any
-    | { oneOf: SwaggerSchema[] }
+    { type: Record<string, any>, example?: undefined } // any
+    | { oneOf: SwaggerSchema[], example?: any }
     | { type: 'string'; format?: 'byte' | 'binary' | 'date' | 'date-time' | 'password' | 'email' | 'uuid' | 'url'; example?: string, enum?: string[] }
     | { type: 'number'; format?: 'float' | 'double'; example?: number }
     | { type: 'integer'; format?: 'int32' | 'int64'; example?: number }

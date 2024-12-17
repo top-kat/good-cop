@@ -12,7 +12,7 @@ export const sharedDefinitions = {
         validate: ctx => hardCodedValue ? ctx.value === hardCodedValue : typeof ctx.value === 'string' && (acceptEmpty || ctx.value.length),
         mongoType: 'string',
         tsTypeStr: hardCodedValue ? `'${hardCodedValue}'` : 'string',
-        swaggerType: { type: 'number', format: 'float' },
+        swaggerType: { type: 'string' },
         exempleValue: () => generateToken(random(10, 30), false, 'alphanumeric'),
     }),
     boolean: {

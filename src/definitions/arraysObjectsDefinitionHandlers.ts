@@ -6,7 +6,7 @@ import { defaultTypeError } from '../helpers/definitionGenericHelpers'
 import { DefCtx, DefinitionPartial, DefinitionObjChild, SwaggerSchema } from '../definitionTypes'
 import { triggerOnObjectTypeAsync, triggerOnObjectType } from '../helpers/triggerOnObjectType'
 
-import { isObject, C } from 'topkat-utils'
+import { isObject, C, forI, random } from 'topkat-utils'
 
 //----------------------------------------
 // VALIDATORS
@@ -39,6 +39,7 @@ export function getArrObjDef(
         objectCache: objOrArr,
         isParent: true,
         swaggerType: () => swaggerTypeRecursive(objOrArr),
+        exempleValue: () => exempleValueRecursive(objOrArr),
     } satisfies DefinitionPartial
 }
 
@@ -169,18 +170,41 @@ function tsTypeRecursive(fnName: 'tsTypeStr' | 'tsTypeStrForWrite', definitionCh
 function swaggerTypeRecursive(definitionChild: DefinitionObjChild) {
     return triggerOnObjectType(definitionChild, {
         errorExtraInfos: { msg: 'swaggerTypeNotDefinedForModel' },
-        onArray(arr) {
+        onArray(arr: Definition[]) {
             return { type: 'array', items: arr[0].getSwaggerType() } satisfies SwaggerSchema
         },
         onObject(object: Record<string, Definition>) {
             const newObjStr = { type: 'object', properties: {} } satisfies SwaggerSchema
             for (const [k, v] of Object.entries(object)) {
-                newObjStr.properties[k] = v.getSwaggerType()
+                if ('getSwaggerType' in v) newObjStr.properties[k] = v.getSwaggerType()
             }
             return newObjStr
         },
         onDefinition: definition => {
             return definition.getSwaggerType()
+        },
+    })
+}
+
+
+//----------------------------------------
+// EXAMPLE VALUE RECURSIVE
+//----------------------------------------
+function exempleValueRecursive(definitionChild: DefinitionObjChild) {
+    return triggerOnObjectType(definitionChild, {
+        errorExtraInfos: { msg: 'valueExampleNotDefinedForModel' },
+        onArray(arr: Definition[]) {
+            return forI(random(1, 3), () => arr[0].getExampleValue())
+        },
+        onObject(object: Record<string, Definition>) {
+            const newObj = {}
+            for (const [k, v] of Object.entries(object)) {
+                if ('getExampleValue' in v) newObj[k] = v.getExampleValue()
+            }
+            return newObj
+        },
+        onDefinition: definition => {
+            return definition.getExampleValue()
         },
     })
 }

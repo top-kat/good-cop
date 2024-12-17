@@ -76,6 +76,7 @@ import {
     round2 as round,
     randomItemInArray,
     random,
+    forI,
 } from 'topkat-utils'
 
 
@@ -264,7 +265,7 @@ export class Definition<
             errorMsg: ctx => `Value "${ctx.value}" does not match allowed values ${possibleValues.join(',')}`,
             validate: ctx => possibleValues.includes(ctx.value),
             swaggerType: { type: 'string', enum: possibleValues.map(e => e.toString()) },
-            exempleValue: () => randomItemInArray(['bourreMaKik', 'groZeub', 'boGoss06', 'pineDuitre', 'bibonLePersifleur', 'groubino', 'uretre']) + '@gmail.com',
+            exempleValue: () => randomItemInArray(possibleValues),
         }) as any as
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef<T[number]>>,

@@ -88,6 +88,7 @@ export class DefinitionBase {
     getSwaggerType() {
         const swaggerDef = this.getDefinitionValue('swaggerType')
         const swDef = (typeof swaggerDef === 'function' ? swaggerDef() : swaggerDef)
+        if (swDef) swDef.example = this.getExampleValue()
         return swDef || { type: {} } as SwaggerSchema
     }
     getExampleValue() {
