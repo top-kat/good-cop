@@ -76,7 +76,6 @@ import {
     round2 as round,
     randomItemInArray,
     random,
-    forI,
 } from 'topkat-utils'
 
 
@@ -769,7 +768,7 @@ export class Definition<
             errorMsg: defaultTypeError('url', false),
             validate: ctx => /^https?:\/\/.+/.test(ctx.value),
             swaggerType: { type: 'string', format: 'url' },
-            exempleValue: `https://${generateToken(random(5, 15))}.${randomItemInArray(['org', 'com', 'fr', 'co.uk', 'io', 'eu', 'app'])}`,
+            exempleValue: `https://${generateToken(random(5, 15), false)}.${randomItemInArray(['org', 'com', 'fr', 'co.uk', 'io', 'eu', 'app'])}`,
         }) as any as
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef< string >>,
