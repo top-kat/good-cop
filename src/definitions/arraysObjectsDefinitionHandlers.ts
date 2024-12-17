@@ -176,12 +176,12 @@ function swaggerTypeRecursive(definitionChild: DefinitionObjChild) {
         onObject(object: Record<string, Definition>) {
             const newObjStr = { type: 'object', properties: {} } satisfies SwaggerSchema
             for (const [k, v] of Object.entries(object)) {
-                if ('getSwaggerType' in v) newObjStr.properties[k] = v.getSwaggerType()
+                if ('getSwaggerType' in v) newObjStr.properties[k] = v?.getSwaggerType?.()
             }
             return newObjStr
         },
         onDefinition: definition => {
-            return definition.getSwaggerType()
+            return definition?.getSwaggerType?.()
         },
     })
 }
@@ -194,17 +194,17 @@ function exempleValueRecursive(definitionChild: DefinitionObjChild) {
     return triggerOnObjectType(definitionChild, {
         errorExtraInfos: { msg: 'valueExampleNotDefinedForModel' },
         onArray(arr: Definition[]) {
-            return forI(random(1, 3), () => arr[0].getExampleValue())
+            return forI(random(1, 3), () => arr[0]?.getExampleValue?.())
         },
         onObject(object: Record<string, Definition>) {
             const newObj = {}
             for (const [k, v] of Object.entries(object)) {
-                if ('getExampleValue' in v) newObj[k] = v.getExampleValue()
+                if ('getExampleValue' in v) newObj[k] = v?.getExampleValue?.()
             }
             return newObj
         },
         onDefinition: definition => {
-            return definition.getExampleValue()
+            return definition?.getExampleValue?.()
         },
     })
 }

@@ -848,7 +848,7 @@ export class Definition<
             },
             tsTypeStr: () => types.map(t => t.getTsTypeAsString().read).join(' | '),
             tsTypeStrForWrite: () => types.map(t => t.getTsTypeAsString().write).join(' | '),
-            swaggerType: { oneOf: types.map(t => t.getSwaggerType()) },
+            swaggerType: () => ({ oneOf: types.map(t => t.getSwaggerType()) }),
             exempleValue: () => randomItemInArray(types).getExampleValue(),
         }) as any as
             NextAutocompletionChoices<
