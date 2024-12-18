@@ -247,7 +247,7 @@ export class Definition<
             errorMsg: defaultTypeError('email', false),
             validate: ctx => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(ctx.value),
             swaggerType: { type: 'string', format: 'email' },
-            exempleValue: () => randomItemInArray(['bourreMaKik', 'groZeub', 'boGoss06', 'pineDuitre', 'bibonLePersifleur', 'groubino', 'uretre']) + '@gmail.com',
+            exempleValue: () => randomItemInArray(['groZeub', 'boGoss06', 'pineDuitre', 'bibonLePersifleur', 'uretreIrrité', 'clitobite', 'jeanDeLaFistule', 'bourseDistendue', 'biteDeLait', 'dickCheese', 'garageAbites']) + '@gmail.com',
         }) as any as
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef< string >>,
