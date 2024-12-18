@@ -256,6 +256,7 @@ export class Definition<
     }
     /** Predefined list of values. Eg: status: _.enum(['success', 'error', 'pending']) OR _.enum([1, 2, 3]) */
     enum<T extends string[] | number[]>(possibleValues: [...T] | readonly [...T]) {
+        type TypeOfReturn = typeof this._newDef<T[number]> // doesn't work when set below ??
         const isNumber = typeof possibleValues[0] === 'number'
         return this._newDef({
             ...(isNumber ? number : string()),
@@ -267,7 +268,7 @@ export class Definition<
             exempleValue: () => randomItemInArray(possibleValues),
         }) as any as
             NextAutocompletionChoices<
-                ReturnType<typeof this._newDef<T[number]>>,
+                ReturnType<TypeOfReturn>,
                 TypedExclude<StringMethods, 'match'>
             >
     }
@@ -431,6 +432,8 @@ export class Definition<
             ? { [k: string]: { [k: string]: InferTypeRead<ValueType> } }
             : { [k: string]: { [k: string]: { [k: string]: InferTypeWrite<ValueType> } } }
 
+        type TypeOfReturn = typeof this._newDef<Read, Write> // doesn't work when set below ??
+
         const realObj = typeof keyName === 'string'
             ? { [`__${keyName}`]: valueType }
             : keyName.length === 2
@@ -446,7 +449,7 @@ export class Definition<
             exempleValue: { randomKey: true, nb: 4, info: 'this is untyped' },
         }) as any as
             NextAutocompletionChoices<
-                ReturnType<typeof this._newDef< Read, Write >>,
+                ReturnType<TypeOfReturn>,
                 'partial' | 'complete'
             >
     }
@@ -455,6 +458,10 @@ export class Definition<
     mergeWith<T extends DefinitionObj>(
         object: T
     ) {
+        type TypeOfReturn = typeof this._newDef<
+            InferTypeRead<T> & typeof this.tsTypeRead,
+            InferTypeWrite<T> & typeof this.tsTypeWrite
+        >
         const objDef = this._definitions.find(d => d.name === 'object')
         if (objDef) {
             const realObjDef = typeof objDef === 'function' ? objDef() : objDef
@@ -465,10 +472,7 @@ export class Definition<
         // Object.assign(this.object, object)
         return this._newDef() as any as
             NextAutocompletionChoices<
-                ReturnType<typeof this._newDef<
-                    InferTypeRead<T> & typeof this.tsTypeRead,
-                    InferTypeWrite<T> & typeof this.tsTypeWrite
-                >>,
+                ReturnType<TypeOfReturn>,
                 'partial' | 'complete'
             >
     }
@@ -1336,7 +1340,7 @@ export const _ = new Definition().init()
 //    ║   ╚═╦═╝ ╠══╝ ╠═       ║   ╠═   ╚══╗   ║    ║  ║╚╗║ ║ ═╦
 //    ╩     ╩   ╩    ╚══╝     ╩   ╚══╝ ═══╝   ╩   ═╩═ ╩ ╚╩ ╚══╝
 
-// /!\ DONT DELETE /!\
+// / !\ DONT DELETE /!\
 
 // type Modelssss = {
 //     aa: {
