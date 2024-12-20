@@ -7,7 +7,7 @@ import { generateToken, isset, randomItemInArray, round2, random } from 'topkat-
 export const sharedDefinitions = {
     string: ({ acceptEmpty = false, hardCodedValue = undefined as string | undefined } = {}) => ({
         mainType: 'string',
-        errorMsg: defaultTypeError(hardCodedValue || 'string'),
+        errorMsg: ctx => ctx.value === '' && acceptEmpty === false ? 'Empty string not allowed' : defaultTypeError(hardCodedValue || 'string')(ctx),
         format: ctx => hardCodedValue ? hardCodedValue : (typeof ctx.value === 'number' ? ctx.value.toString() : typeof ctx.value === 'string' ? ctx.value?.trim() : ctx.value),
         validate: ctx => hardCodedValue ? ctx.value === hardCodedValue : typeof ctx.value === 'string' && (acceptEmpty || ctx.value.length),
         mongoType: 'string',
