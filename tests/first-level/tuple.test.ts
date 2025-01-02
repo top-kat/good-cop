@@ -23,6 +23,6 @@ describe(`Tuple`, () => {
 
     it('reformats in the format defined', async () => {
         await expect(tupleDef.formatAndValidate([1, 'shit']))
-            .rejects.toThrow(`Expected type number but got type NaN for value null`)
+            .rejects.toThrow(`Expected type number but got type string for value "shit"`)
     })
 })

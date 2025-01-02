@@ -31,7 +31,6 @@ describe(`Types Or Complex`, () => {
     ])
 
 
-
     it('1st type OK', async () => {
         expect(await typesOrDef.formatAndValidate({ a: 'a' })).toEqual({ a: 'a' })
     })

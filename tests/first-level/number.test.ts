@@ -35,16 +35,16 @@ describe('Number', () => {
 
     it('returns NaN when passed a string', async () =>
         await expect(numberDef.formatAndValidate('hello'))
-            .rejects.toThrow(`Expected type number but got type NaN for value null`)
+            .rejects.toThrow(`Expected type number but got type string for value "hello"`)
     )
 
     it('returns NaN when passed an array', async () =>
         await expect(numberDef.formatAndValidate(['test', 1]))
-            .rejects.toThrow(`Expected type number but got type NaN for value null`)
+            .rejects.toThrow(`Expected type number but got type array of string for value ["test",1]`)
     )
 
     it('returns NaN when passed an object', async () =>
         await expect(numberDef.formatAndValidate({ number: 6 }))
-            .rejects.toThrow(`Expected type number but got type NaN for value null`)
+            .rejects.toThrow(`Expected type number but got type object for value {"number":6}`)
     )
 })

@@ -64,7 +64,7 @@ describe(`Complex Object`, () => {
     const typesOrWrongType = { ...rightBody, subObj: { ...rightSubobj, typeOr: [null, 2] } }
 
     it('typesOrWrongType', async () => {
-        expect(async () => await objDef.formatAndValidate(typesOrWrongType)).rejects.toThrow(`Value ,2 should be one of the following types: [object Object], [object Object]`)
+        expect(async () => await objDef.formatAndValidate(typesOrWrongType)).rejects.toThrow(`Value [null,2] should be one of the following types: number, boolean`)
     })
 
 })

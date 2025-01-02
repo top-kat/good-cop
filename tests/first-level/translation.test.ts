@@ -21,14 +21,14 @@ describe(`Translation Object`, () => {
     it('throws an error if an isoCode is not present', async () => {
         await expect(transDef.formatAndValidate({ nonIsoCode: 'testman' }))
             .rejects.toThrowError(
-                'Expected type { [countryCodeIso]: translationString } but got {\n  "nonIsoCode": "testman"\n}'
+                'Expected type { [countryCodeIso]: translationString } but got {"nonIsoCode":"testman"}'
             )
     })
 
     it('throws an error if an isoCode is not VALID', async () => {
         await expect(transDef.formatAndValidate({ xx: 'testman' }))
             .rejects.toThrowError(
-                'Expected type { [countryCodeIso]: translationString } but got {\n  "xx": "testman"\n}'
+                'Expected type { [countryCodeIso]: translationString } but got {"xx":"testman"}'
             )
     })
 })

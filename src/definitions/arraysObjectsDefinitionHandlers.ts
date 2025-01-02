@@ -32,8 +32,14 @@ export function getArrObjDef(
 ) {
     return {
         ...(type === 'object' ? objDefPartials : arrDefPartials),
-        validate: async ctx => (type === 'object' ? isObject(ctx.value) : Array.isArray(ctx.value)) && await formatAndValidateRecursive(ctx, objOrArr, ctx.value, ctx.fieldAddr, config?.deleteForeignKeys),
-        format: async ctx => await formatAndValidateRecursive(ctx, objOrArr, ctx.value, ctx.fieldAddr, config?.deleteForeignKeys),
+        validate: async ctx => {
+            const maincheck = type === 'object' ? isObject(ctx.value) : Array.isArray(ctx.value)
+            return maincheck && await formatAndValidateRecursive(ctx, objOrArr, ctx.value, ctx.fieldAddr, config?.deleteForeignKeys, true)
+        },
+        format: async ctx => {
+            const maincheck = type === 'object' ? isObject(ctx.value) : Array.isArray(ctx.value)
+            return maincheck ? await formatAndValidateRecursive(ctx, objOrArr, ctx.value, ctx.fieldAddr, config?.deleteForeignKeys) : ctx.value
+        },
         mongoType: () => mongoTypeRecursive(objOrArr),
         tsTypeStr: () => tsTypeRecursive('tsTypeStr', objOrArr),
         tsTypeStrForWrite: () => tsTypeRecursive('tsTypeStrForWrite', objOrArr),
@@ -57,7 +63,7 @@ async function formatAndValidateRecursive(
         //==============
         async onArray([def]) {
             const output = [] as any[]
-            if (typeof value !== 'undefined') {
+            if (typeof value !== 'undefined' && value !== null) {
                 await validateDefinitionPartials([arrDefPartials], ctx, value, addr)
                 for (const [i2, arrItem] of Object.entries(value)) {
                     const result = await formatAndValidateRecursive(ctx, def, arrItem, ctx.fieldAddr + `[${i2}]`, deleteForeignKeys, isValidation)
