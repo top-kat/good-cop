@@ -76,6 +76,7 @@ import {
     round2 as round,
     randomItemInArray,
     random,
+    removeCircularJSONstringify
 } from 'topkat-utils'
 
 
@@ -836,7 +837,7 @@ export class Definition<
 
         return this._newDef({
             name: 'typesOr',
-            errorMsg: ctx => `Value ${ctx.value} should be one of the following types: ${types.join(', ')}`,
+            errorMsg: ctx => `Value ${removeCircularJSONstringify(ctx.value, 0)} should be one of the following types: ${types.map(t => t?.getTsTypeAsString().read).join(', ')?.replace(/\n/g, '')?.replace(/ +/g, ' ')}`,
             mongoType: 'mixed',
             async validate(ctx) {
                 const errors = [] as any[]
@@ -849,6 +850,17 @@ export class Definition<
                     }
                 }
                 return errors.length < types.length
+            },
+            async format(ctx) {
+                for (const def of types) {
+                    try {
+                        const result = await formatAndValidateDefinitionPartials(def._definitions, ctx, true, false, ctx.value, ctx.fieldAddr)
+                        return result
+                    } catch (err: any) {
+                        err.hasBeenLogged = true
+                    }
+                }
+                return ctx.value
             },
             tsTypeStr: () => types.map(t => t.getTsTypeAsString().read).join(' | '),
             tsTypeStrForWrite: () => types.map(t => t.getTsTypeAsString().write).join(' | '),

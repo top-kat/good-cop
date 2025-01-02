@@ -13,23 +13,23 @@ describe(`Any`, () => {
         expect(anyDef.getTsTypeAsString()).toEqual({ 'read': 'any', 'write': 'any' })
     })
 
-    it('accepts a string', async ()=>{
+    it('accepts a string', async () => {
         expect(await anyDef.formatAndValidate('string')).toEqual('string')
     })
 
-    it('accepts a number', async ()=>{
+    it('accepts a number', async () => {
         expect(await anyDef.formatAndValidate(42)).toEqual(42)
     })
 
-    it('accepts a boolean', async ()=>{
+    it('accepts a boolean', async () => {
         expect(await anyDef.formatAndValidate(true)).toEqual(true)
     })
 
-    it('accepts an array', async ()=>{
-        expect(await anyDef.formatAndValidate([1,2,3])).toEqual([1,2,3])
+    it('accepts an array', async () => {
+        expect(await anyDef.formatAndValidate([1, 2, 3])).toEqual([1, 2, 3])
     })
 
-    it('accepts an object', async ()=>{
-        expect(await anyDef.formatAndValidate({name:'testman', age:25})).toEqual({name:'testman', age:25})
+    it('accepts an object', async () => {
+        expect(await anyDef.formatAndValidate({ name: 'testman', age: 25 })).toEqual({ name: 'testman', age: 25 })
     })
 })

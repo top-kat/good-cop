@@ -68,3 +68,17 @@ describe(`Complex Object`, () => {
     })
 
 })
+
+
+
+
+describe(`Object with enum`, () => {
+
+    const typesOrDef = _.object({ a: _.enum(['a', 'b']) })
+
+
+    it(`Mixed type wrong`, async () => {
+        await expect(typesOrDef.formatAndValidate({ a: 'c' })).rejects.toThrow(`Value "c" does not match allowed values a,b`)
+    })
+
+})

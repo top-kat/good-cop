@@ -41,7 +41,10 @@ export const sharedDefinitions = {
         validate: ctx => typeof ctx.value === 'number' && !isNaN(ctx.value),
         mongoType: 'number',
         tsTypeStr: 'number',
-        format: ctx => parseFloat(ctx.value),
+        format: ctx => {
+            const parsedVal = parseFloat(ctx.value)
+            return isNaN(parsedVal) ? ctx.value : parsedVal
+        },
         swaggerType: { type: 'number', format: 'float' },
         exempleValue: () => round2(Math.random() * 10, 3),
     },
@@ -50,7 +53,10 @@ export const sharedDefinitions = {
         validate: ctx => typeof ctx.value === 'number' && !isNaN(ctx.value),
         mongoType: 'number',
         tsTypeStr: 'number',
-        format: ctx => Math.round(ctx.value * 100) / 100,
+        format: ctx => {
+            const parsedVal = Math.round(ctx.value * 100) / 100
+            return isNaN(parsedVal) ? ctx.value : parsedVal
+        },
         swaggerType: { type: 'number', format: 'float' },
         exempleValue: () => round2(Math.random() * 10),
     },

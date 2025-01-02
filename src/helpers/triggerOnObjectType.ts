@@ -54,13 +54,13 @@ export async function triggerOnObjectTypeAsync<T>(
             for (const [i, subItem] of Object.entries(obj)) output.push(await fn(subItem, i))
             return output
         }
-    } else if(typeof obj === 'object' && obj) {
+    } else if (typeof obj === 'object' && obj) {
         if ('onObject' in options && options.onObject) {
             return await options.onObject(obj)
         } else {
             const fn = 'onObjectItem' in options && options.onObjectItem ? options.onObjectItem : async item => await triggerOnObjectTypeAsync(item, optionBase)
             const newObj = {}
-            for (const [k, v] of Object.entries(obj)){
+            for (const [k, v] of Object.entries(obj)) {
                 // do not write undefined values
                 const newVal = await fn(v, k)
                 if (typeof newVal !== 'undefined') newObj[k] = newVal
@@ -93,7 +93,7 @@ export function triggerOnObjectType<T>(
             const fn = 'onArrayItem' in options && options.onArrayItem ? options.onArrayItem : item => triggerOnObjectType(item, optionBase)
             return obj.map((subItem, i) => fn(subItem, i))
         }
-    } else if(typeof obj === 'object' && obj) {
+    } else if (typeof obj === 'object' && obj) {
         if ('onObject' in options && options.onObject) {
             return options.onObject(obj)
         } else {
