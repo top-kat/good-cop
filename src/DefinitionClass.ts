@@ -198,7 +198,7 @@ export class Definition<
             mongoType: 'date',
             tsTypeStr: 'Date',
             swaggerType: { type: 'string', format: 'date' },
-            exempleValue: () => (new Date()).toString()
+            exempleValue: 'Fri Jan 03 2012 13:13:25 GMT+0100 (Central European Standard Time)'
         }) as any as
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef<
@@ -216,7 +216,7 @@ export class Definition<
             validate: ctx => isDateIntOrStringValid(ctx.value, false, 8),
             format: ctx => (typeof ctx.value === 'string' ? parseInt(ctx.value) : ctx.value),
             swaggerType: { type: 'integer' },
-            exempleValue: () => getDateAs(new Date(), 'dateInt8')
+            exempleValue: '20120101'
         }) as any as
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef< number >>,
@@ -232,7 +232,7 @@ export class Definition<
             validate: ctx => isDateIntOrStringValid(ctx.value, false, 12),
             format: ctx => (typeof ctx.value === 'string' ? parseInt(ctx.value) : ctx.value),
             swaggerType: { type: 'integer' },
-            exempleValue: () => getDateAs(new Date(), 'dateInt12'),
+            exempleValue: '201201012222',
         }) as any as
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef< number >>,
@@ -248,7 +248,7 @@ export class Definition<
             errorMsg: defaultTypeError('email', false),
             validate: ctx => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(ctx.value),
             swaggerType: { type: 'string', format: 'email' },
-            exempleValue: () => randomItemInArray(['groZeub', 'boGoss06', 'pineDuitre', 'bibonLePersifleur', 'uretreIrrité', 'clitobite', 'jeanDeLaFistule', 'bourseDistendue', 'biteDeLait', 'dickCheese', 'garageAbites']) + '@gmail.com',
+            exempleValue: 'uretreIrrité@gmail.com', // randomItemInArray(['groZeub', 'boGoss06', 'pineDuitre', 'bibonLePersifleur', 'uretreIrrité', 'clitobite', 'jeanDeLaFistule', 'bourseDistendue', 'biteDeLait', 'dickCheese', 'garageAbites']) + '@gmail.com',
         }) as any as
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef< string >>,
@@ -266,7 +266,7 @@ export class Definition<
             errorMsg: ctx => `Value "${ctx.value}" does not match allowed values ${possibleValues.join(',')}`,
             validate: ctx => possibleValues.includes(ctx.value),
             swaggerType: { type: 'string', enum: possibleValues.map(e => e.toString()) },
-            exempleValue: () => randomItemInArray(possibleValues),
+            exempleValue: possibleValues[0] // should be deterministic randomItemInArray(possibleValues),
         }) as any as
             NextAutocompletionChoices<
                 ReturnType<TypeOfReturn>,
@@ -280,7 +280,7 @@ export class Definition<
             name: 'float',
             format: ctx => parseFloat(ctx.value),
             swaggerType: { type: 'number', format: 'float' },
-            exempleValue: () => round(Math.random() * 10),
+            exempleValue: 2.12,
 
         }) as any as
             NextAutocompletionChoices<
@@ -572,7 +572,7 @@ export class Definition<
             name: 'number',
             format: ctx => parseInt(ctx.value),
             swaggerType: { type: 'integer' },
-            exempleValue: () => Math.round(Math.random() * 100),
+            exempleValue: 289 // Math.round(Math.random() * 100),
         }) as any as
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef<
@@ -591,7 +591,7 @@ export class Definition<
             format: ctx => ctx.value.toString(),
             validate: ctx => ctx.value?.length === 24,
             swaggerType: { type: 'string', format: 'uuid' },
-            exempleValue: () => generateToken(24, false, 'hexadecimal'),
+            exempleValue: '6776baf5c7c6e518aae88071', // () => generateToken(24, false, 'hexadecimal'),
         }) as NextAutocompletionChoices<ReturnType<typeof this._newDef<string>>, StringMethods>
     }
 
@@ -641,7 +641,7 @@ export class Definition<
                 && ctx.value.length <= maxLength,
             format: async ctx => await encrypt(ctx.value),
             swaggerType: { type: 'string', format: 'password' },
-            exempleValue: () => generateToken(random(8, 15), false, 'alphanumeric'),
+            exempleValue: 'P@ss123!', // () => generateToken(random(8, 15), false, 'alphanumeric'),
         }) as any as
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef< string >>,
@@ -691,7 +691,7 @@ export class Definition<
                 }
 
             },
-            exempleValue: () => generateToken(random(10, 30), false, 'alphanumeric'),
+            exempleValue: '6776baf5c7c6e518aae88072', // () => generateToken(random(10, 30), false, 'alphanumeric'),
 
         }) as any as
             NextAutocompletionChoices<
@@ -715,7 +715,7 @@ export class Definition<
             validate: ctx => regexp.test(ctx.value),
             priority: 55, // may be applied after string() for example
             swaggerType: { type: 'string' },
-            exempleValue: () => generateToken(random(8, 30), false, 'alphanumeric'),
+            exempleValue: 'rndmString' // () => generateToken(random(8, 30), false, 'alphanumeric'),
         }) as any as
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef<
@@ -773,7 +773,7 @@ export class Definition<
             errorMsg: defaultTypeError('url', false),
             validate: ctx => /^https?:\/\/.+/.test(ctx.value),
             swaggerType: { type: 'string', format: 'url' },
-            exempleValue: `https://${generateToken(random(5, 15), false)}.${randomItemInArray(['org', 'com', 'fr', 'co.uk', 'io', 'eu', 'app'])}`,
+            exempleValue: `https://noodle.com/`,
         }) as any as
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef< string >>,
@@ -790,7 +790,7 @@ export class Definition<
             validate: ctx => isDateIntOrStringValid(ctx.value, false, 4),
             format: ctx => (typeof ctx.value === 'string' ? parseInt(ctx.value) : ctx.value),
             swaggerType: { type: 'string' },
-            exempleValue: () => (new Date()).getFullYear(),
+            exempleValue: '2012', // () => (new Date()).getFullYear(),
         }) as any as
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef< number >>,
@@ -865,7 +865,7 @@ export class Definition<
             tsTypeStr: () => types.map(t => t.getTsTypeAsString().read).join(' | '),
             tsTypeStrForWrite: () => types.map(t => t.getTsTypeAsString().write).join(' | '),
             swaggerType: () => ({ oneOf: types.map(t => t.getSwaggerType()) }),
-            exempleValue: () => randomItemInArray(types).getExampleValue(),
+            exempleValue: () => types?.[0]?.getExampleValue(),
         }) as any as
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef<

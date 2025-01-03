@@ -202,7 +202,7 @@ function exempleValueRecursive(definitionChild: DefinitionObjChild) {
     return triggerOnObjectType(definitionChild, {
         errorExtraInfos: { msg: 'valueExampleNotDefinedForModel' },
         onArray(arr: Definition[]) {
-            return forI(random(1, 3), () => arr[0]?.getExampleValue?.())
+            return forI(2, () => arr[0]?.getExampleValue?.())
         },
         onObject(object: Record<string, Definition>) {
             const newObj = {}
