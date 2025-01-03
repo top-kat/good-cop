@@ -71,11 +71,6 @@ import {
     isDateIntOrStringValid,
     parseRegexp,
     recursiveGenericFunctionSync,
-    getDateAs,
-    generateToken,
-    round2 as round,
-    randomItemInArray,
-    random,
     removeCircularJSONstringify
 } from 'topkat-utils'
 

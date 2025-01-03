@@ -6,7 +6,7 @@ import { defaultTypeError } from '../helpers/definitionGenericHelpers'
 import { DefCtx, DefinitionPartial, DefinitionObjChild, SwaggerSchema } from '../definitionTypes'
 import { triggerOnObjectTypeAsync, triggerOnObjectType } from '../helpers/triggerOnObjectType'
 
-import { isObject, C, forI, random } from 'topkat-utils'
+import { isObject, C, forI } from 'topkat-utils'
 
 //----------------------------------------
 // VALIDATORS
