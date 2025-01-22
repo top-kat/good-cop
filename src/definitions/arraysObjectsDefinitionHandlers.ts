@@ -6,7 +6,7 @@ import { defaultTypeError } from '../helpers/definitionGenericHelpers'
 import { DefCtx, DefinitionPartial, DefinitionObjChild, SwaggerSchema } from '../definitionTypes'
 import { triggerOnObjectTypeAsync, triggerOnObjectType } from '../helpers/triggerOnObjectType'
 
-import { isObject, C, forI } from 'topkat-utils'
+import { isObject, forI } from 'topkat-utils'
 
 //----------------------------------------
 // VALIDATORS
@@ -32,14 +32,17 @@ export function getArrObjDef(
 ) {
     return {
         ...(type === 'object' ? objDefPartials : arrDefPartials),
-        // DELETED because it was validating everything twice as format also validate inputs
-        // validate: async ctx => {
-        //     const maincheck = type === 'object' ? isObject(ctx.value) : Array.isArray(ctx.value)
-        //     return maincheck && await formatAndValidateRecursive(ctx, objOrArr, ctx.value, ctx.fieldAddr, config?.deleteForeignKeys, true)
-        // },
+        validateBeforeFormatting: async ctx => {
+            const maincheck = type === 'object' ? isObject(ctx.value) : Array.isArray(ctx.value)
+            return maincheck && await formatAndValidateRecursive(ctx, objOrArr, ctx.value, ctx.fieldAddr, true, true, false, config?.deleteForeignKeys)
+        },
+        validate: async ctx => {
+            const maincheck = type === 'object' ? isObject(ctx.value) : Array.isArray(ctx.value)
+            return maincheck && await formatAndValidateRecursive(ctx, objOrArr, ctx.value, ctx.fieldAddr, true, false, true, config?.deleteForeignKeys)
+        },
         format: async ctx => {
             const maincheck = type === 'object' ? isObject(ctx.value) : Array.isArray(ctx.value)
-            return maincheck ? await formatAndValidateRecursive(ctx, objOrArr, ctx.value, ctx.fieldAddr, config?.deleteForeignKeys) : ctx.value
+            return maincheck ? await formatAndValidateRecursive(ctx, objOrArr, ctx.value, ctx.fieldAddr, false, true, true, config?.deleteForeignKeys) : ctx.value
         },
         mongoType: () => mongoTypeRecursive(objOrArr),
         tsTypeStr: () => tsTypeRecursive('tsTypeStr', objOrArr),
@@ -56,8 +59,10 @@ async function formatAndValidateRecursive(
     obj: DefinitionObjChild,
     value: any,
     addr: string,
+    disableFormatting,
+    disableValidation,
+    disableValidationBeforeFormatting,
     deleteForeignKeys = false,
-    isValidation = false,
 ) {
     return await triggerOnObjectTypeAsync(obj, {
         errorExtraInfos: { modelName: ctx.modelName, addressInParent: addr, deleteForeignKeys },
@@ -67,8 +72,8 @@ async function formatAndValidateRecursive(
             if (typeof value !== 'undefined' && value !== null) {
                 await validateDefinitionPartials([arrDefPartials], ctx, value, addr)
                 for (const [i2, arrItem] of Object.entries(value)) {
-                    const result = await formatAndValidateRecursive(ctx, def, arrItem, ctx.fieldAddr + `[${i2}]`, deleteForeignKeys, isValidation)
-                    if (!isValidation && typeof result !== 'undefined') output.push(result)
+                    const result = await formatAndValidateRecursive(ctx, def, arrItem, ctx.fieldAddr + `[${i2}]`, disableFormatting, disableValidation, disableValidationBeforeFormatting, deleteForeignKeys)
+                    if (!disableFormatting && typeof result !== 'undefined') output.push(result)
                 }
                 return output
             }
@@ -88,20 +93,20 @@ async function formatAndValidateRecursive(
 
                 for (const [k, v] of Object.entries(value)) {
                     const fieldAddr = ctx.fieldAddr ? ctx.fieldAddr + `.${k}` : k
-                    const formatted = await formatAndValidateRecursive(ctx, validator, v, fieldAddr, deleteForeignKeys, isValidation)
-                    if (!isValidation && typeof formatted !== 'undefined') output[k] = formatted
+                    const formatted = await formatAndValidateRecursive(ctx, validator, v, fieldAddr, disableFormatting, disableValidation, disableValidationBeforeFormatting, deleteForeignKeys)
+                    if (!disableFormatting && typeof formatted !== 'undefined') output[k] = formatted
                 }
             } else {
                 for (const [k, validator] of Object.entries(obj)) {
                     const fieldAddr = ctx.fieldAddr ? ctx.fieldAddr + `.${k}` : k
-                    const formatted = await formatAndValidateRecursive(ctx, validator, value[k], fieldAddr, deleteForeignKeys, isValidation)
-                    if (!isValidation && typeof formatted !== 'undefined') output[k] = formatted
+                    const formatted = await formatAndValidateRecursive(ctx, validator, value[k], fieldAddr, disableFormatting, disableValidation, disableValidationBeforeFormatting, deleteForeignKeys)
+                    if (!disableFormatting && typeof formatted !== 'undefined') output[k] = formatted
                 }
 
                 for (const k in value) {
                     // FOREIGN FIELDS HANDLER
                     if (typeof output[k] === 'undefined' && typeof value[k] !== 'undefined') {
-                        if (!isValidation && !deleteForeignKeys) output[k] = value[k]
+                        if (!disableFormatting && !deleteForeignKeys) output[k] = value[k]
                     }
                 }
             }
@@ -111,7 +116,7 @@ async function formatAndValidateRecursive(
         async onDefinition(definition) {
             const { method, dbName, dbId, fields, modelName, user, errorExtraInfos } = ctx
             // TODO CHECK validateDefinitionPartials to avoid spreading the object each time
-            return await definition.formatAndValidate(value, { method, addressInParent: addr, dbName, dbId, parentObj: fields, errorExtraInfos, modelName, user, disableFormatting: isValidation })
+            return await definition.formatAndValidate(value, { method, addressInParent: addr, dbName, dbId, parentObj: fields, errorExtraInfos, modelName, user, disableFormatting, disableValidation, disableValidationBeforeFormatting })
         },
     })
 }

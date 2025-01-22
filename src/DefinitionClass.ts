@@ -484,24 +484,25 @@ export class Definition<
         return this._newDef({
             name: 'tuple',
             mainType: 'array',
+            validateBeforeFormatting: async (ctx) => {
+                for (const [i, def] of Object.entries(array)) {
+                    await formatAndValidateDefinitionPartials(def._definitions, ctx, true, true, false, ctx.value?.[i], ctx.fieldAddr + `[${i}]`)
+                }
+                return true
+            },
             validate: async (ctx) => {
                 if (!Array.isArray(ctx.value)) return false
                 for (const [i, def] of Object.entries(array)) {
-                    await formatAndValidateDefinitionPartials(def._definitions, ctx, false, true, ctx.value?.[i], ctx.fieldAddr + `[${i}]`)
+                    await formatAndValidateDefinitionPartials(def._definitions, ctx, false, true, true, ctx.value?.[i], ctx.fieldAddr + `[${i}]`)
                 }
                 return true
             },
             format: async (ctx) => {
                 const output = [] as any[]
                 for (const [i, def] of Object.entries(array)) {
-                    output.push(await formatAndValidateDefinitionPartials(
-                        def._definitions,
-                        ctx,
-                        true,
-                        false,
-                        ctx.value[i],
-                        ctx.fieldAddr + `[${i}]`
-                    ))
+                    output.push(
+                        await formatAndValidateDefinitionPartials(def._definitions, ctx, true, false, true, ctx.value[i], ctx.fieldAddr + `[${i}]`)
+                    )
                 }
                 return output
             },
@@ -834,11 +835,23 @@ export class Definition<
             name: 'typesOr',
             errorMsg: ctx => `Value ${removeCircularJSONstringify(ctx.value, 0)} should be one of the following types: ${types.map(t => t?.getTsTypeAsString().read).join(', ')?.replace(/\n/g, '')?.replace(/ +/g, ' ')}`,
             mongoType: 'mixed',
+            async validateBeforeFormatting(ctx) {
+                const errors = [] as any[]
+                for (const def of types) {
+                    try {
+                        await formatAndValidateDefinitionPartials(def._definitions, ctx, true, true, false, ctx.value, ctx.fieldAddr)
+                    } catch (err: any) {
+                        err.hasBeenLogged = true
+                        errors.push(err)
+                    }
+                }
+                return errors.length < types.length
+            },
             async validate(ctx) {
                 const errors = [] as any[]
                 for (const def of types) {
                     try {
-                        await formatAndValidateDefinitionPartials(def._definitions, ctx, false, true, ctx.value, ctx.fieldAddr)
+                        await formatAndValidateDefinitionPartials(def._definitions, ctx, false, true, true, ctx.value, ctx.fieldAddr)
                     } catch (err: any) {
                         err.hasBeenLogged = true
                         errors.push(err)
@@ -849,7 +862,7 @@ export class Definition<
             async format(ctx) {
                 for (const def of types) {
                     try {
-                        const result = await formatAndValidateDefinitionPartials(def._definitions, ctx, true, false, ctx.value, ctx.fieldAddr)
+                        const result = await formatAndValidateDefinitionPartials(def._definitions, ctx, true, false, true, ctx.value, ctx.fieldAddr)
                         return result
                     } catch (err: any) {
                         err.hasBeenLogged = true

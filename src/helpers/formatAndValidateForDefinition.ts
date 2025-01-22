@@ -20,6 +20,7 @@ export async function formatAndValidate<This extends DefinitionBase>(
         disableValidation?: boolean
         /** may provide a little perf boost for validation on read operation (that where already formatted on write) */
         disableFormatting?: boolean
+        disableValidationBeforeFormatting?: boolean
         user?: User
     } = {}
 ) {
@@ -34,6 +35,7 @@ export async function formatAndValidate<This extends DefinitionBase>(
         errorExtraInfos = {},
         disableValidation,
         disableFormatting,
+        disableValidationBeforeFormatting,
         user,
     } = options
 
@@ -46,7 +48,7 @@ export async function formatAndValidate<This extends DefinitionBase>(
 
     definitions.forEach(def => def.errorExtraInfos && Object.assign(errorExtraInfos, def.errorExtraInfos))
 
-    return await formatAndValidateDefinitionPartials(definitions, defCtx, disableValidation, disableFormatting, value, addressInParent)
+    return await formatAndValidateDefinitionPartials(definitions, defCtx, disableValidation, disableFormatting, disableValidationBeforeFormatting, value, addressInParent)
 }
 
 export async function formatAndValidateDefinitionPartials(
@@ -54,6 +56,7 @@ export async function formatAndValidateDefinitionPartials(
     defCtxRaw: DefCtxWithoutValueAndAddr,
     disableValidation = false,
     disableFormatting = false,
+    disableValidationBeforeFormatting = false,
     value: any,
     fieldAddr: string
 ) {
@@ -81,7 +84,7 @@ export async function formatAndValidateDefinitionPartials(
         if ((value !== undefined || triggerOnUndefineds) && methods.includes(method)) {
             // VALIDATE before formatting
             if (
-                disableValidation !== true
+                disableValidationBeforeFormatting !== true
                 && def.validateBeforeFormatting
                 && !await def.validateBeforeFormatting(defCtx)
             ) await validationErr()
@@ -114,5 +117,5 @@ export async function validateDefinitionPartials(
     value: any,
     fieldAddr: string
 ) {
-    return await formatAndValidateDefinitionPartials(definitions, defCtx, false, true, value, fieldAddr)
+    return await formatAndValidateDefinitionPartials(definitions, defCtx, false, true, false, value, fieldAddr)
 }
