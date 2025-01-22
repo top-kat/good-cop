@@ -32,10 +32,11 @@ export function getArrObjDef(
 ) {
     return {
         ...(type === 'object' ? objDefPartials : arrDefPartials),
-        validate: async ctx => {
-            const maincheck = type === 'object' ? isObject(ctx.value) : Array.isArray(ctx.value)
-            return maincheck && await formatAndValidateRecursive(ctx, objOrArr, ctx.value, ctx.fieldAddr, config?.deleteForeignKeys, true)
-        },
+        // DELETED because it was validating everything twice as format also validate inputs
+        // validate: async ctx => {
+        //     const maincheck = type === 'object' ? isObject(ctx.value) : Array.isArray(ctx.value)
+        //     return maincheck && await formatAndValidateRecursive(ctx, objOrArr, ctx.value, ctx.fieldAddr, config?.deleteForeignKeys, true)
+        // },
         format: async ctx => {
             const maincheck = type === 'object' ? isObject(ctx.value) : Array.isArray(ctx.value)
             return maincheck ? await formatAndValidateRecursive(ctx, objOrArr, ctx.value, ctx.fieldAddr, config?.deleteForeignKeys) : ctx.value
