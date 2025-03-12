@@ -4,19 +4,20 @@
  *                                          *
 ---------------------------------------------
 
+/!\ Some code patterns used here may not seem to follow good practice at first /!\
 Here are some technical choices that have been taken and may not be intuitive:
 * Everything is in this file, since it's impossible to keep the exact `this` type
-when putting methods in another file (tryed a lot)
+when putting methods in another file (I tried a lot)
 * types and functional code are "separated" with returning `as NextAutocompletionChoices`
 this seems like the best way to choose what to display in the autocomplete suggestion
-while avoiding a class extension nighmare like in zod although is not as strict as zod
-Eg: when typing `_.object().`, `partial` and `complete` are suggested but `greaterThan`
-is not
+while avoiding a class extension nighmare like in zod (the downside is that autocompletion 
+is not as strict as in zod, but maintenability is way easier). Autocompletion example: 
+when typing `_.object().`, `partial` and `complete` are suggested but `greaterThan` is not
 
-/!\ TO CREATE A NEW METHOD /!\:
-=> FirstLevelTypes: the types displayed on first autocomplete suggestion
+/!\ TO ADD A NEW DEFINITION /!\:
+=> FirstLevelTypes: the types displayed on first autocomplete suggestion (base types like number, boolean...)
 => UniversalMethods: the types displayed everywhere else
-=> Then you may select additional methods to suggest via `NextAutocompletionChoices` in the definition
+=> You may then select additional methods to suggest via `NextAutocompletionChoices` in the definition
 
  */
 
@@ -56,6 +57,7 @@ import {
     StringMethods,
     TypedExclude,
     SwaggerSchema,
+    ProvidedModels,
 } from './definitionTypes'
 
 import {
@@ -94,7 +96,7 @@ export class Definition<
     modelTypes = '' as any as ModelsType
     modelTypes2 = '' as any as DefaultDbId
     constructor(
-        models?: any, // any is for removing type reference and avoid circular type definition
+        models?: ProvidedModels, // any is for removing type reference and avoid circular type definition
         definition?: MaybeArray<DefinitionPartial>,
         previousThis?: any
     ) {
@@ -1359,6 +1361,8 @@ export const _ = new Definition().init()
 //  ══╦══ ╦   ╦ ╔══╗ ╔══╗   ══╦══ ╔══╗ ╔═══ ══╦══ ═╦═ ╦╗ ╔ ╔══╗
 //    ║   ╚═╦═╝ ╠══╝ ╠═       ║   ╠═   ╚══╗   ║    ║  ║╚╗║ ║ ═╦
 //    ╩     ╩   ╩    ╚══╝     ╩   ╚══╝ ═══╝   ╩   ═╩═ ╩ ╚╩ ╚══╝
+//
+// Uncomment to test types are correctly inferred
 
 // / !\ DONT DELETE /!\
 
