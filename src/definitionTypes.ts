@@ -259,7 +259,7 @@ export type ModelReadWrite = { // duplicated in core, but may aboid lot of depen
 
 export type ProvidedModels = {
     [databaseName: string]: {
-        [modelName: string]: Definition
+        [modelName: string]: GenericDef
     }
 }
 
