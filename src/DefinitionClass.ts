@@ -96,12 +96,12 @@ export class Definition<
     modelTypes = '' as any as ModelsType
     modelTypes2 = '' as any as DefaultDbId
     constructor(
-        models?: ProvidedModels, // any is for removing type reference and avoid circular type definition
+        models?: () => ProvidedModels, // any is for removing type reference and avoid circular type definition
         definition?: MaybeArray<DefinitionPartial>,
         previousThis?: any
     ) {
         super(definition, previousThis)
-        this._models = models
+        if (models) this.getModels = models
     }
     /** Meant to be used only the first time you init the definition. Eg: new Definition(...).init() to provide correct autocomplete. This is because I couldn't return the good type from constructor. TODO */
     init() {
@@ -121,7 +121,7 @@ export class Definition<
             TypeTsRead extends 'def' ? typeof this['tsTypeRead'] : TypeTsRead,
             TypeTsWrite extends 'def' ? typeof this['tsTypeWrite'] : TypeTsWrite,
             IsRequired
-        >(this._models, newDef, this)
+        >(this.getModels, newDef, this)
     }
 
     /** This is not a definition. This will output the mongo schema final type for definition. Eg: _.mongoModel([], { field1: _.string(), ... }})._getMongoType() === { field1: { type: String } ... } */
@@ -330,8 +330,9 @@ export class Definition<
             dbName: dbId as string,
             model: modelName as string,
         }, () => {
-            const model = this._models?.[dbId as any]?.[modelName as any]
-            if (!model) throw new DescriptiveError(`Model not found. Please make you provided a model with the name "${modelName.toString()}" when initiating good-cop. Make sure you BUILDED the app correctly`, { dbId, modelName, modelNames: Object.keys(this._models || {}) })
+            const allModels = this.getModels?.()
+            const model = allModels?.[dbId as any]?.[modelName as any]
+            if (!model) throw new DescriptiveError(`Model not found. Please make you provided a model with the name "${modelName.toString()}" when initiating good-cop. Make sure you BUILDED the app correctly`, { dbId, modelName, modelNames: Object.keys(allModels || {}) })
             return { ...model._definitions[0], tsTypeStr: undefined }
         }]) as any as
             NextAutocompletionChoices<
@@ -673,10 +674,11 @@ export class Definition<
             swaggerType: () => {
                 let nbOccurence = 0
                 let swaggerType: SwaggerSchema = { type: {} }
-                for (const k in (this._models || {})) {
-                    if (this._models?.[k]?.[modelName as any]) {
+                const allModels = this.getModels?.()
+                for (const k in (allModels || {})) {
+                    if (allModels?.[k]?.[modelName as any]) {
                         nbOccurence++
-                        swaggerType = this._models[k][modelName as any].getSwaggerType()
+                        swaggerType = allModels[k][modelName as any].getSwaggerType()
                     }
                 }
 
