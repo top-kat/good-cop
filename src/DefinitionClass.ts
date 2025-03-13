@@ -90,6 +90,8 @@ export class Definition<
     OverridedTypeWrite = 'def',
     IsRequiredType extends boolean = false
 > extends DefinitionBase {
+    /** Just an alias for tsTypeRead */
+    tsType = '' as OverridedTypeRead
     tsTypeRead = '' as OverridedTypeRead
     tsTypeWrite = '' as OverridedTypeWrite
     isRequiredType = false as IsRequiredType
@@ -1377,11 +1379,11 @@ export const _ = new Definition().init()
 // const __ = new Definition<Modelssss, 'aa'>().init()
 
 // const hardCodedString = __.stringConstant('tt').tsTypeRead
-// const normalstring = __.string().tsTypeRead
-// const hardCodedString2 = __.stringConstant('coucou').tsTypeRead
+// const normalstring = __.string().tsType
+// const hardCodedString2 = __.stringConstant('coucou').tsType
 
-// const populated = __.ref('bb', true).tsTypeRead
-// const notPop = __.ref('bb').tsTypeRead
+// const populated = __.ref('bb', true).tsType
+// const notPop = __.ref('bb').tsType
 
 
 // /* BASE TYPES */

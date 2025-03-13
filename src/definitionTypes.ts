@@ -43,7 +43,7 @@ export type UniversalMethods = EnsureIsDefMethod<
     'promise' |
     'required' |
     'ts' |
-    'tsTypeRead' | 'tsTypeWrite' |
+    'tsTypeRead' | 'tsTypeWrite' | 'tsType' |
     'unique'
 >
 
