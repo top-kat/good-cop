@@ -61,7 +61,7 @@ export type DateMethods = 'isFuture'
 export type SecondLevelMethods = Exclude<keyof Definition, FirstLevelTypes | UniversalMethods>
 
 export type NextAutocompletionChoices<
-    Def extends Definition<any, any, any, any, any>,
+    Def extends Definition<any, any, any, any>,
     Keys extends SecondLevelMethods = never
 > = Pick<Def, Keys | UniversalMethods>
 
@@ -154,7 +154,7 @@ export type InferType<T extends DefinitionObjChild> = InferTypeRead<T> // alias
 //-----------------------------------------------------------------------
 //   /!\ ABOUT CODE DUPLICATION, this makes the code way more readable
 // *  in suggestions type is displayed as { myProp: string }
-// *  else it is printed as InferSubType<Definition<Modelssss, "aa", any,
+// *  else it is printed as InferSubType<Definition<Modelssss, any,
 // *   any>, { name: Definition<Modelssss, "aa", string, string>; }>
 // *  which is not readable at all
 //-----------------------------------------------------------------------

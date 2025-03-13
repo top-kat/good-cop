@@ -4525,6 +4525,13 @@ typed-array-length@^1.0.4:
     for-each "^0.3.3"
     is-typed-array "^1.1.9"
 
+typescript-generic-types@^1.0.2:
+  version "1.0.2"
+  resolved "https://registry.yarnpkg.com/typescript-generic-types/-/typescript-generic-types-1.0.2.tgz#ebf9c85677afc1ed5ebb52a3f1df8f99e6f981c3"
+  integrity sha512-ItIf7zzZGQVmtKgtvlXyJ/Zkre7U9LF8NcJQKywfYejk5eKYQ3uYumw9C1n5MQs3Vf+qOQMBTOqlC9u3kaNr3Q==
+  dependencies:
+    bump-simple "^1.0.24"
+
 typescript@^5.0.3:
   version "5.2.2"
   resolved "https://registry.yarnpkg.com/typescript/-/typescript-5.2.2.tgz#5ebb5e5a5b75f085f22bc3f8460fba308310fa78"

@@ -24,7 +24,7 @@ export const _ = new Definition<{
       Read: ExampleModel
     }
   },
-}, 'bangk'>(() => ({
+}>(() => ({
   bangk: {
     exampleModel: _2.mongoModel(['lastUpdateDate', 'lastUpdater'], complexObjectDef)
   },

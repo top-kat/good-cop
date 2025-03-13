@@ -36,7 +36,8 @@
   },
   "dependencies": {
     "@types/mongoose": "^5.11.97",
-    "topkat-utils": "^1.2.105"
+    "topkat-utils": "^1.2.105",
+    "typescript-generic-types": "^1.0.2"
   },
   "devDependencies": {
     "@types/jest": "^29.5.4",

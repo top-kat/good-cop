@@ -21,6 +21,7 @@ when typing `_.object().`, `partial` and `complete` are suggested but `greaterTh
 
  */
 
+import 'typescript-generic-types'
 import mongoose from 'mongoose' // only used for typings, may not be compatible if used in frontend
 import { CountryCodeIso, TranslationObj, countryIsoCodes, MaybeArray } from './core-types'
 import { DefinitionBase } from './DefinitionBaseClass'
@@ -85,7 +86,6 @@ const { required, number, round2, lt, gt, gte, lte, undefType, string, wrapperTy
 
 export class Definition<
     ModelsType extends DefinitionClassReceivedModelType = any,
-    DefaultDbId extends keyof ModelsType = any,
     OverridedTypeRead = 'def',
     OverridedTypeWrite = 'def',
     IsRequiredType extends boolean = false
@@ -96,7 +96,6 @@ export class Definition<
     tsTypeWrite = '' as OverridedTypeWrite
     isRequiredType = false as IsRequiredType
     modelTypes = '' as any as ModelsType
-    modelTypes2 = '' as any as DefaultDbId
     constructor(
         models?: () => ProvidedModels, // any is for removing type reference and avoid circular type definition
         definition?: MaybeArray<DefinitionPartial>,
@@ -119,7 +118,6 @@ export class Definition<
     >(newDef?: NewDef) {
         return new Definition<
             typeof this['modelTypes'],
-            typeof this['modelTypes2'],
             TypeTsRead extends 'def' ? typeof this['tsTypeRead'] : TypeTsRead,
             TypeTsWrite extends 'def' ? typeof this['tsTypeWrite'] : TypeTsWrite,
             IsRequired
@@ -660,7 +658,7 @@ export class Definition<
             >
     }
 
-    ref<AlwaysPopulated extends boolean>(modelName: keyof ModelsType[DefaultDbId], alwaysPopulated?: AlwaysPopulated) {
+    ref<AlwaysPopulated extends boolean>(modelName: keyof MergeMultipleObjects<ModelsType>, alwaysPopulated?: AlwaysPopulated) {
         return this._newDef({
             mainType: 'string',
             errorMsg: `Only ObjectIds are accepted on referenced fields`,
@@ -699,8 +697,8 @@ export class Definition<
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef<
                     AlwaysPopulated extends true
-                    ? ModelsType[DefaultDbId][typeof modelName]
-                    : ModelsType[DefaultDbId][typeof modelName] | string,
+                    ? MergeMultipleObjects<ModelsType>[typeof modelName]
+                    : MergeMultipleObjects<ModelsType>[typeof modelName] | string,
                     string
                 >>
             >
@@ -1376,7 +1374,7 @@ export const _ = new Definition().init()
 //     }
 // }
 
-// const __ = new Definition<Modelssss, 'aa'>().init()
+// const __ = new Definition<Modelssss>().init()
 
 // const hardCodedString = __.stringConstant('tt').tsTypeRead
 // const normalstring = __.string().tsType

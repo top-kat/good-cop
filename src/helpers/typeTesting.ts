@@ -12,7 +12,7 @@
 //     }
 // }
 
-// const __ = new Definition<Modelssss, 'aa'>().init()
+// const __ = new Definition<Modelssss>().init()
 
 // const hardCodedString = __.stringConstant('tt').tsTypeRead
 // const normalstring = __.string().tsTypeRead
