@@ -383,9 +383,12 @@ export class Definition<
             }
         })
 
-        return this._newDef(getArrObjDef(model || {}, 'object', {
-            deleteForeignKeys: false // actually tried that but led to a bug where $push and all mongo instruction where deleted
-        })) as any as
+        return this._newDef(
+            // this def cannot be a function because we need to keep track of def.objectCache for further manipulation
+            getArrObjDef(model || {}, 'object', {
+                deleteForeignKeys: false // actually tried that but led to a bug where $push and all mongo instruction where deleted
+            })
+        ) as any as
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef<
                     InferTypeRead<T> & MongoFieldsRead<U[number]>,

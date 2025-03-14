@@ -186,6 +186,7 @@ export type InferTypeRead<
 
 
 export type GenericDef = {
+    tsType: any,
     tsTypeRead: any,
     tsTypeWrite: any
     isRequiredType: boolean
