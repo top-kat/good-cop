@@ -661,7 +661,7 @@ export class Definition<
             >
     }
 
-    ref<AlwaysPopulated extends boolean>(modelName: keyof MergeMultipleObjects<ModelsType>, alwaysPopulated?: AlwaysPopulated) {
+    ref<AlwaysPopulated extends boolean, ModelName extends keyof MergeMultipleObjects<ModelsType>>(modelName: ModelName, alwaysPopulated?: AlwaysPopulated) {
         return this._newDef({
             mainType: 'string',
             errorMsg: `Only ObjectIds are accepted on referenced fields`,
@@ -700,8 +700,10 @@ export class Definition<
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef<
                     AlwaysPopulated extends true
-                    ? MergeMultipleObjects<ModelsType>[typeof modelName]
-                    : MergeMultipleObjects<ModelsType>[typeof modelName] | string,
+                    ? MergeMultipleObjects<ModelsType>[ModelName]
+                    : AlwaysPopulated extends false
+                    ? string
+                    : MergeMultipleObjects<ModelsType>[ModelName] | string,
                     string
                 >>
             >
