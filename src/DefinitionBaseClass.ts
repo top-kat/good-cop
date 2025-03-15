@@ -85,6 +85,7 @@ export class DefinitionBase {
 
         return output
     }
+    /** Get Swagger type object for this definition */
     getSwaggerType() {
         const swaggerDef = this.getDefinitionValue('swaggerType')
         const swDef = (typeof swaggerDef === 'function' ? swaggerDef() : swaggerDef)
@@ -95,30 +96,49 @@ export class DefinitionBase {
         const exempleVal = this.getDefinitionValue('exempleValue')
         return typeof exempleVal === 'function' ? exempleVal() : exempleVal
     }
-    _getDefinitionObjFlat(
+    /** This is a helper that will get any object definition to its flat version (with dot notation for subobjects) with a replacer callback.
+    * ```ts
+    * _getDefinitionObjFlat({
+    *       a: {
+    *         b: { c: Definition }, 
+    *         d: Definition
+    *       }, 
+    *       e: Definition
+    *     },
+    *     item => 'replaced'
+    * })
+    * ```
+    * * Will become:
+    * ```ts
+    * { 
+    *   'a.b.c': 'replaced',
+    *   'a.d': 'replaced',
+    *   e: 'replaced'
+    * }
+    * ```
+    */
+    _getDefinitionObjFlat<T = Definition>(
+        /** This option will remove 'myObj.myArr[0].item' => 'myObj.myArr.item' */
         removeArrayBracketsNotation = false,
-        onDefinition: (def: Definition) => any = (def: Definition) => def,
+        onDefinition: (def: Definition) => T = (def: Definition) => def as T,
         addr = '',
         objFlat = {}
-    ) {
+    ): Record<string, T> {
         const obj = this._getObjectCache()
-        return obj ? _getDefinitionObjFlat(removeArrayBracketsNotation, onDefinition, obj, addr, objFlat) : {}
+        if (obj) return _getDefinitionObjFlat(removeArrayBracketsNotation, onDefinition, obj, addr, objFlat)
+        else return {}
     }
 }
 
-
-
-
-
-function _getDefinitionObjFlat(
+function _getDefinitionObjFlat<T = Definition>(
     this: Definition | any,
     removeArrayBracketsNotation = false,
     /** Returning falsey value will write nothing in flat model */
-    onDefinition: (def: Definition) => any = (def: Definition) => def,
+    onDefinition: (def: Definition) => T = (def: Definition) => def as T,
     parentValue,
     addr = '',
     flatObj: Record<string, Definition> = {}
-): Record<string, Definition> {
+): Record<string, T> {
     // TODO avoid making a recursive function at each reads
     // if (!removeArrayBracketsNotation && this?._flatObjectCache) return this?._flatObjectCache
     // if (removeArrayBracketsNotation && this?._flatObjectCacheWithoutArraySyntax) return this?._flatObjectCacheWithoutArraySyntax
@@ -131,9 +151,9 @@ function _getDefinitionObjFlat(
         },
         onDefinition(definition) {
             const returnValue = onDefinition(definition)
-            if (returnValue) flatObj[addr] = returnValue
+            if (returnValue) flatObj[addr] = returnValue as any
             definition._getDefinitionObjFlat(removeArrayBracketsNotation, onDefinition, addr, flatObj)
         },
     })
-    return flatObj
+    return flatObj as Record<string, T>
 }
