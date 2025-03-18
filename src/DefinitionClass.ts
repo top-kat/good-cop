@@ -262,8 +262,8 @@ export class Definition<
             tsTypeStr: possibleValues.length ? isNumber ? `${possibleValues.join(` | `)}` : `'${possibleValues.join(`' | '`)}'` : 'never',
             errorMsg: ctx => `Value "${ctx.value}" does not match allowed values ${possibleValues.join(',')}`,
             validate: ctx => possibleValues.includes(ctx.value),
-            swaggerType: { type: 'string', enum: possibleValues.map(e => e.toString()) },
-            exempleValue: possibleValues[0].toString() // should be deterministic randomItemInArray(possibleValues),
+            swaggerType: { type: 'string', enum: possibleValues.map(e => e?.toString?.()) },
+            exempleValue: possibleValues?.[0]?.toString?.() // should be deterministic randomItemInArray(possibleValues),
         }) as any as
             NextAutocompletionChoices<
                 ReturnType<TypeOfReturn>,
@@ -520,7 +520,7 @@ export class Definition<
             tsTypeStrForWrite: () => `[${array.map(def => def.getTsTypeAsString().write).join(', ')}]`,
             objectCache: array as any,
             isParent: true,
-            swaggerType: { type: 'array', items: array.map(d => d.getSwaggerType()) },
+            swaggerType: (depth) => ({ type: 'array', items: array.map(d => d.getSwaggerType(depth)) }),
             exempleValue: () => `[${array.map(d => d.getExampleValue()).join(', ')}]`,
         }) as any as
             NextAutocompletionChoices<
@@ -535,7 +535,7 @@ export class Definition<
         object: T = {} as T,
         {
             /** Whenever to delete fields that are not included in the original model */
-            deleteForeignKeys = false
+            deleteForeignKeys = false,
         } = {}
     ) {
         return this._newDef({
@@ -678,14 +678,22 @@ export class Definition<
             tsTypeStr: (alwaysPopulated ? '' : `string | modelTypes.`) + `${capitalize1st(modelName as string)}`,
             tsTypeStrForWrite: `string`,
             ref: modelName as string,
-            swaggerType: () => {
+            swaggerType: (depth) => {
+
+                // TODO There is a bug where there is a infinite loop at some point but spent 1/2 day on it
+                // without finding the bug 🤯. This is a workaround.
+                if (depth && depth >= 3) {
+                    if (alwaysPopulated) return { type: 'object' }
+                    else return { type: 'string' }
+                }
+
                 let nbOccurence = 0
                 let swaggerType: SwaggerSchema = { type: {} }
                 const allModels = this.getModels?.()
                 for (const k in (allModels || {})) {
                     if (allModels?.[k]?.[modelName as any]) {
                         nbOccurence++
-                        swaggerType = allModels[k][modelName as any].getSwaggerType()
+                        swaggerType = allModels[k][modelName as any].getSwaggerType(depth)
                     }
                 }
 
@@ -885,8 +893,8 @@ export class Definition<
             },
             tsTypeStr: () => types.map(t => t.getTsTypeAsString().read).join(' | '),
             tsTypeStrForWrite: () => types.map(t => t.getTsTypeAsString().write).join(' | '),
-            swaggerType: () => ({ oneOf: types.map(t => t.getSwaggerType()) }),
-            exempleValue: () => types?.[0]?.getExampleValue(),
+            swaggerType: depth => ({ oneOf: types.map(t => t.getSwaggerType(depth)) }),
+            exempleValue: depth => types?.[0]?.getExampleValue(depth),
         }) as any as
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef<

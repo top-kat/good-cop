@@ -193,8 +193,8 @@ export type GenericDef = {
     tsTypeWrite: any
     isRequiredType: boolean
     getTsTypeAsString: () => ({ read: string, write: string })
-    getSwaggerType: () => SwaggerSchema
-    getExampleValue: () => any
+    getSwaggerType: (depth?: number) => SwaggerSchema
+    getExampleValue: (depth?: number) => any
     _definitions: DefinitionPartial[]
 }
 

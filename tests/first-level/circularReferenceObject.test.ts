@@ -3,8 +3,38 @@ process.env.GOOD_COP_MAX_RECURSION_DEPTH = '5'
 import { _ } from '../../src/DefinitionClass'
 
 
+
+
+
+
 describe('Circular object ref test', () => {
 
+
+  const circularEmulateDefinition = _.object({
+    dueDiligenceReferences: _.array(_.object({
+      date: _.date().default(() => new Date()),
+      reference: _.string().required(),
+      status: _.enum(['cool', 'bad']).default('cool'),
+    }))
+  })
+
+
+  it('Check arr of obj', async () => {
+    await expect(circularEmulateDefinition.getSwaggerType())
+      .toEqual({ 'type': 'object', 'properties': { 'dueDiligenceReferences': { 'type': 'array', 'items': { 'type': 'object', 'properties': { 'date': { 'type': 'string', 'format': 'date', 'example': '"Fri Jan 03 2012 13:13:25 GMT+0100 (Central European Standard Time)"' }, 'reference': { 'type': 'string', 'example': '"rndmString"' }, 'status': { 'type': 'string', 'enum': ['cool', 'bad'], 'example': 'cool' } }, 'example': '{\n  "date": "\\"Fri Jan 03 2012 13:13:25 GMT+0100 (Central European Standard Time)\\"",\n  "reference": "\\"rndmString\\"",\n  "status": "cool"\n}' }, 'example': '[{\n  "date": "\\"Fri Jan 03 2012 13:13:25 GMT+0100 (Central European Standard Time)\\"",\n  "reference": "\\"rndmString\\"",\n  "status": "cool"\n}, {\n  "date": "\\"Fri Jan 03 2012 13:13:25 GMT+0100 (Central European Standard Time)\\"",\n  "reference": "\\"rndmString\\"",\n  "status": "cool"\n}]' } }, 'example': '{\n  "dueDiligenceReferences": "[{\\n  \\"date\\": \\"\\\\\\"Fri Jan 03 2012 13:13:25 GMT+0100 (Central European Standard Time)\\\\\\"\\",\\n  \\"reference\\": \\"\\\\\\"rndmString\\\\\\"\\",\\n  \\"status\\": \\"cool\\"\\n}, {\\n  \\"date\\": \\"\\\\\\"Fri Jan 03 2012 13:13:25 GMT+0100 (Central European Standard Time)\\\\\\"\\",\\n  \\"reference\\": \\"\\\\\\"rndmString\\\\\\"\\",\\n  \\"status\\": \\"cool\\"\\n}]"\n}' })
+  })
+
+
+})
+
+
+
+
+
+
+describe('Circular object ref test', () => {
+
+  process.env.GOOD_COP_MAX_RECURSION_DEPTH = '5'
 
   const o = {
     o: _.object({
