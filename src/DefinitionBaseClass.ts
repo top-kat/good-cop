@@ -145,7 +145,6 @@ function _getDefinitionObjFlat<T = Definition>(
     flatObj: Record<string, Definition> = {},
     depth: number,
 ): Record<string, T> {
-    console.log(`depth`, depth)
     // TODO avoid making a recursive function at each reads
     // if (!removeArrayBracketsNotation && this?._flatObjectCache) return this?._flatObjectCache
     // if (removeArrayBracketsNotation && this?._flatObjectCacheWithoutArraySyntax) return this?._flatObjectCacheWithoutArraySyntax
