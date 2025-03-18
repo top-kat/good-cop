@@ -45,12 +45,12 @@ export function getArrObjDef(
             return maincheck ? await formatAndValidateRecursive(ctx, objOrArr, ctx.value, ctx.fieldAddr, false, true, true, config?.deleteForeignKeys) : ctx.value
         },
         mongoType: () => mongoTypeRecursive(objOrArr),
-        tsTypeStr: () => tsTypeRecursive('tsTypeStr', objOrArr),
-        tsTypeStrForWrite: () => tsTypeRecursive('tsTypeStrForWrite', objOrArr),
+        tsTypeStr: (_, depth = 0) => tsTypeRecursive('tsTypeStr', objOrArr, depth),
+        tsTypeStrForWrite: (_, depth = 0) => tsTypeRecursive('tsTypeStrForWrite', objOrArr, depth),
         objectCache: objOrArr,
         isParent: true,
-        swaggerType: () => swaggerTypeRecursive(objOrArr),
-        exempleValue: () => exempleValueRecursive(objOrArr),
+        swaggerType: depth => swaggerTypeRecursive(objOrArr, depth),
+        exempleValue: depth => exempleValueRecursive(objOrArr, depth),
     } satisfies DefinitionPartial
 }
 
@@ -64,6 +64,9 @@ async function formatAndValidateRecursive(
     disableValidationBeforeFormatting,
     deleteForeignKeys = false,
 ) {
+
+    ctx = { ...ctx, depth: ctx.depth + 1 } // we don't corrupt reference here
+
     return await triggerOnObjectTypeAsync(obj, {
         errorExtraInfos: { modelName: ctx.modelName, addressInParent: addr, deleteForeignKeys },
         //==============
@@ -114,21 +117,21 @@ async function formatAndValidateRecursive(
             return valueIsUndefined && Object.keys(output).length === 0 ? undefined : output
         },
         async onDefinition(definition) {
-            const { method, dbName, dbId, fields, modelName, user, errorExtraInfos } = ctx
+            const { method, dbName, dbId, fields, modelName, user, errorExtraInfos, depth } = ctx
             // TODO CHECK validateDefinitionPartials to avoid spreading the object each time
-            return await definition.formatAndValidate(value, { method, addressInParent: addr, dbName, dbId, parentObj: fields, errorExtraInfos, modelName, user, disableFormatting, disableValidation, disableValidationBeforeFormatting })
+            return await definition.formatAndValidate(value, { method, addressInParent: addr, dbName, dbId, parentObj: fields, errorExtraInfos, modelName, user, disableFormatting, disableValidation, disableValidationBeforeFormatting, depth })
         },
-    })
+    }, ctx.depth)
 }
 
 //----------------------------------------
 // MONGOTYPE
 //----------------------------------------
-function mongoTypeRecursive(obj: DefinitionObjChild) {
+function mongoTypeRecursive(obj: DefinitionObjChild, depth = 0) {
     return triggerOnObjectType(obj, {
         errorExtraInfos: { msg: 'mongoTypeNotDefinedForModel' },
         onDefinition: definition => definition._getMongoType(),
-    })
+    }, depth)
 }
 
 //----------------------------------------
@@ -136,11 +139,11 @@ function mongoTypeRecursive(obj: DefinitionObjChild) {
 //----------------------------------------
 const indentationUnit = '    '
 
-function tsTypeRecursive(fnName: 'tsTypeStr' | 'tsTypeStrForWrite', definitionChild: DefinitionObjChild) {
+function tsTypeRecursive(fnName: 'tsTypeStr' | 'tsTypeStrForWrite', definitionChild: DefinitionObjChild, depth: number) {
     return triggerOnObjectType(definitionChild, {
         errorExtraInfos: { msg: 'typescriptTypeNotDefinedForModel' }, // TODO add extra infos on field name
         onArray(arr): string {
-            return `Array<${arr.map(item => tsTypeRecursive(fnName, item)).join(', ')}>`
+            return `Array<${arr.map(item => tsTypeRecursive(fnName, item, depth)).join(', ')}>`
         },
         onObject(object: Record<string, Definition>): string {
             let newObjStr = ``
@@ -158,7 +161,7 @@ function tsTypeRecursive(fnName: 'tsTypeStr' | 'tsTypeStrForWrite', definitionCh
                         newKey = k + `?` // default optional if arr or obj
                     }
                 }
-                const tsValStr = tsTypeRecursive(fnName, v)
+                const tsValStr = tsTypeRecursive(fnName, v, depth + 1)
 
                 const optional = newKey.endsWith('?')
                 const parsedKey = newKey.replace(/\?$/, '')
@@ -167,10 +170,10 @@ function tsTypeRecursive(fnName: 'tsTypeStr' | 'tsTypeStrForWrite', definitionCh
             return newObjStr.length ? `{\n${newObjStr}}` : '{}'
         },
         onDefinition: (definition): string => {
-            const { read, write } = definition.getTsTypeAsString()
+            const { read, write } = definition.getTsTypeAsString(depth + 1)
             return fnName === 'tsTypeStr' ? read : write
         },
-    })
+    }, depth + 1)
 }
 
 
@@ -178,44 +181,44 @@ function tsTypeRecursive(fnName: 'tsTypeStr' | 'tsTypeStrForWrite', definitionCh
 //----------------------------------------
 // SWAGGER TYPE
 //----------------------------------------
-function swaggerTypeRecursive(definitionChild: DefinitionObjChild) {
+function swaggerTypeRecursive(definitionChild: DefinitionObjChild, depth = 0) {
     return triggerOnObjectType(definitionChild, {
         errorExtraInfos: { msg: 'swaggerTypeNotDefinedForModel' },
         onArray(arr: Definition[]) {
-            return { type: 'array', items: arr[0]?.getSwaggerType?.() || {} } satisfies SwaggerSchema
+            return { type: 'array', items: arr[0]?.getSwaggerType?.(depth) || {} } satisfies SwaggerSchema
         },
         onObject(object: Record<string, Definition>) {
             const newObjStr = { type: 'object', properties: {} } satisfies SwaggerSchema
             for (const [k, v] of Object.entries(object)) {
-                if ('getSwaggerType' in v) newObjStr.properties[k] = v?.getSwaggerType?.()
+                if ('getSwaggerType' in v) newObjStr.properties[k] = v?.getSwaggerType?.(depth + 1)
             }
             return newObjStr
         },
         onDefinition: definition => {
-            return definition?.getSwaggerType?.()
+            return definition?.getSwaggerType?.(depth + 1)
         },
-    })
+    }, depth)
 }
 
 
 //----------------------------------------
 // EXAMPLE VALUE RECURSIVE
 //----------------------------------------
-function exempleValueRecursive(definitionChild: DefinitionObjChild) {
+function exempleValueRecursive(definitionChild: DefinitionObjChild, depth = 0) {
     return triggerOnObjectType(definitionChild, {
         errorExtraInfos: { msg: 'valueExampleNotDefinedForModel' },
         onArray(arr: Definition[]) {
-            return forI(2, () => arr[0]?.getExampleValue?.())
+            return forI(2, () => arr[0]?.getExampleValue?.(depth))
         },
         onObject(object: Record<string, Definition>) {
             const newObj = {}
             for (const [k, v] of Object.entries(object)) {
-                if ('getExampleValue' in v) newObj[k] = v?.getExampleValue?.()
+                if ('getExampleValue' in v) newObj[k] = v?.getExampleValue?.(depth + 1)
             }
             return newObj
         },
         onDefinition: definition => {
-            return definition?.getExampleValue?.()
+            return definition?.getExampleValue?.(depth + 1)
         },
-    })
+    }, depth)
 }

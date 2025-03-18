@@ -91,17 +91,17 @@ export type DefinitionPartial = NoExtraProperties<{
     /** Error message displayed when the validate function return falsey value */
     errorMsg?: string | ((ctx: DefCtx) => MaybePromise<string>)
     /** Shall represent the ts type, the value should never be evaluated in code, only the inferred type, so we can type as `{ tsType: '' as any as anyTypeYouWant }` */
-    tsType?: ((previousType: string) => string) | any
+    tsType?: ((previousType: string, depth?: number) => string) | any
     /** string representation of the typescript type */
-    tsTypeStr?: ((previousType: string) => string) | string
+    tsTypeStr?: ((previousType: string, depth?: number) => string) | string
     /** string representation of the typescript type for write methods (update, create) */
-    tsTypeStrForWrite?: (() => string) | string
+    tsTypeStrForWrite?: ((previousType: string, depth?: number) => string) | string
     /** Use function to modify mongoType object directly, use object to pass a full or a string to define which type to use for mongo for that field */
     mongoType?: ((mongoTypeObj: Record<string, any>, definitions: (DefinitionPartial | DefinitionPartialFn)[]) => any) | MongoTypesString | Record<string, any>
     /** string representation of the Swagger type */
-    swaggerType?: SwaggerSchema | (() => SwaggerSchema)
+    swaggerType?: SwaggerSchema | ((depth?: number) => SwaggerSchema)
     /** string representation of an example value */
-    exempleValue?: any | (() => any)
+    exempleValue?: string | ((depth?: number) => string)
     /** should return a truthy value if valid and falsey if not. Actually validation is done AFTER formatting. If you want it differently please use validateBeforeFormatting() */
     validate?: (ctx: DefCtx) => (any | Promise<any>)
     /** This happen BEFORE formatting, unless classic validation should return a truthy value if valid and falsey if not */
@@ -145,6 +145,8 @@ export interface DefCtx {
     fieldAddr: string
     map?: ObjectWithNoFn
     user: User
+    /** Track depth in recursive functions */
+    depth: number
 }
 
 export type DefCtxWithoutValueAndAddr = Omit<DefCtx, 'value' | 'fieldAddr'>

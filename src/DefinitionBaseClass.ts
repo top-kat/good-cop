@@ -64,7 +64,7 @@ export class DefinitionBase {
     isType(type: MainTypes) {
         return findTypeInDefinitions(this._definitions, type)
     }
-    getTsTypeAsString() {
+    getTsTypeAsString(depth = 0) {
         const definitions = this._definitions
 
         const output = { read: 'any' } as { read: string, write: string }
@@ -76,7 +76,7 @@ export class DefinitionBase {
                 const typeInDef = def[readOrWriteType]
                 const readOrWrite = isRead ? 'read' : 'write'
                 if (typeInDef) {
-                    output[readOrWrite] = typeof typeInDef === 'function' ? typeInDef(isRead ? output.read : output.write || output.read) : typeInDef
+                    output[readOrWrite] = typeof typeInDef === 'function' ? typeInDef(isRead ? output.read : output.write || output.read, depth + 1) : typeInDef
                 }
             }
         }
@@ -86,15 +86,18 @@ export class DefinitionBase {
         return output
     }
     /** Get Swagger type object for this definition */
-    getSwaggerType() {
+    getSwaggerType(depth = 0) {
         const swaggerDef = this.getDefinitionValue('swaggerType')
-        const swDef = (typeof swaggerDef === 'function' ? swaggerDef() : swaggerDef)
+        const swDef = (typeof swaggerDef === 'function' ? swaggerDef(depth) : swaggerDef)
         if (swDef) swDef.example = this.getExampleValue()
         return swDef || { type: {} } as SwaggerSchema
     }
-    getExampleValue() {
+    getExampleValue(
+        /** Keep track of recursive executions internally for security and performance purposes */
+        depth = 0
+    ) {
         const exempleVal = this.getDefinitionValue('exempleValue')
-        return typeof exempleVal === 'function' ? exempleVal() : exempleVal
+        return typeof exempleVal === 'function' ? exempleVal(depth) : exempleVal
     }
     /** This is a helper that will get any object definition to its flat version (with dot notation for subobjects) with a replacer callback.
     * ```ts
@@ -122,10 +125,12 @@ export class DefinitionBase {
         removeArrayBracketsNotation = false,
         onDefinition: (def: Definition) => T = (def: Definition) => def as T,
         addr = '',
-        objFlat = {}
+        objFlat = {},
+        /** Keep track of recursive executions for security */
+        depth = 0
     ): Record<string, T> {
         const obj = this._getObjectCache()
-        if (obj) return _getDefinitionObjFlat(removeArrayBracketsNotation, onDefinition, obj, addr, objFlat)
+        if (obj) return _getDefinitionObjFlat(removeArrayBracketsNotation, onDefinition, obj, addr, objFlat, depth)
         else return {}
     }
 }
@@ -137,23 +142,24 @@ function _getDefinitionObjFlat<T = Definition>(
     onDefinition: (def: Definition) => T = (def: Definition) => def as T,
     parentValue,
     addr = '',
-    flatObj: Record<string, Definition> = {}
+    flatObj: Record<string, Definition> = {},
+    depth: number,
 ): Record<string, T> {
     // TODO avoid making a recursive function at each reads
     // if (!removeArrayBracketsNotation && this?._flatObjectCache) return this?._flatObjectCache
     // if (removeArrayBracketsNotation && this?._flatObjectCacheWithoutArraySyntax) return this?._flatObjectCacheWithoutArraySyntax
     triggerOnObjectType(parentValue, {
         onArrayItem(item, i) {
-            _getDefinitionObjFlat(removeArrayBracketsNotation, onDefinition, item, addr + (removeArrayBracketsNotation ? '' : `[${i}]`), flatObj)
+            _getDefinitionObjFlat(removeArrayBracketsNotation, onDefinition, item, addr + (removeArrayBracketsNotation ? '' : `[${i}]`), flatObj, depth)
         },
         onObjectItem(value, key) {
-            _getDefinitionObjFlat(removeArrayBracketsNotation, onDefinition, value, addr ? addr + `.${key}` : key, flatObj)
+            _getDefinitionObjFlat(removeArrayBracketsNotation, onDefinition, value, addr ? addr + `.${key}` : key, flatObj, depth + 1)
         },
         onDefinition(definition) {
             const returnValue = onDefinition(definition)
             if (returnValue) flatObj[addr] = returnValue as any
-            definition._getDefinitionObjFlat(removeArrayBracketsNotation, onDefinition, addr, flatObj)
+            definition._getDefinitionObjFlat(removeArrayBracketsNotation, onDefinition, addr, flatObj, depth + 1)
         },
-    })
+    }, depth + 1)
     return flatObj as Record<string, T>
 }

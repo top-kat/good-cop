@@ -1,7 +1,9 @@
 
 import { Definition } from '../DefinitionClass'
 
-import { DescriptiveError } from 'topkat-utils'
+import { C, DescriptiveError } from 'topkat-utils'
+
+const maxDepth = 9
 
 type TriggerOnObjectTypeOptions<T> = {
     required?: boolean
@@ -31,7 +33,8 @@ type TriggerOnObjectTypeOptionsAsync<T> = {
 
 export async function triggerOnObjectTypeAsync<T>(
     obj: T,
-    optionBase: TriggerOnObjectTypeOptionsAsync<T>
+    optionBase: TriggerOnObjectTypeOptionsAsync<T>,
+    depth: number,
 ) {
     const {
         onDefinition,
@@ -40,6 +43,12 @@ export async function triggerOnObjectTypeAsync<T>(
         returnValueIfUndefined,
         ...options
     } = optionBase
+
+    if (depth >= maxDepth) {
+        C.error(false, 'Too much recursion for format and validate. Cycle has been stopped')
+        return returnValueIfUndefined
+    }
+
     if (obj && typeof obj === 'object' && '_definitions' in obj) return await onDefinition(obj as any)
     else if (typeof obj === 'undefined') {
         if (required) {
@@ -49,7 +58,7 @@ export async function triggerOnObjectTypeAsync<T>(
         if ('onArray' in options) {
             return await options.onArray?.(obj)
         } else {
-            const fn = 'onArrayItem' in options && options.onArrayItem ? options.onArrayItem : async item => await triggerOnObjectTypeAsync(item, optionBase)
+            const fn = 'onArrayItem' in options && options.onArrayItem ? options.onArrayItem : async item => await triggerOnObjectTypeAsync(item, optionBase, depth)
             const output = [] as any[]
             for (const [i, subItem] of Object.entries(obj)) output.push(await fn(subItem, i))
             return output
@@ -58,7 +67,7 @@ export async function triggerOnObjectTypeAsync<T>(
         if ('onObject' in options && options.onObject) {
             return await options.onObject(obj)
         } else {
-            const fn = 'onObjectItem' in options && options.onObjectItem ? options.onObjectItem : async item => await triggerOnObjectTypeAsync(item, optionBase)
+            const fn = 'onObjectItem' in options && options.onObjectItem ? options.onObjectItem : async item => await triggerOnObjectTypeAsync(item, optionBase, depth)
             const newObj = {}
             for (const [k, v] of Object.entries(obj)) {
                 // do not write undefined values
@@ -72,7 +81,8 @@ export async function triggerOnObjectTypeAsync<T>(
 
 export function triggerOnObjectType<T>(
     obj: T,
-    optionBase: TriggerOnObjectTypeOptions<T>
+    optionBase: TriggerOnObjectTypeOptions<T>,
+    depth: number,
 ) {
     const {
         onDefinition,
@@ -81,6 +91,12 @@ export function triggerOnObjectType<T>(
         returnValueIfUndefined,
         ...options
     } = optionBase
+
+    if (depth >= maxDepth) {
+        C.error(false, 'Too much recursion for format and validate. Cycle has been stopped')
+        return returnValueIfUndefined
+    }
+
     if (obj && typeof obj === 'object' && '_definitions' in obj) return onDefinition(obj as any)
     else if (typeof obj === 'undefined') {
         if (required) {
@@ -90,14 +106,14 @@ export function triggerOnObjectType<T>(
         if ('onArray' in options && options.onArray) {
             return options.onArray(obj)
         } else {
-            const fn = 'onArrayItem' in options && options.onArrayItem ? options.onArrayItem : item => triggerOnObjectType(item, optionBase)
+            const fn = 'onArrayItem' in options && options.onArrayItem ? options.onArrayItem : item => triggerOnObjectType(item, optionBase, depth)
             return obj.map((subItem, i) => fn(subItem, i))
         }
     } else if (typeof obj === 'object' && obj) {
         if ('onObject' in options && options.onObject) {
             return options.onObject(obj)
         } else {
-            const fn = 'onObjectItem' in options && options.onObjectItem ? options.onObjectItem : item => triggerOnObjectType(item, optionBase)
+            const fn = 'onObjectItem' in options && options.onObjectItem ? options.onObjectItem : item => triggerOnObjectType(item, optionBase, depth)
             const newObj = {}
             for (const [k, v] of Object.entries(obj)) {
                 // do not write undefined values

@@ -195,7 +195,7 @@ export class Definition<
             mongoType: 'date',
             tsTypeStr: 'Date',
             swaggerType: { type: 'string', format: 'date' },
-            exempleValue: 'Fri Jan 03 2012 13:13:25 GMT+0100 (Central European Standard Time)'
+            exempleValue: '"Fri Jan 03 2012 13:13:25 GMT+0100 (Central European Standard Time)"'
         }) as any as
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef<
@@ -245,7 +245,7 @@ export class Definition<
             errorMsg: defaultTypeError('email', false),
             validate: ctx => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(ctx.value),
             swaggerType: { type: 'string', format: 'email' },
-            exempleValue: 'uretreIrrité@gmail.com', // randomItemInArray(['groZeub', 'boGoss06', 'pineDuitre', 'bibonLePersifleur', 'uretreIrrité', 'clitobite', 'jeanDeLaFistule', 'bourseDistendue', 'biteDeLait', 'dickCheese', 'garageAbites']) + '@gmail.com',
+            exempleValue: '"uretreIrrité@gmail.com"', // randomItemInArray(['groZeub', 'boGoss06', 'pineDuitre', 'bibonLePersifleur', 'uretreIrrité', 'clitobite', 'jeanDeLaFistule', 'bourseDistendue', 'biteDeLait', 'dickCheese', 'garageAbites']) + '@gmail.com',
         }) as any as
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef< string >>,
@@ -263,7 +263,7 @@ export class Definition<
             errorMsg: ctx => `Value "${ctx.value}" does not match allowed values ${possibleValues.join(',')}`,
             validate: ctx => possibleValues.includes(ctx.value),
             swaggerType: { type: 'string', enum: possibleValues.map(e => e.toString()) },
-            exempleValue: possibleValues[0] // should be deterministic randomItemInArray(possibleValues),
+            exempleValue: possibleValues[0]?.toString?.() // should be deterministic randomItemInArray(possibleValues),
         }) as any as
             NextAutocompletionChoices<
                 ReturnType<TypeOfReturn>,
@@ -277,7 +277,7 @@ export class Definition<
             name: 'float',
             format: ctx => parseFloat(ctx.value),
             swaggerType: { type: 'number', format: 'float' },
-            exempleValue: 2.12,
+            exempleValue: '2.12',
 
         }) as any as
             NextAutocompletionChoices<
@@ -296,7 +296,7 @@ export class Definition<
             validate: ctx => ctx.value === false,
             tsTypeStr: 'false',
             swaggerType: { type: 'boolean' },
-            exempleValue: false,
+            exempleValue: 'false',
         }) as any as
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef< boolean, boolean >>,
@@ -312,7 +312,7 @@ export class Definition<
             validate: ctx => ctx.value === true,
             tsTypeStr: 'true',
             swaggerType: { type: 'boolean' },
-            exempleValue: true,
+            exempleValue: 'true',
         }) as any as
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef< boolean, boolean >>,
@@ -452,7 +452,7 @@ export class Definition<
             mongoType: () => mongoose.Schema.Types.Mixed,
             nbNestedGenericObjects: typeof keyName === 'string' ? 1 : keyName.length,
             swaggerType: { type: 'object' },
-            exempleValue: { randomKey: true, nb: 4, info: 'this is untyped' },
+            exempleValue: '{ randomKey: true, nb: 4, info: "this is untyped" }',
         }) as any as
             NextAutocompletionChoices<
                 ReturnType<TypeOfReturn>,
@@ -521,7 +521,7 @@ export class Definition<
             objectCache: array as any,
             isParent: true,
             swaggerType: { type: 'array', items: array.map(d => d.getSwaggerType()) },
-            exempleValue: () => array.map(d => d.getExampleValue()),
+            exempleValue: () => `[${array.map(d => d.getExampleValue()).join(', ')}]`,
         }) as any as
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef<
@@ -578,7 +578,7 @@ export class Definition<
             name: 'number',
             format: ctx => parseInt(ctx.value),
             swaggerType: { type: 'integer' },
-            exempleValue: 289 // Math.round(Math.random() * 100),
+            exempleValue: '289' // Math.round(Math.random() * 100),
         }) as any as
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef<
@@ -597,7 +597,7 @@ export class Definition<
             format: ctx => ctx.value.toString(),
             validate: ctx => ctx.value?.length === 24,
             swaggerType: { type: 'string', format: 'uuid' },
-            exempleValue: '6776baf5c7c6e518aae88071', // () => generateToken(24, false, 'hexadecimal'),
+            exempleValue: '"6776baf5c7c6e518aae88071"', // () => generateToken(24, false, 'hexadecimal'),
         }) as NextAutocompletionChoices<ReturnType<typeof this._newDef<string>>, StringMethods>
     }
 
@@ -647,7 +647,7 @@ export class Definition<
                 && ctx.value.length <= maxLength,
             format: async ctx => await encrypt(ctx.value),
             swaggerType: { type: 'string', format: 'password' },
-            exempleValue: 'P@ss123!', // () => generateToken(random(8, 15), false, 'alphanumeric'),
+            exempleValue: '"P@ss123!"', // () => generateToken(random(8, 15), false, 'alphanumeric'),
         }) as any as
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef< string >>,
@@ -698,7 +698,7 @@ export class Definition<
                 }
 
             },
-            exempleValue: '6776baf5c7c6e518aae88072', // () => generateToken(random(10, 30), false, 'alphanumeric'),
+            exempleValue: '"6776baf5c7c6e518aae88072"', // () => generateToken(random(10, 30), false, 'alphanumeric'),
 
         }) as any as
             NextAutocompletionChoices<
@@ -724,7 +724,7 @@ export class Definition<
             validate: ctx => regexp.test(ctx.value),
             priority: 55, // may be applied after string() for example
             swaggerType: { type: 'string' },
-            exempleValue: 'rndmString' // () => generateToken(random(8, 30), false, 'alphanumeric'),
+            exempleValue: '"rndmString"' // () => generateToken(random(8, 30), false, 'alphanumeric'),
         }) as any as
             NextAutocompletionChoices<
                 ReturnType<typeof this._newDef<
@@ -767,7 +767,7 @@ export class Definition<
             mongoType: 'object',
             tsTypeStr: 'TranslationObj',
             swaggerType: { type: 'object' },
-            exempleValue: { fr: 'Bonjour', en: 'Hello' },
+            exempleValue: '{ fr: "Bonjour", en: "Hello" }',
         }) as any as NextAutocompletionChoices<
             ReturnType<typeof this._newDef<TranslationObj>>
         >

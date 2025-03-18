@@ -22,6 +22,8 @@ export async function formatAndValidate<This extends DefinitionBase>(
         disableFormatting?: boolean
         disableValidationBeforeFormatting?: boolean
         user?: User
+        /** Tracking depth in recursive validation functions */
+        depth?: number
     } = {}
 ) {
     const definitions = this._definitions.map(d => typeof d === 'function' ? d() : d)
@@ -37,12 +39,13 @@ export async function formatAndValidate<This extends DefinitionBase>(
         disableFormatting,
         disableValidationBeforeFormatting,
         user,
+        depth = 0,
     } = options
 
     errorExtraInfos.userId = user?._id
     errorExtraInfos.userRole = user?.role
 
-    const defCtx = { dbName, modelName, dbId, method, fields: parentObj || value, user } as DefCtxWithoutValueAndAddr
+    const defCtx = { dbName, modelName, dbId, method, fields: parentObj || value, user, depth } as DefCtxWithoutValueAndAddr
 
     defCtx.errorExtraInfos = errorExtraInfos
 

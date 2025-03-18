@@ -13,7 +13,7 @@ export const sharedDefinitions = {
         mongoType: 'string',
         tsTypeStr: hardCodedValue ? `'${hardCodedValue}'` : 'string',
         swaggerType: { type: 'string' },
-        exempleValue: 'rndmString', //() => generateToken(random(10, 30), false, 'alphanumeric'),
+        exempleValue: '"rndmString"', //() => generateToken(random(10, 30), false, 'alphanumeric'),
     }),
     boolean: {
         name: 'boolean',
@@ -24,7 +24,7 @@ export const sharedDefinitions = {
         mongoType: 'boolean',
         tsTypeStr: 'boolean',
         swaggerType: { type: 'boolean' },
-        exempleValue: true, // () => randomItemInArray([true, false]),
+        exempleValue: 'true', // () => randomItemInArray([true, false]),
     },
     required: {
         name: 'required',
@@ -46,7 +46,7 @@ export const sharedDefinitions = {
             return isNaN(parsedVal) ? ctx.value : parsedVal
         },
         swaggerType: { type: 'number', format: 'float' },
-        exempleValue: 12, //() => round2(Math.random() * 10, 3),
+        exempleValue: '12', //() => round2(Math.random() * 10, 3),
     },
     round2: {
         errorMsg: defaultTypeError('number'),
@@ -58,7 +58,7 @@ export const sharedDefinitions = {
             return isNaN(parsedVal) ? ctx.value : parsedVal
         },
         swaggerType: { type: 'number', format: 'float' },
-        exempleValue: 12.12, //() => round2(Math.random() * 10),
+        exempleValue: '12.12', //() => round2(Math.random() * 10),
     },
     lt: (maxVal: number) => ({
         errorMsg: ctx => `Value ${ctx.value} should be strictly below required maximum value ${maxVal}`,
@@ -82,7 +82,7 @@ export const sharedDefinitions = {
         format: ctx => typeof ctx.value === 'undefined' ? ctx.value : undefined,
         tsTypeStr: `undefined`,
         swaggerType: { type: {} },
-        exempleValue: undefined, // () => round2(Math.random() * 10),
+        exempleValue: 'undefined', // () => round2(Math.random() * 10),
     },
     wrapperTypeStr: (def, wrapperName) => ({
         tsTypeStr: () => {
