@@ -3,7 +3,10 @@ import { Definition } from '../DefinitionClass'
 
 import { C, DescriptiveError } from 'topkat-utils'
 
-const maxDepth = 9
+const isNode = typeof process !== 'undefined' && process.versions?.node
+
+const defaultMaxDepth = 20
+const maxDepth = Number(isNode ? process.env.GOOD_COP_MAX_RECURSION_DEPTH || defaultMaxDepth : defaultMaxDepth)
 
 type TriggerOnObjectTypeOptions<T> = {
     required?: boolean
@@ -32,6 +35,7 @@ type TriggerOnObjectTypeOptionsAsync<T> = {
 })
 
 export async function triggerOnObjectTypeAsync<T>(
+    processName: string,
     obj: T,
     optionBase: TriggerOnObjectTypeOptionsAsync<T>,
     depth: number,
@@ -44,8 +48,7 @@ export async function triggerOnObjectTypeAsync<T>(
         ...options
     } = optionBase
 
-    if (depth >= maxDepth) {
-        C.error(false, 'Too much recursion for format and validate. Cycle has been stopped')
+    if (hasReachMaxDepthAndErrMsg(processName, depth, returnValueIfUndefined)) {
         return returnValueIfUndefined
     }
 
@@ -58,7 +61,7 @@ export async function triggerOnObjectTypeAsync<T>(
         if ('onArray' in options) {
             return await options.onArray?.(obj)
         } else {
-            const fn = 'onArrayItem' in options && options.onArrayItem ? options.onArrayItem : async item => await triggerOnObjectTypeAsync(item, optionBase, depth)
+            const fn = 'onArrayItem' in options && options.onArrayItem ? options.onArrayItem : async item => await triggerOnObjectTypeAsync(processName, item, optionBase, depth)
             const output = [] as any[]
             for (const [i, subItem] of Object.entries(obj)) output.push(await fn(subItem, i))
             return output
@@ -67,7 +70,7 @@ export async function triggerOnObjectTypeAsync<T>(
         if ('onObject' in options && options.onObject) {
             return await options.onObject(obj)
         } else {
-            const fn = 'onObjectItem' in options && options.onObjectItem ? options.onObjectItem : async item => await triggerOnObjectTypeAsync(item, optionBase, depth)
+            const fn = 'onObjectItem' in options && options.onObjectItem ? options.onObjectItem : async item => await triggerOnObjectTypeAsync(processName, item, optionBase, depth)
             const newObj = {}
             for (const [k, v] of Object.entries(obj)) {
                 // do not write undefined values
@@ -80,6 +83,7 @@ export async function triggerOnObjectTypeAsync<T>(
 }
 
 export function triggerOnObjectType<T>(
+    processName: string,
     obj: T,
     optionBase: TriggerOnObjectTypeOptions<T>,
     depth: number,
@@ -92,8 +96,7 @@ export function triggerOnObjectType<T>(
         ...options
     } = optionBase
 
-    if (depth >= maxDepth) {
-        C.error(false, 'Too much recursion for format and validate. Cycle has been stopped')
+    if (hasReachMaxDepthAndErrMsg(processName, depth, returnValueIfUndefined)) {
         return returnValueIfUndefined
     }
 
@@ -106,14 +109,14 @@ export function triggerOnObjectType<T>(
         if ('onArray' in options && options.onArray) {
             return options.onArray(obj)
         } else {
-            const fn = 'onArrayItem' in options && options.onArrayItem ? options.onArrayItem : item => triggerOnObjectType(item, optionBase, depth)
+            const fn = 'onArrayItem' in options && options.onArrayItem ? options.onArrayItem : item => triggerOnObjectType(processName, item, optionBase, depth)
             return obj.map((subItem, i) => fn(subItem, i))
         }
     } else if (typeof obj === 'object' && obj) {
         if ('onObject' in options && options.onObject) {
             return options.onObject(obj)
         } else {
-            const fn = 'onObjectItem' in options && options.onObjectItem ? options.onObjectItem : item => triggerOnObjectType(item, optionBase, depth)
+            const fn = 'onObjectItem' in options && options.onObjectItem ? options.onObjectItem : item => triggerOnObjectType(processName, item, optionBase, depth)
             const newObj = {}
             for (const [k, v] of Object.entries(obj)) {
                 // do not write undefined values
@@ -124,3 +127,9 @@ export function triggerOnObjectType<T>(
         }
     }
 }
+
+function hasReachMaxDepthAndErrMsg(processName: string, depth: number, returnValueIfUndefined) {
+    const hass = depth >= maxDepth
+    if (hass) C.warning(false, `Too much recursion for ${processName} (depth ${depth}). Cycle has been stopped. Returned ${returnValueIfUndefined}:${typeof returnValueIfUndefined}.`)
+    return hass
+} 

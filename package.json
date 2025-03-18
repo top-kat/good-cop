@@ -28,10 +28,12 @@
     "clean": "rm -rf ./dist",
     "build": "tsc",
     "test": "jest --watchAll",
+    "test:filter": "jest --watchAll --testPathPattern=circular",
     "test:ci": "jest --ci --runInBand --maxConcurrency=1 --silent",
-    "bump:major": "yarn test:ci && npm run build && node node_modules/bump-simple/bump-simple.js --major",
-    "bump:minor": "yarn test:ci && npm run build && node node_modules/bump-simple/bump-simple.js --minor",
-    "bump:patch": "yarn test:ci && npm run build && node node_modules/bump-simple/bump-simple.js --patch"
+    "bump": "yarn test:ci && npm run build && npm bump --patch",
+    "bump:major": "yarn test:ci && npm run build && npm bump --patch",
+    "bump:minor": "yarn test:ci && npm run build && npm bump --minor",
+    "bump:patch": "yarn test:ci && npm run build && npm bump --patch --patch"
   },
   "dependencies": {
     "@types/mongoose": "^5.11.97",
@@ -42,8 +44,8 @@
     "@types/jest": "^29.5.4",
     "@typescript-eslint/eslint-plugin": "latest",
     "@typescript-eslint/parser": "latest",
-    "bump-simple": "^1.0.24",
     "eslint": "latest",
+    "bump-simple": "^1.0.29",
     "eslint-config-next": "latest",
     "eslint-config-turbo": "latest",
     "jest": "^29.7.0",

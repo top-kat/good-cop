@@ -76,7 +76,7 @@ export class DefinitionBase {
                 const typeInDef = def[readOrWriteType]
                 const readOrWrite = isRead ? 'read' : 'write'
                 if (typeInDef) {
-                    output[readOrWrite] = typeof typeInDef === 'function' ? typeInDef(isRead ? output.read : output.write || output.read, depth + 1) : typeInDef
+                    output[readOrWrite] = typeof typeInDef === 'function' ? typeInDef(isRead ? output.read : output.write || output.read, depth) : typeInDef
                 }
             }
         }
@@ -145,10 +145,11 @@ function _getDefinitionObjFlat<T = Definition>(
     flatObj: Record<string, Definition> = {},
     depth: number,
 ): Record<string, T> {
+    console.log(`depth`, depth)
     // TODO avoid making a recursive function at each reads
     // if (!removeArrayBracketsNotation && this?._flatObjectCache) return this?._flatObjectCache
     // if (removeArrayBracketsNotation && this?._flatObjectCacheWithoutArraySyntax) return this?._flatObjectCacheWithoutArraySyntax
-    triggerOnObjectType(parentValue, {
+    triggerOnObjectType('_getDefinitionObjFlat', parentValue, {
         onArrayItem(item, i) {
             _getDefinitionObjFlat(removeArrayBracketsNotation, onDefinition, item, addr + (removeArrayBracketsNotation ? '' : `[${i}]`), flatObj, depth)
         },

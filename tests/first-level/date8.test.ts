@@ -17,12 +17,12 @@ describe(`Date8`, () => {
     })
 
     it('validates and formats a valid 8-digit date string', async () => {
-        await expect(date8Def.formatAndValidate(validDateString)).resolves.toEqual(20231113);
-    });
+        await expect(date8Def.formatAndValidate(validDateString)).resolves.toEqual(20231113)
+    })
 
     it('validates and formats a valid 8-digit date number', async () => {
-        await expect(date8Def.formatAndValidate(20231113)).resolves.toEqual(20231113);
-    });
+        await expect(date8Def.formatAndValidate(20231113)).resolves.toEqual(20231113)
+    })
 
     //ATT: this is still resolving, need to fix logic for INVALID DATE
     // it('throws an error for an invalid 8-digit date string', async () => {

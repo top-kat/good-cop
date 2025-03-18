@@ -263,7 +263,7 @@ export class Definition<
             errorMsg: ctx => `Value "${ctx.value}" does not match allowed values ${possibleValues.join(',')}`,
             validate: ctx => possibleValues.includes(ctx.value),
             swaggerType: { type: 'string', enum: possibleValues.map(e => e.toString()) },
-            exempleValue: possibleValues[0]?.toString?.() // should be deterministic randomItemInArray(possibleValues),
+            exempleValue: possibleValues[0].toString() // should be deterministic randomItemInArray(possibleValues),
         }) as any as
             NextAutocompletionChoices<
                 ReturnType<TypeOfReturn>,
