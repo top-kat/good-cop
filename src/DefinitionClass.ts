@@ -138,6 +138,8 @@ export class Definition<
             else if (isObject(mongoType)) mongoTypeOutput = mongoType as Record<string, any> // Model
         }
 
+        delete (mongoTypeOutput as any)?._id
+
         return mongoTypeOutput
     }
 
